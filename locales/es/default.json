@@ -2,9 +2,36 @@
   "home": {
     "header": "Hola de Ahsan"
   },
+  
   "navbar": {
-    "login": "Iniciar sesión",
+    "createResume": "Crear currículum",
     "pricing": "Precios",
-    "resume": "Currículum"
-  }
+    "login": "Iniciar sesión",
+    "language": "Idioma"
+  },
+   "footer": {
+    "company": "SkyCube Worldwide",
+    "tagline": "Una plataforma moderna que ayuda a los profesionales a crear currículums de clase mundial sin complicaciones.",
+    "contactUs": "Contáctenos",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "quickLinks": "Enlaces rápidos",
+    "pricing": "Precios",
+    "createResume": "Crear currículum",
+    "privacy": "Política de privacidad",
+    "terms": "Términos y condiciones",
+    "rights": "Todos los derechos reservados."
+  },
+  "templates": {
+  "heading": "Ejemplos de Currículum",
+  "description": "Todos los ejemplos de currículum a continuación fueron escritos por nuestro equipo de redactores profesionales o contribuidos por profesionales exitosos que consiguieron empleo gracias a Kickresume.",
+  "searchPlaceholder": "Buscar plantillas de currículum...",
+  "template1": "Moderno Limpio",
+  "template2": "Corporativo Azul",
+  "template3": "Minimalista Pro",
+  "template4": "Clásico Elegante"
+}
+
+
 }

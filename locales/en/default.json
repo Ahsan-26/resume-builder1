@@ -2,9 +2,39 @@
   "home": {
     "header": "Hello From Ahsan"
   },
+  
   "navbar": {
-    "login": "Login",
+    "createResume": "Create Resume",
     "pricing": "Pricing",
-    "resume": "Resume"
-  }
+    "login": "Login",
+    "language": "Language"
+},
+
+  "footer": {
+    "company": "SkyCube Worldwide",
+    "tagline": "A modern platform helping professionals create world-class resumes with zero friction.",
+    "contactUs": "Contact Us",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "quickLinks": "Quick Links",
+    "pricing": "Pricing",
+    "createResume": "Create Resume",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "rights": "All rights reserved."
+  },
+  "templates": {
+  "heading": "Resume Samples",
+  "description": "All the resume examples below were either written by our team of professional resume writers or contributed by successful professionals who got hired with the help of Kickresume.",
+  "searchPlaceholder": "Search resume templates...",
+  "template1": "Modern Clean",
+  "template2": "Corporate Blue",
+  "template3": "Minimalist Pro",
+  "template4": "Elegant Classic"
+}
+
+
+
+
 }

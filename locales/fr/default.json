@@ -2,9 +2,36 @@
   "home": {
     "header": "Bonjour d'Ahsan"
   },
+  
   "navbar": {
-    "login": "Connexion",
+    "createResume": "Créer un CV",
     "pricing": "Tarification",
-    "resume": "Résumé"
-  }
+    "login": "Connexion",
+    "language": "Langue"
+  },
+  "footer": {
+    "company": "SkyCube Worldwide",
+    "tagline": "Une plateforme moderne aidant les professionnels à créer des CV de classe mondiale sans effort.",
+    "contactUs": "Contactez-nous",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "quickLinks": "Liens rapides",
+    "pricing": "Tarification",
+    "createResume": "Créer un CV",
+    "privacy": "Politique de confidentialité",
+    "terms": "Termes et conditions",
+    "rights": "Tous droits réservés."
+  },
+  "templates": {
+  "heading": "Exemples de CV",
+  "description": "Tous les exemples de CV ci-dessous ont été rédigés par notre équipe de rédacteurs professionnels ou contribué par des professionnels ayant trouvé un emploi grâce à Kickresume.",
+  "searchPlaceholder": "Rechercher des modèles de CV...",
+  "template1": "Moderne Épuré",
+  "template2": "Corporate Bleu",
+  "template3": "Minimaliste Pro",
+  "template4": "Classique Élégant"
 }
+
+}
+
