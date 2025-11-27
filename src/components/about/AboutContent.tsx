@@ -3,10 +3,10 @@ export default function AboutContent() {
     <div className="relative py-16 px-6 lg:px-20 bg-gradient-to-r from-[#f3f4fd] to-[#ffffff] overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
         
-        {/* Mission */}
+       
         <div className="flex flex-col items-start text-left">
           <div className="mb-4 w-12 h-12 flex items-center justify-center bg-gradient-to-br from-[var(--color-brand-primary)] to-[var(--color-brand-gradient)] text-white rounded-full shadow-lg">
-            {/* You can replace with SVG icon */}
+          
             <span className="font-bold text-lg">M</span>
           </div>
           <h3 className="text-2xl md:text-3xl font-extrabold text-[var(--color-brand-primary)] mb-3">
@@ -17,7 +17,7 @@ export default function AboutContent() {
           </p>
         </div>
 
-        {/* Vision */}
+      
         <div className="flex flex-col items-start text-left relative z-10">
           <div className="mb-4 w-12 h-12 flex items-center justify-center bg-gradient-to-br from-[var(--color-brand-primary)] to-[var(--color-brand-gradient)] text-white rounded-full shadow-lg">
             <span className="font-bold text-lg">V</span>
@@ -30,7 +30,7 @@ export default function AboutContent() {
           </p>
         </div>
 
-        {/* Values */}
+      
         <div className="flex flex-col items-start text-left">
           <div className="mb-4 w-12 h-12 flex items-center justify-center bg-gradient-to-br from-[var(--color-brand-primary)] to-[var(--color-brand-gradient)] text-white rounded-full shadow-lg">
             <span className="font-bold text-lg">V</span>
