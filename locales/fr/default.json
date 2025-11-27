@@ -1,0 +1,10 @@
+{
+  "home": {
+    "header": "Bonjour d'Ahsan"
+  },
+  "navbar": {
+    "login": "Connexion",
+    "pricing": "Tarification",
+    "resume": "Résumé"
+  }
+}

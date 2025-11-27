@@ -1,0 +1,10 @@
+{
+  "home": {
+    "header": "Hello From Ahsan"
+  },
+  "navbar": {
+    "login": "Login",
+    "pricing": "Pricing",
+    "resume": "Resume"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "home": {
+    "header": "Hola de Ahsan"
+  },
+  "navbar": {
+    "login": "Iniciar sesión",
+    "pricing": "Precios",
+    "resume": "Currículum"
+  }
+}
