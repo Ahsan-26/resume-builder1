@@ -8,15 +8,17 @@ import AiWriterSection from "@/components/home/AiWriterSection";
 import TemplateShowcase from "@/components/templates/TemplateShowcase";
 import FeatureCardsSection from "@/components/home/FeatureCardsSection";
 import CareerToolboxSection from "@/components/home/CareerToolboxSection";
+import FinalCtaSection from "@/components/home/FinalCtaSection";
 export default function Home() {
   return (
-    <div className="container mx-auto px-6 py-12">
-      <HeroSection imageSrc="/heroImage.png" />
+    <div className="container mx-auto px-6 pb-12">
+      <HeroSection imageSrc="/heroImage.jpg" />
       <AiWriterSection />
       <TemplateShowcase />
       <FeatureCardsSection />
       <CareerToolboxSection />
       <FaqSection />
+      <FinalCtaSection />
     </div>
   );
 }

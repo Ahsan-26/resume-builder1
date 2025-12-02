@@ -33,25 +33,25 @@ const NavbarDesktop: React.FC = () => {
 
   // Dropdown items
   const featuresItems = [
-    { icon: "📄", titleKey: "navbar.resumeBuilder", descKey: "navbar.resumeBuilderDesc", href: "/resume-builder" },
-    { icon: "✉️", titleKey: "navbar.coverLetterBuilder", descKey: "navbar.coverLetterBuilderDesc", href: "/cover-letter-builder" },
-    { icon: "✅", titleKey: "navbar.resumeChecker", descKey: "navbar.resumeCheckerDesc", href: "/resume-checker" },
-    { icon: "📝", titleKey: "navbar.clChecker", descKey: "navbar.clCheckerDesc", href: "/cover-letter-checker" }, // New
-    { icon: "✍️", titleKey: "navbar.aiResumeWriter", descKey: "navbar.aiResumeWriterDesc", href: "/ai-resume-writer" },
+    { icon: "resumeBuilder", titleKey: "navbar.resumeBuilder", descKey: "navbar.resumeBuilderDesc", href: "/resume-builder" },
+    { icon: "coverLetter", titleKey: "navbar.coverLetterBuilder", descKey: "navbar.coverLetterBuilderDesc", href: "/cover-letter-builder" },
+    { icon: "checker", titleKey: "navbar.resumeChecker", descKey: "navbar.resumeCheckerDesc", href: "/resume-checker" },
+    { icon: "checker", titleKey: "navbar.clChecker", descKey: "navbar.clCheckerDesc", href: "/cover-letter-checker" },
+    { icon: "aiWriter", titleKey: "navbar.aiResumeWriter", descKey: "navbar.aiResumeWriterDesc", href: "/ai-resume-writer" },
   ];
 
   const resumeItems = [
-    { icon: "📄", titleKey: "navbar.resumeBuilder", descKey: "navbar.resumeBuilderDesc", href: "/resume-builder" },
-    { icon: "✅", titleKey: "navbar.resumeChecker", descKey: "navbar.resumeCheckerDesc", href: "/resume-checker" },
-    { icon: "✍️", titleKey: "navbar.aiResumeWriter", descKey: "navbar.aiResumeWriterDesc", href: "/ai-resume-writer" },
-    { icon: "📝", titleKey: "navbar.resumeExamples", descKey: "navbar.resumeExamplesDesc", href: "/resume-examples" },
+    { icon: "resumeBuilder", titleKey: "navbar.resumeBuilder", descKey: "navbar.resumeBuilderDesc", href: "/resume-builder" },
+    { icon: "checker", titleKey: "navbar.resumeChecker", descKey: "navbar.resumeCheckerDesc", href: "/resume-checker" },
+    { icon: "aiWriter", titleKey: "navbar.aiResumeWriter", descKey: "navbar.aiResumeWriterDesc", href: "/ai-resume-writer" },
+    { icon: "examples", titleKey: "navbar.resumeExamples", descKey: "navbar.resumeExamplesDesc", href: "/resume-examples" },
   ];
 
   const coverItems = [
-    { icon: "✉️", titleKey: "navbar.coverLetterBuilder", descKey: "navbar.coverLetterBuilderDesc", href: "/cover-letter-builder" },
-    { icon: "✍️", titleKey: "navbar.aiCoverLetterWriter", descKey: "navbar.aiCoverLetterWriterDesc", href: "/ai-cover-letter-writer" },
-    { icon: "📑", titleKey: "navbar.coverTemplates", descKey: "navbar.coverTemplatesDesc", href: "/cover-letter-templates" },
-    { icon: "📝", titleKey: "navbar.coverExamples", descKey: "navbar.coverExamplesDesc", href: "/cover-letter-examples" },
+    { icon: "coverLetter", titleKey: "navbar.coverLetterBuilder", descKey: "navbar.coverLetterBuilderDesc", href: "/cover-letter-builder" },
+    { icon: "aiWriter", titleKey: "navbar.aiCoverLetterWriter", descKey: "navbar.aiCoverLetterWriterDesc", href: "/ai-cover-letter-writer" },
+    { icon: "templates", titleKey: "navbar.coverTemplates", descKey: "navbar.coverTemplatesDesc", href: "/cover-letter-templates" },
+    { icon: "examples", titleKey: "navbar.coverExamples", descKey: "navbar.coverExamplesDesc", href: "/cover-letter-examples" },
   ];
 
   return (
