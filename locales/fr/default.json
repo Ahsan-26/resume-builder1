@@ -1,37 +1,128 @@
 {
   "home": {
-    "header": "Bonjour d'Ahsan"
+    "header": "Bonjour de la part d'Ahsan"
   },
-  
   "navbar": {
-    "createResume": "Créer un CV",
-    "pricing": "Tarification",
+    "features": "Fonctionnalités",
+    "resume": "CV",
+    "coverLetter": "Lettre de Motivation",
+    "resumeBuilder": "Créateur de CV",
+    "resumeBuilderDesc": "Créez votre meilleur CV et obtenez un emploi.",
+    "coverLetterBuilder": "Créateur de Lettre de Motivation",
+    "coverLetterBuilderDesc": "Ajoutez une lettre assortie à votre CV.",
+    "resumeChecker": "Vérificateur de CV",
+    "resumeCheckerDesc": "Obtenez des retours instantanés sur votre CV.",
+    "clChecker": "Vérificateur de Lettre",
+    "clCheckerDesc": "Obtenez un retour instantané sur votre lettre.",
+    "aiResume": "Rédacteur de CV IA",
+    "aiResumeDesc": "Laissez l’IA rédiger votre CV.",
+    "aiResumeWriter": "Rédacteur de CV IA",
+    "aiResumeWriterDesc": "Laissez l’IA rédiger votre CV.",
+    "aiCover": "Rédacteur de Lettre IA",
+    "aiCoverDesc": "Généré avec GPT-4.1 pour votre lettre.",
+    "aiCoverLetterWriter": "Rédacteur de Lettre IA",
+    "aiCoverLetterWriterDesc": "Généré avec GPT-4.1 pour votre lettre.",
+    "resumeTemplates": "Modèles de CV",
+    "resumeTemplatesDesc": "Modèles conçus par des professionnels.",
+    "resumeExamples": "Exemples de CV",
+    "resumeExamplesDesc": "Voir des exemples de CV réussis.",
+    "coverTemplates": "Modèles de Lettre de Motivation",
+    "coverTemplatesDesc": "Modèles de lettres de motivation professionnels.",
+    "coverExamples": "Exemples de Lettre de Motivation",
+    "coverExamplesDesc": "Voir des exemples de lettres de motivation réussies.",
     "login": "Connexion",
-    "language": "Langue"
+    "createResume": "Créer Mon CV",
+    "pricing": "Tarifs",
+    "atsChecker": "Vérificateur ATS",
+    "seeTemplates": "Voir tous les modèles"
   },
   "footer": {
     "company": "SkyCube Worldwide",
-    "tagline": "Une plateforme moderne aidant les professionnels à créer des CV de classe mondiale sans effort.",
+    "tagline": "Une plateforme moderne aidant les professionnels à créer des CV de classe mondiale sans friction.",
     "contactUs": "Contactez-nous",
     "email": "E-mail",
     "phone": "Téléphone",
     "address": "Adresse",
-    "quickLinks": "Liens rapides",
-    "pricing": "Tarification",
+    "quickLinks": "Liens Rapides",
+    "pricing": "Tarifs",
     "createResume": "Créer un CV",
-    "privacy": "Politique de confidentialité",
-    "terms": "Termes et conditions",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Termes et Conditions",
     "rights": "Tous droits réservés."
   },
+  "hero": {
+    "title": "Créez Votre CV Professionnel",
+    "description": "Sky Resume vous aide à créer un CV qui se démarque auprès des recruteurs et vous fait remarquer.",
+    "extraText": "Choisissez parmi des modèles conçus par des experts et personnalisez-les à votre style. Faites bonne impression dès le premier regard avec un CV qui ouvre des portes.",
+    "createResume": "Créer Mon CV",
+    "seeExamples": "Voir les Exemples",
+    "imageAlt": "Exemple de Modèle de CV"
+  },
   "templates": {
-  "heading": "Exemples de CV",
-  "description": "Tous les exemples de CV ci-dessous ont été rédigés par notre équipe de rédacteurs professionnels ou contribué par des professionnels ayant trouvé un emploi grâce à Kickresume.",
-  "searchPlaceholder": "Rechercher des modèles de CV...",
-  "template1": "Moderne Épuré",
-  "template2": "Corporate Bleu",
-  "template3": "Minimaliste Pro",
-  "template4": "Classique Élégant"
+    "heading": "Exemples de CV",
+    "description": "Tous les exemples de CV ci-dessous ont été rédigés par notre équipe de rédacteurs professionnels ou fournis par des professionnels qui ont été embauchés grâce à Sky Resume.",
+    "searchPlaceholder": "Rechercher des modèles de CV...",
+    "template1": "Moderne et Clair",
+    "template2": "Bleu Corporate",
+    "template3": "Minimaliste Pro",
+    "template4": "Classique Élégant"
+  },
+  "aiSection": {
+    "subheading": "Créateur de CV IA",
+    "heading": "Laissez l'intelligence artificielle rédiger votre CV.",
+    "body": "Vous avez du mal à trouver les bons mots pour votre CV ? Notre créateur de CV IA peut les trouver en un rien de temps ! Il est propulsé par GPT-4.1 d'OpenAI, le modèle de langage le plus puissant au monde, et peut produire automatiquement un texte indiscernable des rédacteurs humains. Dites adieu au syndrome de la page blanche. Générez le premier brouillon de votre CV en quelques secondes.",
+    "jobTitleLabel": "Titre du poste",
+    "jobTitleValue": "Responsable Marketing",
+    "descriptionLabel": "Description",
+    "descriptionValues": [
+      "Mise en œuvre de campagnes marketing ayant augmenté la notoriété du produit de 25%...",
+      "Direction d'une équipe de 5 designers pour créer des identités de marque primées...",
+      "Optimisation de la logistique de la chaîne d'approvisionnement, réduisant les coûts de 15% par an...",
+      "Développement d'une application web full-stack servant plus de 10k utilisateurs quotidiens..."
+    ],
+    "aiWriterBtn": "Rédacteur IA",
+    "feature1": "Propulsé par GPT-4.1",
+    "feature2": "Généré en quelques secondes",
+    "feature3": "Produit un texte humain",
+    "feature4": "Personne ne le saura"
+  },
+  "templateShowcase": {
+    "heading": "Choisissez un modèle de CV.",
+    "subHeading": "Faites-le à votre image.",
+    "description": "Faites-vous embaucher rapidement avec un CV et une lettre de motivation qui se démarquent visuellement. Parcourez plus de 40 modèles de CV compatibles ATS conçus par des experts RH et des typographes. Personnalisez n'importe quel modèle comme vous le souhaitez.",
+    "feature1": "Conçu par des typographes",
+    "feature2": "Compatible ATS",
+    "feature3": "Modèle de base gratuit",
+    "feature4": "Vous vaut des compliments"
+  },
+  "featureCards": {
+    "card1Title": "Générateur de Lettre IA",
+    "card1Desc": "Vous n'avez pas à taper un seul mot pour obtenir le premier brouillon de votre lettre de motivation. Laissez l'intelligence artificielle le faire pour vous, puis choisissez un modèle assorti à votre CV.",
+    "card1Link": "En savoir plus sur le Générateur de Lettre IA.",
+    "card2Title": "Vérificateur de CV",
+    "card2Desc": "Votre CV est-il bon ? Comparez votre CV à d'autres CV réussis dans notre base de données et découvrez votre score. Obtenez des commentaires instantanés et des conseils personnalisés.",
+    "card2Link": "En savoir plus sur le Vérificateur de CV.",
+    "card3Title": "Générateur de CV IA",
+    "card3Desc": "Transformez votre CV en site web personnel en un seul clic. Laissez votre futur employeur vous chercher en ligne. Créez une forte présence en ligne et assurez-vous qu'ils vous voient sous votre meilleur jour.",
+    "card3Link": "En savoir plus sur notre Générateur de CV IA."
+  },
+  "careerToolbox": {
+    "heading": "La seule boîte à outils de carrière dont vous aurez besoin.",
+    "feature1Title": "Générateur de CV IA",
+    "feature1Desc": "Notre générateur de CV propulsé par GPT-4 vous aidera à créer un CV professionnel impressionnant en quelques secondes.",
+    "feature2Title": "Générateur de Lettre IA",
+    "feature2Desc": "Essayez notre rédacteur de lettre de motivation IA et produisez une lettre solide en quelques secondes.",
+    "feature3Title": "Vérificateur ATS",
+    "feature3Desc": "Devenez ami avec les bots, optimisez votre CV pour les systèmes de suivi des candidats (ATS) et obtenez plus d'entretiens.",
+    "feature4Title": "40+ Modèles Professionnels",
+    "feature4Desc": "Tous les modèles de CV et de lettre de motivation sont hautement personnalisables et conçus par une équipe de typographes qualifiés.",
+    "feature5Title": "1,500+ Exemples de CV",
+    "feature5Desc": "Inspirez-vous d'exemples de CV et de lettres de motivation qui ont aidé de vraies personnes à décrocher des emplois dans les meilleures entreprises du monde.",
+    "feature6Title": "Vérificateur de CV",
+    "feature6Desc": "Obtenez des commentaires instantanés et des conseils personnalisés sur la façon d'améliorer votre CV."
+  },
+  "finalCta": {
+    "heading": "Laissez votre CV faire le travail.",
+    "description": "Rejoignez 8 000 000 de demandeurs d'emploi dans le monde et faites-vous embaucher plus rapidement avec votre meilleur CV."
+  }
 }
-
-}
-

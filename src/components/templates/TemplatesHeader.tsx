@@ -5,9 +5,19 @@ export default function TemplatesHeader() {
 
   return (
     <div className="text-center mb-10 px-4 md:px-0">
-      <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-brand-primary)] mb-4">
-        {t("heading")}
-      </h1>
+      <h1
+  className="
+    heading-font
+    text-3xl md:text-4xl
+    font-bold
+    text-[var(--color-brand-primary)]
+    mb-4
+  "
+>
+  {t("heading")}
+</h1>
+
+
       <p className="text-gray-600 max-w-3xl mx-auto mb-6">
         {t("description")}
       </p>

@@ -1,37 +1,128 @@
 {
   "home": {
-    "header": "Hola de Ahsan"
+    "header": "Hola desde Ahsan"
   },
-  
   "navbar": {
-    "createResume": "Crear currículum",
+    "features": "Funciones",
+    "resume": "Currículum",
+    "coverLetter": "Carta de Presentación",
+    "resumeBuilder": "Creador de Currículum",
+    "resumeBuilderDesc": "Crea tu mejor currículum y consigue trabajo.",
+    "coverLetterBuilder": "Creador de Carta de Presentación",
+    "coverLetterBuilderDesc": "Adjunta una carta que haga juego con tu CV.",
+    "resumeChecker": "Verificador de Currículum",
+    "resumeCheckerDesc": "Obtén retroalimentación instantánea para tu currículum.",
+    "clChecker": "Revisión de Carta",
+    "clCheckerDesc": "Recibe comentarios instantáneos para tu carta.",
+    "aiResume": "Escritor de CV con IA",
+    "aiResumeDesc": "Deja que la IA escriba tu currículum.",
+    "aiResumeWriter": "Escritor de CV con IA",
+    "aiResumeWriterDesc": "Deja que la IA escriba tu currículum.",
+    "aiCover": "Escritor de Carta de Presentación con IA",
+    "aiCoverDesc": "Generado con GPT-4.1 para tu carta de presentación.",
+    "aiCoverLetterWriter": "Escritor de Carta con IA",
+    "aiCoverLetterWriterDesc": "Generado con GPT-4.1 para tu carta.",
+    "resumeTemplates": "Plantillas de Currículum",
+    "resumeTemplatesDesc": "Plantillas diseñadas profesionalmente.",
+    "resumeExamples": "Ejemplos de Currículum",
+    "resumeExamplesDesc": "Ver ejemplos de currículums exitosos.",
+    "coverTemplates": "Plantillas de Carta de Presentación",
+    "coverTemplatesDesc": "Plantillas de carta diseñadas profesionalmente.",
+    "coverExamples": "Ejemplos de Carta de Presentación",
+    "coverExamplesDesc": "Ver ejemplos de cartas de presentación exitosas.",
+    "login": "Iniciar Sesión",
+    "createResume": "Crear Mi Currículum",
     "pricing": "Precios",
-    "login": "Iniciar sesión",
-    "language": "Idioma"
+    "atsChecker": "Verificador ATS",
+    "seeTemplates": "Ver todas las plantillas"
   },
-   "footer": {
+  "footer": {
     "company": "SkyCube Worldwide",
     "tagline": "Una plataforma moderna que ayuda a los profesionales a crear currículums de clase mundial sin complicaciones.",
-    "contactUs": "Contáctenos",
-    "email": "Correo electrónico",
+    "contactUs": "Contáctanos",
+    "email": "Correo",
     "phone": "Teléfono",
     "address": "Dirección",
-    "quickLinks": "Enlaces rápidos",
+    "quickLinks": "Enlaces Rápidos",
     "pricing": "Precios",
-    "createResume": "Crear currículum",
-    "privacy": "Política de privacidad",
-    "terms": "Términos y condiciones",
+    "createResume": "Crear Currículum",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos y Condiciones",
     "rights": "Todos los derechos reservados."
   },
+  "hero": {
+    "title": "Crea Tu Currículum Profesional",
+    "description": "Sky Resume te ayuda a crear un currículum que destaque ante los reclutadores y te haga notar.",
+    "extraText": "Elige entre plantillas diseñadas por expertos y personalízalas a tu estilo. Causa una excelente primera impresión con un currículum que abre puertas.",
+    "createResume": "Crear Mi Currículum",
+    "seeExamples": "Ver Ejemplos",
+    "imageAlt": "Plantilla de Currículum de Muestra"
+  },
   "templates": {
-  "heading": "Ejemplos de Currículum",
-  "description": "Todos los ejemplos de currículum a continuación fueron escritos por nuestro equipo de redactores profesionales o contribuidos por profesionales exitosos que consiguieron empleo gracias a Kickresume.",
-  "searchPlaceholder": "Buscar plantillas de currículum...",
-  "template1": "Moderno Limpio",
-  "template2": "Corporativo Azul",
-  "template3": "Minimalista Pro",
-  "template4": "Clásico Elegante"
-}
-
-
+    "heading": "Ejemplos de Currículums",
+    "description": "Todos los ejemplos de currículum a continuación fueron escritos por nuestro equipo de redactores profesionales o aportados por profesionales exitosos que consiguieron trabajo con la ayuda de Sky Resume.",
+    "searchPlaceholder": "Buscar plantillas de currículum...",
+    "template1": "Moderno y Limpio",
+    "template2": "Corporativo Azul",
+    "template3": "Minimalista Pro",
+    "template4": "Clásico Elegante"
+  },
+  "aiSection": {
+    "subheading": "Creador de CV con IA",
+    "heading": "Deja que la inteligencia artificial escriba tu currículum.",
+    "body": "¿Te cuesta encontrar las palabras adecuadas para tu currículum? ¡Nuestro creador de currículums con IA puede encontrarlas en poco tiempo! Está impulsado por GPT-4.1 de OpenAI, el modelo de lenguaje más potente del mundo, y puede producir automáticamente texto indistinguible de escritores humanos. Di adiós al bloqueo del escritor. Genera el primer borrador de tu currículum en segundos.",
+    "jobTitleLabel": "Título del trabajo",
+    "jobTitleValue": "Gerente de Marketing",
+    "descriptionLabel": "Descripción",
+    "descriptionValues": [
+      "Implementé campañas de marketing que aumentaron el conocimiento del producto en un 25%...",
+      "Lideré un equipo de 5 diseñadores para crear identidades de marca galardonadas...",
+      "Optimicé la logística de la cadena de suministro, reduciendo costos en un 15% anual...",
+      "Desarrollé una aplicación web full-stack sirviendo a más de 10k usuarios diarios..."
+    ],
+    "aiWriterBtn": "Escritor IA",
+    "feature1": "Impulsado por GPT-4.1",
+    "feature2": "Generado en segundos",
+    "feature3": "Produce texto humano",
+    "feature4": "Nadie lo sabrá"
+  },
+  "templateShowcase": {
+    "heading": "Elige una plantilla de currículum.",
+    "subHeading": "Hazlo más tú.",
+    "description": "Consigue trabajo rápido con un currículum y una carta de presentación que destaquen visualmente. Explora más de 40 plantillas aptas para ATS diseñadas por expertos en RRHH y tipógrafos. Personaliza cualquier plantilla como quieras.",
+    "feature1": "Diseñado por tipógrafos",
+    "feature2": "Apto para ATS",
+    "feature3": "Plantilla básica gratuita",
+    "feature4": "Te consigue cumplidos"
+  },
+  "featureCards": {
+    "card1Title": "Creador de Cartas con IA",
+    "card1Desc": "No tienes que escribir ni una sola palabra para obtener el primer borrador de tu carta de presentación. Deja que la inteligencia artificial lo haga por ti, luego elige una plantilla que combine con tu currículum.",
+    "card1Link": "Más sobre el Creador de Cartas con IA.",
+    "card2Title": "Verificador de Currículum",
+    "card2Desc": "¿Es bueno tu currículum? Compara tu currículum con otros currículums exitosos en nuestra base de datos y descubre tu puntuación. Obtén comentarios instantáneos y consejos personalizados.",
+    "card2Link": "Más sobre el Verificador de Currículum.",
+    "card3Title": "Creador de CV con IA",
+    "card3Desc": "Convierte tu currículum en un sitio web personal con un solo clic. Deja que tu futuro empleador te busque en línea. Crea una fuerte presencia en línea y asegúrate de que te vean de la mejor manera posible.",
+    "card3Link": "Más sobre nuestro Creador de CV con IA."
+  },
+  "careerToolbox": {
+    "heading": "La única caja de herramientas profesional que necesitarás.",
+    "feature1Title": "Creador de CV con IA",
+    "feature1Desc": "Nuestro creador de currículums impulsado por GPT-4 te ayudará a crear un currículum profesional impresionante en segundos.",
+    "feature2Title": "Creador de Cartas con IA",
+    "feature2Desc": "Prueba nuestro escritor de cartas de presentación con IA y produce una carta sólida en segundos.",
+    "feature3Title": "Verificador ATS",
+    "feature3Desc": "Hazte amigo de los bots, optimiza tu currículum para los sistemas de seguimiento de candidatos (ATS) y consigue más entrevistas.",
+    "feature4Title": "40+ Plantillas Profesionales",
+    "feature4Desc": "Todas las plantillas de currículum y carta de presentación son altamente personalizables y diseñadas por un equipo de tipógrafos expertos.",
+    "feature5Title": "1,500+ Ejemplos de Currículum",
+    "feature5Desc": "Inspírate con ejemplos de currículums y cartas de presentación que ayudaron a personas reales a conseguir trabajos en las mejores empresas del mundo.",
+    "feature6Title": "Verificador de Currículum",
+    "feature6Desc": "Obtén comentarios instantáneos y consejos personalizados sobre cómo mejorar tu currículum."
+  },
+  "finalCta": {
+    "heading": "Deja que tu currículum haga el trabajo.",
+    "description": "Únete a 8,000,000 de solicitantes de empleo en todo el mundo y consigue trabajo más rápido con tu mejor currículum."
+  }
 }

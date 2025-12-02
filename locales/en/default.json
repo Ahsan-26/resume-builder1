@@ -2,14 +2,40 @@
   "home": {
     "header": "Hello From Ahsan"
   },
-  
   "navbar": {
-    "createResume": "Create Resume",
+    "features": "Features",
+    "resume": "Resume",
+    "coverLetter": "Cover Letter",
+    "resumeBuilder": "Resume Builder",
+    "resumeBuilderDesc": "Create your best resume yet. Get hired.",
+    "coverLetterBuilder": "Cover Letter Builder",
+    "coverLetterBuilderDesc": "Attach a matching cover letter.",
+    "resumeChecker": "Resume Checker",
+    "resumeCheckerDesc": "Get instant feedback for your resume.",
+    "clChecker": "Cover Letter Checker",
+    "clCheckerDesc": "Get instant feedback for your cover letter.",
+    "aiResume": "AI Resume Writer",
+    "aiResumeDesc": "Let AI write your resume.",
+    "aiResumeWriter": "AI Resume Writer",
+    "aiResumeWriterDesc": "Let AI write your resume.",
+    "aiCover": "AI Cover Letter Writer",
+    "aiCoverDesc": "GPT-4.1 powered cover letter writer.",
+    "aiCoverLetterWriter": "AI Cover Letter Writer",
+    "aiCoverLetterWriterDesc": "GPT-4.1 powered cover letter writer.",
+    "resumeTemplates": "Resume Templates",
+    "resumeTemplatesDesc": "Professionally designed templates.",
+    "resumeExamples": "Resume Examples",
+    "resumeExamplesDesc": "See examples of successful resumes.",
+    "coverTemplates": "Cover Letter Templates",
+    "coverTemplatesDesc": "Professionally designed cover letter templates.",
+    "coverExamples": "Cover Letter Examples",
+    "coverExamplesDesc": "See examples of successful cover letters.",
+    "login": "Log In",
+    "createResume": "Create My Resume",
     "pricing": "Pricing",
-    "login": "Login",
-    "language": "Language"
-},
-
+    "atsChecker": "ATS Checker",
+    "seeTemplates": "See all templates"
+  },
   "footer": {
     "company": "SkyCube Worldwide",
     "tagline": "A modern platform helping professionals create world-class resumes with zero friction.",
@@ -24,17 +50,79 @@
     "terms": "Terms & Conditions",
     "rights": "All rights reserved."
   },
+  "hero": {
+    "title": "Build Your Professional Resume",
+    "description": "Sky Resume helps you craft a resume that stands out to recruiters and gets you noticed.",
+    "extraText": "Choose from expertly designed templates and customize them to your personal style. Make your first impression count with a resume that opens doors.",
+    "createResume": "Create My Resume",
+    "seeExamples": "See Examples",
+    "imageAlt": "Sample Resume Template"
+  },
   "templates": {
-  "heading": "Resume Samples",
-  "description": "All the resume examples below were either written by our team of professional resume writers or contributed by successful professionals who got hired with the help of Kickresume.",
-  "searchPlaceholder": "Search resume templates...",
-  "template1": "Modern Clean",
-  "template2": "Corporate Blue",
-  "template3": "Minimalist Pro",
-  "template4": "Elegant Classic"
-}
-
-
-
-
+    "heading": "Resume Samples",
+    "description": "All the resume examples below were either written by our team of professional resume writers or contributed by successful professionals who got hired with the help of Sky Resume.",
+    "searchPlaceholder": "Search resume templates...",
+    "template1": "Modern Clean",
+    "template2": "Corporate Blue",
+    "template3": "Minimalist Pro",
+    "template4": "Elegant Classic"
+  },
+  "aiSection": {
+    "subheading": "AI Resume Builder",
+    "heading": "Let artificial intelligence write your resume.",
+    "body": "Are you struggling to find the right words for your resume? Our AI resume builder can find them in no time! It’s powered by OpenAI’s GPT-4.1, the world’s most powerful language model, and it can automatically produce text indistinguishable from human writers. Say goodbye to writer’s block. Generate the first draft of your resume in seconds.",
+    "jobTitleLabel": "Job title",
+    "jobTitleValue": "Marketing Manager",
+    "descriptionLabel": "Description",
+    "descriptionValues": [
+      "Implemented marketing campaigns that increased product awareness by 25%...",
+      "Led a team of 5 designers to create award-winning brand identities...",
+      "Optimized supply chain logistics, reducing costs by 15% annually...",
+      "Developed a full-stack web application serving 10k+ daily users..."
+    ],
+    "aiWriterBtn": "AI Writer",
+    "feature1": "Powered by GPT-4.1",
+    "feature2": "Generated in seconds",
+    "feature3": "Produces human-like text",
+    "feature4": "Nobody's gonna know"
+  },
+  "templateShowcase": {
+    "heading": "Pick a resume template.",
+    "subHeading": "Make it more you.",
+    "description": "Get hired fast with a resume and cover letter that visually stand out from the pile. Browse 40+ ATS-friendly resume templates designed by a team of HR experts and typographers. Customize any template in any way you want.",
+    "feature1": "Designed by typographers",
+    "feature2": "ATS-friendly",
+    "feature3": "Free basic template",
+    "feature4": "Gets you compliments"
+  },
+  "featureCards": {
+    "card1Title": "AI Cover Letter Builder",
+    "card1Desc": "You don't have to type a single word to get the first draft of your cover letter. Let artificial intelligence do it for you, then pick a template that matches your resume.",
+    "card1Link": "Learn more about the AI Cover Letter Builder.",
+    "card2Title": "Resume Checker",
+    "card2Desc": "Is your resume any good? Compare your resume against other successful resumes in our database and discover your resume score. Get instant feedback and personalized tips.",
+    "card2Link": "Learn more about the Resume Checker.",
+    "card3Title": "AI Resume Builder",
+    "card3Desc": "Turn your resume into a personal website with a single click. Let your future employer look you up online. Create a strong online presence and make sure they see you in the best possible light.",
+    "card3Link": "Learn more about our AI Resume Builder."
+  },
+  "careerToolbox": {
+    "heading": "The only career toolbox you’ll ever need.",
+    "feature1Title": "AI Resume Builder",
+    "feature1Desc": "Our GPT-4-powered resume builder will help you create an impressive professional resume in seconds.",
+    "feature2Title": "AI Cover Letter Builder",
+    "feature2Desc": "Try our AI Cover Letter Writer and produce a rock-solid cover letter in seconds.",
+    "feature3Title": "ATS Resume Checker",
+    "feature3Desc": "Befriend the bots, optimize your resume for Applicant Tracking Systems (ATS), and get invited to more interviews.",
+    "feature4Title": "40+ Professional Templates",
+    "feature4Desc": "All resume and cover letter templates are highly customizable and designed by a team of skilled typographers.",
+    "feature5Title": "1,500+ Resume Examples",
+    "feature5Desc": "Get inspired by resume and cover letter examples that helped real people land jobs with the world’s top companies.",
+    "feature6Title": "Resume Checker",
+    "feature6Desc": "Get instant feedback and personalized tips on how to improve your resume."
+  },
+  "finalCta": {
+    "heading": "Let your resume do the work.",
+    "description": "Join 8,000,000 job seekers worldwide and get hired faster with your best resume yet."
+  }
 }

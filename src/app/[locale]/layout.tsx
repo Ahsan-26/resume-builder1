@@ -4,6 +4,15 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Navbar from "@/components/navbar/Navbar"; // <-- ADD THIS
 import Footer from "@/components/Footer/Footer";
+
+import { Nunito } from "next/font/google";
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"], // heading weights
+  variable: "--font-heading",
+});
+
 export default async function RootLayout({
   children,
   params,
@@ -18,19 +27,18 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale}>
-      <body className="bg-[var(--color-brand-background)] text-[var(--color-brand-primary)] antialiased">
+  <html lang={locale} className={nunito.variable}>
+<body className="bg-[var(--color-brand-background)] text-[var(--color-brand-primary)] antialiased">
+      <NextIntlClientProvider locale={locale}>
+        <Navbar />
 
-        <NextIntlClientProvider locale={locale}>
-          <Navbar />
-         
-          <main className="min-h-screen">
-            {children}
-          </main>
-       <Footer />
-        </NextIntlClientProvider>
+        <main className="min-h-screen">
+          {children}
+        </main>
 
-      </body>
-    </html>
-  );
+        <Footer />
+      </NextIntlClientProvider>
+    </body>
+  </html>
+);
 }
