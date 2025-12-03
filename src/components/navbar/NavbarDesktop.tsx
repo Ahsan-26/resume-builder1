@@ -95,7 +95,7 @@ const NavbarDesktop: React.FC = () => {
 
       {/* Right side */}
       <div className="flex items-center gap-4">
-        <Link href="/login" className="font-semibold text-brand-primary hover:text-brand-hover px-4 py-2 rounded-lg transition-colors">
+        <Link href="/auth/login" className="font-semibold text-brand-primary hover:text-brand-hover px-4 py-2 rounded-lg transition-colors">
           {t("navbar.login")}
         </Link>
         <NavbarButton>{t("navbar.createResume")}</NavbarButton>

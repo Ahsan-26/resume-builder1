@@ -2,8 +2,10 @@ import "./globals.css";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import Navbar from "@/components/navbar/Navbar"; // <-- ADD THIS
+import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
 import { Nunito } from "next/font/google";
 
@@ -27,18 +29,19 @@ export default async function RootLayout({
   }
 
   return (
-  <html lang={locale} className={nunito.variable}>
-<body className="bg-[var(--color-brand-background)] text-[var(--color-brand-primary)] antialiased">
-      <NextIntlClientProvider locale={locale}>
-        <Navbar />
-
-        <main className="min-h-screen">
-          {children}
-        </main>
-
-        <Footer />
-      </NextIntlClientProvider>
-    </body>
-  </html>
-);
+    <html lang={locale} className={nunito.variable}>
+      <body className="bg-[var(--color-brand-background)] text-[var(--color-brand-primary)] antialiased">
+        <NextIntlClientProvider locale={locale}>
+          <AuthProvider>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+            <Toaster position="top-center" />
+          </AuthProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
 }

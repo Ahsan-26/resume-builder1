@@ -1,5 +1,5 @@
 // src/lib/apiClient.ts
-const BASE = "https://rehan.pythonanywhere.com/api";
+const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 type FetchOptions = RequestInit & { _retry?: boolean };
 

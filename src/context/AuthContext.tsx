@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { setTokens, clearTokens } from "@/lib/auth";
-import { useToast } from "@/components/ui/ToastContext";
+import toast from "react-hot-toast";
 
 type User = Record<string, any> | null;
 
@@ -23,7 +23,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const toast = useToast();
 
   useEffect(() => {
     let mounted = true;
@@ -55,16 +54,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const res = await fetch("https://rehan.pythonanywhere.com/api/auth/login/", {
+      const res = await apiFetch("/auth/login/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = payload.detail || payload.error || "Invalid credentials";
-        toast?.push({ type: "error", title: "Login failed", body: msg });
+        toast.error(msg);
         return { ok: false, error: msg };
       }
 
@@ -72,66 +70,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (access && refresh) {
         setTokens({ access, refresh });
         setUser(userObj ?? null);
-        toast?.push({ type: "success", title: "Signed in", body: "Welcome back." });
+        toast.success("Welcome back!");
         return { ok: true };
       }
 
       return { ok: false, error: "Invalid server response" };
     } catch (err) {
       console.error(err);
-      toast?.push({ type: "error", title: "Network error", body: "Please try again." });
+      toast.error("Network error. Please try again.");
       return { ok: false, error: "Network error" };
     }
   };
 
   const logout = async () => {
     try {
-      await fetch("https://rehan.pythonanywhere.com/api/auth/logout/", {
+      await apiFetch("/auth/logout/", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("sr_access")}` },
-      }).catch(() => {});
+      }).catch(() => { });
     } finally {
       clearTokens();
       setUser(null);
-      toast?.push({ type: "info", title: "Signed out", body: "You have been signed out." });
+      toast.success("Signed out successfully");
     }
   };
 
   const registerInit = async (email: string, password: string) => {
     try {
-      const res = await fetch("https://rehan.pythonanywhere.com/api/auth/register/", {
+      const res = await apiFetch("/auth/register/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = payload.detail || payload.error || "Registration failed";
-        toast?.push({ type: "error", title: "Registration error", body: msg });
+        toast.error(msg);
         return { ok: false, error: msg };
       }
 
-      toast?.push({ type: "success", title: "Check your email", body: "A verification code has been sent." });
+      toast.success("Verification code sent to your email");
       return { ok: true };
     } catch (err) {
-      toast?.push({ type: "error", title: "Network error", body: "Please try again." });
+      toast.error("Network error. Please try again.");
       return { ok: false, error: "Network error" };
     }
   };
 
   const registerVerify = async (email: string, code: string) => {
     try {
-      const res = await fetch("https://rehan.pythonanywhere.com/api/auth/register/", {
+      const res = await apiFetch("/auth/register/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
       });
 
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = payload.detail || payload.error || "Verification failed";
-        toast?.push({ type: "error", title: "Verification failed", body: msg });
+        toast.error(msg);
         return { ok: false, error: msg };
       }
 
@@ -139,12 +134,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (access && refresh) {
         setTokens({ access, refresh });
         setUser(userObj ?? null);
-        toast?.push({ type: "success", title: "Account created", body: "Welcome to SkyResume!" });
+        toast.success("Account created! Welcome to SkyResume.");
         return { ok: true };
       }
       return { ok: false, error: "Invalid server response" };
     } catch (err) {
-      toast?.push({ type: "error", title: "Network error", body: "Please try again." });
+      toast.error("Network error. Please try again.");
       return { ok: false, error: "Network error" };
     }
   };

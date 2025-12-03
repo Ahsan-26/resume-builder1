@@ -107,7 +107,7 @@ export default function NavbarMobile() {
             </Link>
 
             <div className="pt-4 mt-2 border-t border-gray-100 flex flex-col gap-3">
-              <Link href="/login" className="block w-full py-3 text-center font-semibold text-brand-primary border border-brand-primary rounded-lg hover:bg-brand-primary/5 transition-colors">
+              <Link href="/auth/login" className="block w-full py-3 text-center font-semibold text-brand-primary border border-brand-primary rounded-lg hover:bg-brand-primary/5 transition-colors">
                 {t('navbar.login')}
               </Link>
 

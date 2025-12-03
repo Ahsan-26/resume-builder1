@@ -9,6 +9,7 @@ import TemplateShowcase from "@/components/templates/TemplateShowcase";
 import FeatureCardsSection from "@/components/home/FeatureCardsSection";
 import CareerToolboxSection from "@/components/home/CareerToolboxSection";
 import FinalCtaSection from "@/components/home/FinalCtaSection";
+
 export default function Home() {
   return (
     <div className="container mx-auto px-6 pb-12">

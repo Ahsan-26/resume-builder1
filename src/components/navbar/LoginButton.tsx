@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function LoginButton({ label }: { label: string }) {
   return (
     <Link
-      href="/login"
+      href="/auth/login"
       className="
         px-4 py-2 rounded-lg border-2 font-medium
         border-[var(--color-brand-primary)]
