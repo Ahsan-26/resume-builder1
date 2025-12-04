@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import { Nunito } from "next/font/google";
 
@@ -28,19 +29,23 @@ export default async function RootLayout({
     notFound();
   }
 
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+
   return (
     <html lang={locale} className={nunito.variable}>
       <body className="bg-[var(--color-brand-background)] text-[var(--color-brand-primary)] antialiased">
-        <NextIntlClientProvider locale={locale}>
-          <AuthProvider>
-            <Navbar />
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <Footer />
-            <Toaster position="top-center" />
-          </AuthProvider>
-        </NextIntlClientProvider>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <NextIntlClientProvider locale={locale}>
+            <AuthProvider>
+              <Navbar />
+              <main className="min-h-screen">
+                {children}
+              </main>
+              <Footer />
+              <Toaster position="top-center" />
+            </AuthProvider>
+          </NextIntlClientProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

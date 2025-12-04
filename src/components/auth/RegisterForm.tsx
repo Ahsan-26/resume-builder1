@@ -16,6 +16,10 @@ import { useTranslations } from "next-intl";
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -86,6 +90,22 @@ export default function RegisterForm() {
           />
           {errors.password && (
             <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t("confirmPasswordLabel")}
+          </label>
+          <input
+            {...register("confirmPassword")}
+            type="password"
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+              }`}
+            placeholder={t("passwordPlaceholder")}
+          />
+          {errors.confirmPassword && (
+            <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
           )}
         </div>
 

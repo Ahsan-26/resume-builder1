@@ -315,6 +315,7 @@
     "setNewPasswordSubtitle": "Create a new secure password for your account",
     "newPasswordLabel": "New Password",
     "confirmPasswordLabel": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
     "resetPasswordBtn": "Reset Password",
     "invalidLink": "Invalid Link",
     "invalidLinkMsg": "This password reset link is invalid or has expired.",
