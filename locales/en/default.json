@@ -38,7 +38,7 @@
   },
   "footer": {
     "company": "SkyCube Worldwide",
-    "tagline": "A modern platform helping professionals create world-class resumes with zero friction.",
+    "tagline": "A modern platform helping professionals create world-class resumes with zero friction",
     "contactUs": "Contact Us",
     "email": "Email",
     "phone": "Phone",
@@ -48,7 +48,21 @@
     "createResume": "Create Resume",
     "privacy": "Privacy Policy",
     "terms": "Terms & Conditions",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "features": "Features",
+    "about": "About",
+    "legal": "Legal",
+    "resumeBuilder": "Resume Builder",
+    "coverLetterBuilder": "Cover Letter Builder",
+    "resumeChecker": "Resume Checker",
+    "aiResumeWriter": "AI Resume Writer",
+    "templates": "Templates",
+    "aboutUs": "About Us",
+    "howItWorks": "How It Works",
+    "blog": "Blog",
+    "careers": "Careers",
+    "cookiePolicy": "Cookie Policy",
+    "refundPolicy": "Refund Policy"
   },
   "hero": {
     "title": "Build Your Professional Resume",
@@ -171,10 +185,75 @@
   },
   "resumeBuilderSection": {
     "tagline": "Resume Builder",
-    "heading": "You've never seen a resume builder this good.",
+    "heading": "You've never seen a resume builder this good",
     "description": "Detail to perfection — for free! Build your professional resume in minutes with our intuitive, drag-and-drop builder.",
     "cta": "Build My Resume",
     "trustedBy": "Trusted by 8 million successful job seekers worldwide."
+  },
+  "coverLetterBuilderSection": {
+    "tagline": "Cover Letter Builder",
+    "heading": "Write a cover letter that gets you hired",
+    "description": "Create a professional cover letter in minutes. Choose from our library of templates and let our AI help you write the perfect letter.",
+    "cta": "Create Cover Letter",
+    "trustedBy": "Trusted by 8 million successful job seekers worldwide."
+  },
+  "resumeCheckerSection": {
+    "tagline": "Resume Checker",
+    "heading": "Is your resume good enough?",
+    "description": "Get a free resume review and find out how you stack up against other candidates. Our AI-powered checker will give you a score and personalized tips.",
+    "cta": "Check My Resume",
+    "trustedBy": "Trusted by top recruiters and hiring managers.",
+    "score": "Score",
+    "accuracy": "98% Accuracy",
+    "impact": "Impact & Quantifiable Results",
+    "impactDesc": "Great job using numbers.",
+    "wordChoice": "Word Choice",
+    "wordChoiceDesc": "Try using more action verbs.",
+    "ats": "ATS Compatibility",
+    "atsDesc": "Optimized for ATS parsing.",
+    "freeCheck": "Free Check"
+  },
+  "aiResumeWriterSection": {
+    "tagline": "AI Resume Writer",
+    "heading": "Let AI write your resume for you",
+    "description": "Struggling with writer's block? Our AI-powered writer creates professional content for your resume in seconds. Just enter your job title and let the magic happen.",
+    "cta": "Start Writing with AI",
+    "trustedBy": "Trusted by 8 million successful job seekers worldwide.",
+    "feature1": "Powered by GPT-4",
+    "feature2": "Keyword Optimization",
+    "feature3": "Human-like Writing",
+    "mockResume": {
+      "name": "Carolina Herrera",
+      "info": "Date of birth: 21/12/1991 • Nationality: Peruvian",
+      "profile": "Profile",
+      "profileText": "Telecom Engineer with IT experience. Worked in the most important telecom company in Peru across different areas.",
+      "experience": "Work Experience",
+      "job1": "UX Designer",
+      "job1Company": "Amazon",
+      "job1Desc": "Server Admin in Verizon Enterprise Solutions.",
+      "job2": "Junior Process Analyst",
+      "job2Company": "Indra"
+    }
+  },
+  "aiCoverLetterSection": {
+    "tagline": "AI Cover Letter Writer",
+    "heading": "Generate a cover letter in seconds with artificial intelligence.",
+    "description": "Never write a cover letter from scratch again. Let our AI writer create a personalized cover letter for you in seconds. It's fast, easy, and effective.",
+    "cta": "Start Writing with AI",
+    "trustedBy": "Trusted by 8 million successful job seekers worldwide.",
+    "feature1": "Powered by GPT-4",
+    "feature2": "Tailored to Job Description",
+    "feature3": "Professional Tone",
+    "mockCoverLetter": {
+      "date": "October 24, 2025",
+      "recipient": "Hiring Manager\nTech Corp Inc.\n123 Innovation Way\nSan Francisco, CA 94105",
+      "salutation": "Dear Hiring Manager,",
+      "p1": "I am writing to express my strong interest in the Senior Product Designer position at Tech Corp Inc. With over 8 years of experience in UX/UI design and a proven track record of leading successful product launches, I am confident in my ability to contribute to your team.",
+      "p2": "In my previous role at Creative Solutions, I led the redesign of our flagship mobile app, resulting in a 40% increase in user engagement and a 25% boost in retention. I am passionate about creating intuitive and user-centric designs that solve real problems.",
+      "p3": "I am particularly drawn to Tech Corp Inc.'s commitment to innovation and its user-first approach. I would welcome the opportunity to discuss how my skills and experience align with your needs.",
+      "closing": "Sincerely,",
+      "name": "Alex Morgan"
+    }
   },
   "resumeTemplatesList": {
     "heading": "Kick things off with a stylish resume template",

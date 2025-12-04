@@ -38,7 +38,7 @@
   },
   "footer": {
     "company": "SkyCube Worldwide",
-    "tagline": "Une plateforme moderne aidant les professionnels à créer des CV de classe mondiale sans friction.",
+    "tagline": "Une plateforme moderne aidant les professionnels à créer des CV de classe mondiale sans friction",
     "contactUs": "Contactez-nous",
     "email": "E-mail",
     "phone": "Téléphone",
@@ -48,7 +48,21 @@
     "createResume": "Créer un CV",
     "privacy": "Politique de Confidentialité",
     "terms": "Termes et Conditions",
-    "rights": "Tous droits réservés."
+    "rights": "Tous droits réservés.",
+    "features": "Fonctionnalités",
+    "about": "À Propos",
+    "legal": "Légal",
+    "resumeBuilder": "Créateur de CV",
+    "coverLetterBuilder": "Créateur de Lettre de Motivation",
+    "resumeChecker": "Vérificateur de CV",
+    "aiResumeWriter": "Rédacteur de CV IA",
+    "templates": "Modèles",
+    "aboutUs": "À Propos de Nous",
+    "howItWorks": "Comment Ça Marche",
+    "blog": "Blog",
+    "careers": "Carrières",
+    "cookiePolicy": "Politique de Cookies",
+    "refundPolicy": "Politique de Remboursement"
   },
   "hero": {
     "title": "Créez Votre CV Professionnel",
@@ -171,10 +185,75 @@
   },
   "resumeBuilderSection": {
     "tagline": "Créateur de CV",
-    "heading": "Vous n'avez jamais vu un créateur de CV aussi bon.",
+    "heading": "Vous n'avez jamais vu un créateur de CV aussi bon",
     "description": "Le détail à la perfection — gratuitement ! Créez votre CV professionnel en quelques minutes avec notre constructeur intuitif par glisser-déposer.",
     "cta": "Créer Mon CV",
     "trustedBy": "Recommandé par 8 millions de demandeurs d'emploi dans le monde."
+  },
+  "coverLetterBuilderSection": {
+    "tagline": "Créateur de Lettre de Motivation",
+    "heading": "Rédigez une lettre de motivation qui vous fait embaucher",
+    "description": "Créez une lettre de motivation professionnelle en quelques minutes. Choisissez parmi notre bibliothèque de modèles et laissez notre IA vous aider à rédiger la lettre parfaite.",
+    "cta": "Créer une Lettre de Motivation",
+    "trustedBy": "Recommandé par 8 millions de demandeurs d'emploi dans le monde."
+  },
+  "resumeCheckerSection": {
+    "tagline": "Vérificateur de CV",
+    "heading": "Votre CV est-il assez bon ?",
+    "description": "Obtenez une révision gratuite de votre CV et découvrez comment vous vous comparez aux autres candidats. Notre vérificateur propulsé par IA vous donnera un score et des conseils personnalisés.",
+    "cta": "Vérifier Mon CV",
+    "trustedBy": "Recommandé par les meilleurs recruteurs et responsables du recrutement.",
+    "score": "Score",
+    "accuracy": "Précision de 98 %",
+    "impact": "Impact et Résultats Quantifiables",
+    "impactDesc": "Excellent travail avec les chiffres !",
+    "wordChoice": "Choix des Mots",
+    "wordChoiceDesc": "Essayez plus de verbes d'action.",
+    "ats": "Compatibilité ATS",
+    "atsDesc": "Optimisé pour l'analyse ATS.",
+    "freeCheck": "Vérification Gratuite"
+  },
+  "aiResumeWriterSection": {
+    "tagline": "Rédacteur de CV IA",
+    "heading": "Laissez l'IA rédiger votre CV pour vous",
+    "description": "Vous avez du mal avec le syndrome de la page blanche ? Notre rédacteur propulsé par IA crée du contenu professionnel pour votre CV en quelques secondes. Entrez simplement votre titre de poste et laissez la magie opérer.",
+    "cta": "Commencer à Écrire avec l'IA",
+    "trustedBy": "Recommandé par 8 millions de demandeurs d'emploi dans le monde.",
+    "feature1": "Propulsé par GPT-4",
+    "feature2": "Optimisation des Mots-clés",
+    "feature3": "Écriture humaine",
+    "mockResume": {
+      "name": "Carolina Herrera",
+      "info": "Date de naissance : 21/12/1991 • Nationalité : Péruvienne",
+      "profile": "Profil",
+      "profileText": "Ingénieur Télécom avec expérience IT. A travaillé dans la plus importante entreprise de télécommunications au Pérou.",
+      "experience": "Expérience Professionnelle",
+      "job1": "Designer UX",
+      "job1Company": "Amazon",
+      "job1Desc": "Admin Serveur chez Verizon Enterprise Solutions.",
+      "job2": "Analyste de Processus Junior",
+      "job2Company": "Indra"
+    }
+  },
+  "aiCoverLetterSection": {
+    "tagline": "Rédacteur de Lettre IA",
+    "heading": "Générez une lettre de motivation en quelques secondes avec l'intelligence artificielle.",
+    "description": "N'écrivez plus jamais une lettre de motivation à partir de zéro. Laissez notre rédacteur IA créer une lettre personnalisée pour vous en quelques secondes. C'est rapide, facile et efficace.",
+    "cta": "Commencer à Écrire avec l'IA",
+    "trustedBy": "Recommandé par 8 millions de demandeurs d'emploi dans le monde.",
+    "feature1": "Propulsé par GPT-4",
+    "feature2": "Adapté à la Description du Poste",
+    "feature3": "Ton Professionnel",
+    "mockCoverLetter": {
+      "date": "24 Octobre 2025",
+      "recipient": "Responsable du Recrutement\nTech Corp Inc.\n123 Innovation Way\nSan Francisco, CA 94105",
+      "salutation": "Cher Responsable du Recrutement,",
+      "p1": "Je vous écris pour exprimer mon vif intérêt pour le poste de Senior Product Designer chez Tech Corp Inc. Avec plus de 8 ans d'expérience en design UX/UI et un historique prouvé de direction de lancements de produits réussis, je suis confiant dans ma capacité à contribuer à votre équipe.",
+      "p2": "Dans mon poste précédent chez Creative Solutions, j'ai dirigé la refonte de notre application mobile phare, ce qui a entraîné une augmentation de 40 % de l'engagement des utilisateurs et une augmentation de 25 % de la rétention. Je suis passionné par la création de designs intuitifs et centrés sur l'utilisateur qui résolvent de vrais problèmes.",
+      "p3": "Je suis particulièrement attiré par l'engagement de Tech Corp Inc. envers l'innovation et son approche centrée sur l'utilisateur. Je serais ravi de discuter de la manière dont mes compétences et mon expérience correspondent à vos besoins.",
+      "closing": "Cordialement,",
+      "name": "Alex Morgan"
+    }
   },
   "resumeTemplatesList": {
     "heading": "Commencez avec un modèle de CV élégant",

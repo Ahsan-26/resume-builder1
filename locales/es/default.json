@@ -38,7 +38,7 @@
   },
   "footer": {
     "company": "SkyCube Worldwide",
-    "tagline": "Una plataforma moderna que ayuda a los profesionales a crear currículums de clase mundial sin complicaciones.",
+    "tagline": "Una plataforma moderna que ayuda a los profesionales a crear currículums de clase mundial sin complicaciones",
     "contactUs": "Contáctanos",
     "email": "Correo",
     "phone": "Teléfono",
@@ -48,7 +48,21 @@
     "createResume": "Crear Currículum",
     "privacy": "Política de Privacidad",
     "terms": "Términos y Condiciones",
-    "rights": "Todos los derechos reservados."
+    "rights": "Todos los derechos reservados.",
+    "features": "Funciones",
+    "about": "Acerca de",
+    "legal": "Legal",
+    "resumeBuilder": "Creador de Currículum",
+    "coverLetterBuilder": "Creador de Carta de Presentación",
+    "resumeChecker": "Verificador de Currículum",
+    "aiResumeWriter": "Escritor de CV con IA",
+    "templates": "Plantillas",
+    "aboutUs": "Sobre Nosotros",
+    "howItWorks": "Cómo Funciona",
+    "blog": "Blog",
+    "careers": "Carreras",
+    "cookiePolicy": "Política de Cookies",
+    "refundPolicy": "Política de Reembolso"
   },
   "hero": {
     "title": "Crea Tu Currículum Profesional",
@@ -171,10 +185,75 @@
   },
   "resumeBuilderSection": {
     "tagline": "Creador de Currículum",
-    "heading": "Nunca has visto un creador de currículum tan bueno.",
+    "heading": "Nunca has visto un creador de currículum tan bueno",
     "description": "Detalle a la perfección — ¡gratis! Crea tu currículum profesional en minutos con nuestro constructor intuitivo de arrastrar y soltar.",
     "cta": "Crear Mi Currículum",
     "trustedBy": "Con la confianza de 8 millones de solicitantes de empleo exitosos en todo el mundo."
+  },
+  "coverLetterBuilderSection": {
+    "tagline": "Creador de Carta de Presentación",
+    "heading": "Escribe una carta de presentación que te consiga el trabajo",
+    "description": "Crea una carta de presentación profesional en minutos. Elige de nuestra biblioteca de plantillas y deja que nuestra IA te ayude a escribir la carta perfecta.",
+    "cta": "Crear Carta de Presentación",
+    "trustedBy": "Con la confianza de 8 millones de solicitantes de empleo exitosos en todo el mundo."
+  },
+  "resumeCheckerSection": {
+    "tagline": "Verificador de Currículum",
+    "heading": "¿Es tu currículum lo suficientemente bueno?",
+    "description": "Obtén una revisión gratuita de tu currículum y descubre cómo te comparas con otros candidatos. Nuestro verificador impulsado por IA te dará una puntuación y consejos personalizados.",
+    "cta": "Verificar Mi Currículum",
+    "trustedBy": "Con la confianza de los mejores reclutadores y gerentes de contratación.",
+    "score": "Puntuación",
+    "accuracy": "98% de Precisión",
+    "impact": "Impacto y Resultados Cuantificables",
+    "impactDesc": "¡Gran trabajo usando números!",
+    "wordChoice": "Elección de Palabras",
+    "wordChoiceDesc": "Prueba más verbos de acción.",
+    "ats": "Compatibilidad ATS",
+    "atsDesc": "Optimizado para análisis ATS.",
+    "freeCheck": "Verificación Gratuita"
+  },
+  "aiResumeWriterSection": {
+    "tagline": "Escritor de CV con IA",
+    "heading": "Deja que la IA escriba tu currículum por ti",
+    "description": "¿Luchando con el bloqueo del escritor? Nuestro escritor impulsado por IA crea contenido profesional para tu currículum en segundos. Solo ingresa tu título de trabajo y deja que ocurra la magia.",
+    "cta": "Empezar a Escribir con IA",
+    "trustedBy": "Con la confianza de 8 millones de solicitantes de empleo exitosos en todo el mundo.",
+    "feature1": "Impulsado por GPT-4",
+    "feature2": "Optimización de Palabras Clave",
+    "feature3": "Escritura similar a la humana",
+    "mockResume": {
+      "name": "Carolina Herrera",
+      "info": "Fecha de nacimiento: 21/12/1991 • Nacionalidad: Peruana",
+      "profile": "Perfil",
+      "profileText": "Ingeniera de Telecomunicaciones con experiencia en TI. Trabajó en la empresa de telecomunicaciones más importante del Perú.",
+      "experience": "Experiencia Laboral",
+      "job1": "Diseñadora UX",
+      "job1Company": "Amazon",
+      "job1Desc": "Administradora de Servidores en Verizon Enterprise Solutions.",
+      "job2": "Analista de Procesos Junior",
+      "job2Company": "Indra"
+    }
+  },
+  "aiCoverLetterSection": {
+    "tagline": "Escritor de Cartas con IA",
+    "heading": "Genera una carta de presentación en segundos con inteligencia artificial.",
+    "description": "Nunca vuelvas a escribir una carta de presentación desde cero. Deja que nuestro escritor de IA cree una carta personalizada para ti en segundos. Es rápido, fácil y efectivo.",
+    "cta": "Empezar a Escribir con IA",
+    "trustedBy": "Con la confianza de 8 millones de solicitantes de empleo exitosos en todo el mundo.",
+    "feature1": "Impulsado por GPT-4",
+    "feature2": "Adaptado a la Descripción del Trabajo",
+    "feature3": "Tono Profesional",
+    "mockCoverLetter": {
+      "date": "24 de Octubre, 2025",
+      "recipient": "Gerente de Contratación\nTech Corp Inc.\n123 Innovation Way\nSan Francisco, CA 94105",
+      "salutation": "Estimado Gerente de Contratación,",
+      "p1": "Le escribo para expresar mi gran interés en el puesto de Diseñador de Producto Senior en Tech Corp Inc. Con más de 8 años de experiencia en diseño UX/UI y un historial comprobado de liderazgo en lanzamientos de productos exitosos, confío en mi capacidad para contribuir a su equipo.",
+      "p2": "En mi puesto anterior en Creative Solutions, lideré el rediseño de nuestra aplicación móvil insignia, lo que resultó en un aumento del 40% en la participación de los usuarios y un aumento del 25% en la retención. Me apasiona crear diseños intuitivos y centrados en el usuario que resuelvan problemas reales.",
+      "p3": "Me atrae particularmente el compromiso de Tech Corp Inc. con la innovación y su enfoque centrado en el usuario. Agradecería la oportunidad de discutir cómo mis habilidades y experiencia se alinean con sus necesidades.",
+      "closing": "Atentamente,",
+      "name": "Alex Morgan"
+    }
   },
   "resumeTemplatesList": {
     "heading": "Empieza con una plantilla de currículum elegante",

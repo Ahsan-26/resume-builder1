@@ -58,8 +58,8 @@ export default function NavbarMobile() {
                   <Link href="/resume-builder" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.resumeBuilder')}</Link>
                   <Link href="/cover-letter-builder" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.coverLetterBuilder')}</Link>
                   <Link href="/resume-checker" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.resumeChecker')}</Link>
-                  <Link href="/cover-letter-checker" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.clChecker')}</Link>
                   <Link href="/ai-resume-writer" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.aiResumeWriter')}</Link>
+                  <Link href="/ai-cover-letter" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.aiCoverLetterWriter')}</Link>
                 </div>
               )}
             </div>
@@ -95,7 +95,7 @@ export default function NavbarMobile() {
               {expandedMenu === 'coverLetter' && (
                 <div className="pl-4 space-y-2 mt-1 mb-2">
                   <Link href="/cover-letter-builder" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.coverLetterBuilder')}</Link>
-                  <Link href="/ai-cover-letter-writer" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.aiCoverLetterWriter')}</Link>
+                  <Link href="/ai-cover-letter" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.aiCoverLetterWriter')}</Link>
                   <Link href="/cover-letter-templates" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.coverTemplates')}</Link>
                   <Link href="/cover-letter-examples" className="block py-2 px-2 text-sm text-gray-600 hover:text-brand-primary rounded-md hover:bg-gray-50">{t('navbar.coverExamples')}</Link>
                 </div>

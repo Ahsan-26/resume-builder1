@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { FaGoogle, FaApple, FaFacebook, FaAws, FaLinkedin } from "react-icons/fa";
+import Link from "next/link";
 
 export default function ResumeBuilderSection() {
     const t = useTranslations("resumeBuilderSection");
@@ -24,9 +25,9 @@ export default function ResumeBuilderSection() {
                             </p>
                         </div>
 
-                        <button className="px-8 py-4 bg-[var(--color-brand-gradient)] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                        <Link href="/resume-builder" className="inline-block px-8 py-4 bg-[var(--color-brand-gradient)] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
                             {t("cta")}
-                        </button>
+                        </Link>
 
                         <div className="pt-8 border-t border-gray-100">
                             <p className="text-sm text-gray-500 mb-4 font-medium">

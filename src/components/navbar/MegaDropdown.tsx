@@ -49,7 +49,7 @@ export default function MegaDropdown({ title, items = [], onClose }: { title?: s
   };
 
   return (
-    <div className="absolute left-0 mt-3 w-[650px] bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden animate-slideDown border border-gray-100">
+    <div className="w-[650px] bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden animate-slideDown border border-gray-100">
       <div className="p-6 grid grid-cols-2 gap-3">
         {items.map((it, i) => {
           const IconComponent = IconMap[it.icon];

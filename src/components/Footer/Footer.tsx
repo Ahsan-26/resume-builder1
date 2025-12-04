@@ -8,26 +8,26 @@ export default function Footer() {
   const t = useTranslations("footer");
 
   const features = [
-    { name: "Resume Builder", href: "/resume-builder" },
-    { name: "Cover Letter Builder", href: "/cover-letter-builder" },
-    { name: "Resume Checker", href: "/resume-checker" },
-    { name: "AI Resume Writer", href: "/ai-resume-writer" },
-    { name: "Templates", href: "/templates" },
+    { name: t("resumeBuilder"), href: "/resume-builder" },
+    { name: t("coverLetterBuilder"), href: "/cover-letter-builder" },
+    { name: t("resumeChecker"), href: "/resume-checker" },
+    { name: t("aiResumeWriter"), href: "/ai-resume-writer" },
+    { name: t("templates"), href: "/templates" },
   ];
 
   const about = [
-    { name: "About Us", href: "/about" },
-    { name: "How It Works", href: "/how-it-works" },
-    { name: "Pricing", href: "/pricing" },
-    { name: "Blog", href: "/blog" },
-    { name: "Careers", href: "/careers" },
+    { name: t("aboutUs"), href: "/about" },
+    { name: t("howItWorks"), href: "/how-it-works" },
+    { name: t("pricing"), href: "/pricing" },
+    { name: t("blog"), href: "/blog" },
+    { name: t("careers"), href: "/careers" },
   ];
 
   const legal = [
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms of Service", href: "/terms" },
-    { name: "Cookie Policy", href: "/cookies" },
-    { name: "Refund Policy", href: "/refund" },
+    { name: t("privacy"), href: "/privacy" },
+    { name: t("terms"), href: "/terms" },
+    { name: t("cookiePolicy"), href: "/cookies" },
+    { name: t("refundPolicy"), href: "/refund" },
   ];
 
   return (
@@ -71,7 +71,7 @@ export default function Footer() {
 
           {/* Features */}
           <div>
-            <h4 className="text-lg font-bold text-brand-primary mb-4">Features</h4>
+            <h4 className="text-lg font-bold text-brand-primary mb-4">{t("features")}</h4>
             <ul className="space-y-2.5">
               {features.map((item, index) => (
                 <li key={index}>
@@ -89,7 +89,7 @@ export default function Footer() {
 
           {/* About */}
           <div>
-            <h4 className="text-lg font-bold text-brand-primary mb-4">About</h4>
+            <h4 className="text-lg font-bold text-brand-primary mb-4">{t("about")}</h4>
             <ul className="space-y-2.5">
               {about.map((item, index) => (
                 <li key={index}>
@@ -107,7 +107,7 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-lg font-bold text-brand-primary mb-4">Legal</h4>
+            <h4 className="text-lg font-bold text-brand-primary mb-4">{t("legal")}</h4>
             <ul className="space-y-2.5">
               {legal.map((item, index) => (
                 <li key={index}>
