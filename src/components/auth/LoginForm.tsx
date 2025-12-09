@@ -39,7 +39,7 @@ export default function LoginForm() {
     const res = await login(data.email, data.password);
     setIsLoading(false);
     if (res.ok) {
-      router.push("/dashboard"); // Redirect to dashboard or home
+      router.push("/dashboard"); // Redirect to dashboard
     }
   };
 

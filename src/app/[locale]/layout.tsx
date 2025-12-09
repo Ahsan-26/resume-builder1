@@ -37,11 +37,7 @@ export default async function RootLayout({
         <GoogleOAuthProvider clientId={googleClientId}>
           <NextIntlClientProvider locale={locale}>
             <AuthProvider>
-              <Navbar />
-              <main className="min-h-screen">
-                {children}
-              </main>
-              <Footer />
+              {children}
               <Toaster position="top-center" />
             </AuthProvider>
           </NextIntlClientProvider>

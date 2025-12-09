@@ -24,7 +24,7 @@ export default function VerifyOTPForm({ email }: { email: string }) {
     setLoading(false);
 
     if (res.ok) {
-      router.push("/dashboard"); // or home
+      router.push("/"); // or home
     }
   };
 

@@ -321,5 +321,29 @@
     "invalidLinkMsg": "This password reset link is invalid or has expired.",
     "requestNewLink": "Request a new link",
     "orContinueWith": "Or continue with"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}!",
+    "documents": "Documents",
+    "lastEdited": "Last edited",
+    "createNew": "Create New",
+    "jobOpenings": "Job Openings",
+    "careerMap": "Career Map",
+    "interviews": "Interviews",
+    "sidebar": {
+      "home": "Home",
+      "resumes": "Resumes",
+      "coverLetters": "Cover Letters",
+      "website": "Website",
+      "resignationLetter": "Resignation Letter",
+      "myAccount": "My Account",
+      "logout": "Log Out"
+    },
+    "menu": {
+      "resume": "Resume",
+      "coverLetter": "Cover Letter",
+      "website": "Website",
+      "resignationLetter": "Resignation Letter"
+    }
   }
 }
