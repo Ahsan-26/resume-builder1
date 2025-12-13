@@ -1,12 +1,19 @@
 @import "tailwindcss";
 
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-.heading-font {
-  font-family: var(--font-heading);
+.heading-font,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), sans-serif !important;
 }
 
 @theme {

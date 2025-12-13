@@ -21,6 +21,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const menuItems = [
         { name: t("resumes"), icon: FileText, href: "/dashboard/resumes" },
         { name: t("coverLetters"), icon: File, href: "/dashboard/cover-letters" },
+        { name: "Templates", icon: File, href: "/dashboard/templates" }, // TODO: Add translation
         { name: t("myAccount"), icon: User, href: "/profile" },
     ];
 
@@ -47,8 +48,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             href={item.href}
                             onClick={onClose}
                             className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200"
+                                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200"
                                 }`}
                         >
                             {isActive && (

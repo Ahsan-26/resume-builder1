@@ -8,12 +8,12 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-import { Nunito } from "next/font/google";
+import localFont from "next/font/local";
 
-const nunito = Nunito({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"], // heading weights
+const nunito = localFont({
+  src: "../../fonts/Nunito-Variable.ttf",
   variable: "--font-heading",
+  display: "swap",
 });
 
 export default async function RootLayout({
