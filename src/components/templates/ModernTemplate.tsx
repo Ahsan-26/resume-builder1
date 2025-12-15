@@ -110,7 +110,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume }) => {
                     </div>
                 )}
 
-                {/* Strengths */}
+                {/* Strengthsss */}
                 {resume.strengths && resume.strengths.length > 0 && (
                     <div className="space-y-4">
                         <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-200 pb-2">
