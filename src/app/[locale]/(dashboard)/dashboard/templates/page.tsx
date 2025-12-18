@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { fetchTemplates } from "@/lib/api/templates";
 import { createResume } from "@/lib/api/resumes";
@@ -13,6 +13,7 @@ import Image from "next/image";
 
 export default function TemplatesPage() {
     const t = useTranslations("dashboard");
+    const locale = useLocale();
     const router = useRouter();
     const searchParams = useSearchParams();
     const resumeName = searchParams.get("name");
@@ -56,7 +57,7 @@ export default function TemplatesPage() {
                 target_role: "Professional",
             });
             toast.success("Resume created!");
-            router.push(`/resumes/${newResume.id}/edit`);
+            router.push(`/${locale}/dashboard/resumes/${newResume.id}/edit`);
         } catch (error) {
             console.error("Failed to create resume", error);
             toast.error("Failed to create resume");

@@ -1,3 +1,46 @@
+export interface TemplateLayout {
+    type: 'two_column' | 'single_column';
+    header: 'top' | 'left' | 'right';
+    columns?: {
+        left: number;
+        right: number;
+    };
+}
+
+export interface TemplateStyle {
+    font_family: string;
+    heading_scale: number;
+    body_scale: number;
+    primary_color: string;
+    accent_color: string;
+    section_gap: number;
+    line_height: number;
+}
+
+export interface SectionConfig {
+    area: 'header' | 'left' | 'right' | 'full';
+    order: number;
+    visible: boolean;
+    display?: string;
+}
+
+export interface TemplateSections {
+    personal_info: SectionConfig;
+    work_experiences: SectionConfig;
+    educations: SectionConfig;
+    skill_categories: SectionConfig;
+    strengths: SectionConfig;
+    hobbies: SectionConfig;
+    custom_sections: SectionConfig;
+}
+
+export interface TemplateDefinition {
+    schema_version: number;
+    layout: TemplateLayout;
+    style: TemplateStyle;
+    sections: TemplateSections;
+}
+
 export interface Template {
     id: string;
     name: string;
@@ -7,6 +50,7 @@ export interface Template {
     is_premium: boolean;
     preview_image_url: string;
     is_active: boolean;
+    definition: TemplateDefinition;
 }
 
 export interface PersonalInfo {
@@ -105,6 +149,7 @@ export interface Resume {
     title: string;
     slug: string;
     template: Template;
+    template_id?: string; // Added for robustness when nested template is missing
     language: string;
     target_role: string;
     is_ai_generated: boolean;

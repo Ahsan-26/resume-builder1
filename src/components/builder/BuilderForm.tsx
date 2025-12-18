@@ -29,8 +29,9 @@ export const BuilderForm: React.FC<BuilderFormProps> = ({ activeSection }) => {
     }
 
     return (
-        <div className="flex-1 h-full overflow-y-auto bg-gray-50 p-8">
-            <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+
+        <div className="flex-1 h-full overflow-y-auto bg-gray-50 md:bg-white p-4 md:p-0">
+            <div className="max-w-none mx-auto bg-white md:bg-transparent rounded-xl shadow-sm md:shadow-none border border-gray-200 md:border-none p-4 md:p-6">
                 {activeSection === "templates" && <TemplatesForm />}
                 {activeSection === "personal" && <PersonalInfoForm data={resume.personal_info || {}} />}
                 {activeSection === "experience" && <ExperienceForm items={resume.work_experiences || []} />}

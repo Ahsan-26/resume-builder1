@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Plus, FileText, Loader2, MoreVertical, Edit, Trash2, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ interface DocumentsSectionProps {
 
 export default function DocumentsSection({ filter }: DocumentsSectionProps) {
     const t = useTranslations("dashboard");
+    const locale = useLocale();
     const router = useRouter();
     const [documents, setDocuments] = useState<Resume[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +48,7 @@ export default function DocumentsSection({ filter }: DocumentsSectionProps) {
     const handleCreateResume = (name: string) => {
         setIsCreateDialogOpen(false);
         // Navigate to templates page with resume name
-        router.push(`/dashboard/templates?name=${encodeURIComponent(name)}`);
+        router.push(`/${locale}/dashboard/templates?name=${encodeURIComponent(name)}`);
     };
 
     const handleDeleteResume = async () => {
@@ -107,7 +108,7 @@ export default function DocumentsSection({ filter }: DocumentsSectionProps) {
                                 {/* Resume Card */}
                                 <div
                                     className="cursor-pointer"
-                                    onClick={() => router.push(`/resumes/${doc.id}/edit`)}
+                                    onClick={() => router.push(`/${locale}/dashboard/resumes/${doc.id}/edit`)}
                                 >
                                     <div className="aspect-[210/297] bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 border-2 border-transparent group-hover:border-blue-500 transition-all relative overflow-hidden shadow-sm">
                                         {doc.template?.preview_image_url ? (
@@ -153,7 +154,7 @@ export default function DocumentsSection({ filter }: DocumentsSectionProps) {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        router.push(`/resumes/${doc.id}/edit`);
+                                                        router.push(`/${locale}/dashboard/resumes/${doc.id}/edit`);
                                                     }}
                                                     className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
                                                 >
