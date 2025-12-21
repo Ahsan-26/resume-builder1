@@ -62,6 +62,23 @@ export async function updateResume(id: string, data: UpdateResumeData): Promise<
     return res.json();
 }
 
+export async function autosaveResume(id: string, data: UpdateResumeData): Promise<Resume> {
+    console.log("Autosaving resume:", id, "with data:", data);
+    const res = await apiFetch(`/resumes/${id}/autosave/`, {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+        if (res.status === 429) {
+            throw new Error("Too many requests. Please wait a moment and try again.");
+        }
+        const errorData = await res.json().catch(() => ({}));
+        console.error("Autosave Resume Error Details:", errorData);
+        throw new Error(errorData.detail || `Failed to autosave resume (Error ${res.status})`);
+    }
+    return res.json();
+}
+
 export async function deleteResume(id: string): Promise<void> {
     const res = await apiFetch(`/resumes/${id}/`, {
         method: "DELETE",

@@ -29,17 +29,27 @@ export const BuilderForm: React.FC<BuilderFormProps> = ({ activeSection }) => {
     }
 
     return (
+        <div className="flex-1 h-full overflow-y-auto bg-white">
+            <div className="max-w-3xl mx-auto p-8 md:p-12">
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 capitalize">
+                        {activeSection.replace('_', ' ')}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Fill in your details below to update your resume.
+                    </p>
+                </div>
 
-        <div className="flex-1 h-full overflow-y-auto bg-gray-50 md:bg-white p-4 md:p-0">
-            <div className="max-w-none mx-auto bg-white md:bg-transparent rounded-xl shadow-sm md:shadow-none border border-gray-200 md:border-none p-4 md:p-6">
-                {activeSection === "templates" && <TemplatesForm />}
-                {activeSection === "personal" && <PersonalInfoForm data={resume.personal_info || {}} />}
-                {activeSection === "experience" && <ExperienceForm items={resume.work_experiences || []} />}
-                {activeSection === "education" && <EducationForm items={resume.educations || []} />}
-                {activeSection === "skills" && <SkillsForm categories={resume.skill_categories || []} />}
-                {activeSection === "strengths" && <StrengthsForm items={resume.strengths || []} />}
-                {activeSection === "hobbies" && <HobbiesForm items={resume.hobbies || []} />}
-                {activeSection === "custom" && <CustomSectionForm sections={resume.custom_sections || []} />}
+                <div className="space-y-8">
+                    {activeSection === "templates" && <TemplatesForm />}
+                    {activeSection === "personal" && <PersonalInfoForm data={resume.personal_info || {}} />}
+                    {activeSection === "experience" && <ExperienceForm items={resume.work_experiences || []} />}
+                    {activeSection === "education" && <EducationForm items={resume.educations || []} />}
+                    {activeSection === "skills" && <SkillsForm categories={resume.skill_categories || []} />}
+                    {activeSection === "strengths" && <StrengthsForm items={resume.strengths || []} />}
+                    {activeSection === "hobbies" && <HobbiesForm items={resume.hobbies || []} />}
+                    {activeSection === "custom" && <CustomSectionForm sections={resume.custom_sections || []} />}
+                </div>
             </div>
         </div>
     );

@@ -1,54 +1,68 @@
 import { create } from 'zustand';
 import { Resume, PersonalInfo, WorkExperience, Education, SkillCategory, CustomSection } from '../types/resume';
-import { fetchResume, updateResume } from '../lib/api/resumes';
+import { fetchResume, updateResume, autosaveResume } from '../lib/api/resumes';
+
+// Module-level variable to track autosave timeout
+let autosaveTimeout: NodeJS.Timeout | null = null;
 
 interface ResumeState {
     resume: Resume | null;
     isLoading: boolean;
     isSaving: boolean;
+    isAutosaving: boolean;
+    lastSaved: Date | null;
     error: string | null;
+    isPreviewMode: boolean;
 
     // Actions
     fetchResume: (id: string) => Promise<void>;
     setResume: (resume: Resume) => void;
+    setIsPreviewMode: (isPreview: boolean) => void;
     updateResumeData: (data: Partial<Resume>) => void;
     updateTitle: (title: string) => void;
+    updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
+    updateSectionOrder: (sectionSettings: Record<string, { order: number; visible: boolean }>) => void;
 
     // Experience
     addExperience: (experience: WorkExperience) => void;
     updateExperience: (id: string, experience: Partial<WorkExperience>) => void;
-    removeExperience: (id: string) => void;
+    removeExperience: (id: string) => Promise<void>;
 
     // Education
     addEducation: (education: Education) => void;
     updateEducation: (id: string, education: Partial<Education>) => void;
-    removeEducation: (id: string) => void;
+    removeEducation: (id: string) => Promise<void>;
 
     // Skills
-    updateSkillCategories: (categories: SkillCategory[]) => void;
+    updateSkillCategories: (categories: SkillCategory[]) => Promise<void>;
 
     // Strengths & Hobbies
-    updateStrengths: (strengths: any[]) => void;
-    updateHobbies: (hobbies: any[]) => void;
+    updateStrengths: (strengths: any[]) => Promise<void>;
+    updateHobbies: (hobbies: any[]) => Promise<void>;
 
     // Custom Sections
-    updateCustomSections: (sections: CustomSection[]) => void;
+    updateCustomSections: (sections: CustomSection[]) => Promise<void>;
 
     // General Save
     saveResume: () => Promise<void>;
+    autosaveResume: () => Promise<void>;
 }
 
 export const useResumeStore = create<ResumeState>((set, get) => ({
     resume: null,
     isLoading: false,
     isSaving: false,
+    isAutosaving: false,
+    lastSaved: null,
     error: null,
+    isPreviewMode: false,
 
     fetchResume: async (id: string) => {
         set({ isLoading: true, error: null });
         try {
             const resume = await fetchResume(id);
             console.log("Fetched resume:", resume);
+            console.log("Personal Info from backend:", resume.personal_info);
             if (!resume.id) {
                 console.error("Fetched resume is missing ID:", resume);
             }
@@ -60,6 +74,8 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
 
     setResume: (resume) => set({ resume }),
 
+    setIsPreviewMode: (isPreview) => set({ isPreviewMode: isPreview }),
+
     updateResumeData: (data) =>
         set((state) => {
             if (!state.resume) return {};
@@ -67,6 +83,17 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 resume: {
                     ...state.resume,
                     ...data,
+                },
+            };
+        }),
+
+    updateSectionOrder: (sectionSettings) =>
+        set((state) => {
+            if (!state.resume) return {};
+            return {
+                resume: {
+                    ...state.resume,
+                    section_settings: sectionSettings,
                 },
             };
         }),
@@ -117,16 +144,44 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
             };
         }),
 
-    removeExperience: (id) =>
+    removeExperience: async (id) => {
+        const { resume } = get();
+        if (!resume) return;
+
+        // Store original state for rollback
+        const originalExperiences = resume.work_experiences || [];
+
+        // Optimistic update - remove immediately from UI
         set((state) => {
             if (!state.resume) return {};
             return {
                 resume: {
                     ...state.resume,
-                    work_experiences: (state.resume.work_experiences || []).filter((exp) => exp.id !== id),
+                    work_experiences: originalExperiences.filter((exp) => exp.id !== id),
                 },
             };
-        }),
+        });
+
+        // Sync with backend
+        try {
+            await get().autosaveResume();
+            console.log('Experience deleted successfully');
+        } catch (error) {
+            // Rollback on error
+            console.error('Failed to delete experience:', error);
+            set((state) => {
+                if (!state.resume) return {};
+                return {
+                    resume: {
+                        ...state.resume,
+                        work_experiences: originalExperiences,
+                    },
+                };
+            });
+            const toast = (await import("react-hot-toast")).default;
+            toast.error('Failed to delete experience');
+        }
+    },
 
     addEducation: (education) =>
         set((state) => {
@@ -152,18 +207,52 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
             };
         }),
 
-    removeEducation: (id) =>
+    removeEducation: async (id) => {
+        const { resume } = get();
+        if (!resume) return;
+
+        // Store original state for rollback
+        const originalEducations = resume.educations || [];
+
+        // Optimistic update - remove immediately from UI
         set((state) => {
             if (!state.resume) return {};
             return {
                 resume: {
                     ...state.resume,
-                    educations: (state.resume.educations || []).filter((edu) => edu.id !== id),
+                    educations: originalEducations.filter((edu) => edu.id !== id),
                 },
             };
-        }),
+        });
 
-    updateSkillCategories: (categories) =>
+        // Sync with backend
+        try {
+            await get().autosaveResume();
+            console.log('Education deleted successfully');
+        } catch (error) {
+            // Rollback on error
+            console.error('Failed to delete education:', error);
+            set((state) => {
+                if (!state.resume) return {};
+                return {
+                    resume: {
+                        ...state.resume,
+                        educations: originalEducations,
+                    },
+                };
+            });
+            const toast = (await import("react-hot-toast")).default;
+            toast.error('Failed to delete education');
+        }
+    },
+
+    updateSkillCategories: async (categories) => {
+        const { resume } = get();
+        if (!resume) return;
+
+        const originalCategories = resume.skill_categories || [];
+
+        // Optimistic update
         set((state) => {
             if (!state.resume) return {};
             return {
@@ -172,9 +261,32 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                     skill_categories: categories,
                 },
             };
-        }),
+        });
 
-    updateStrengths: (strengths) =>
+        // Sync with backend
+        try {
+            await get().autosaveResume();
+        } catch (error) {
+            console.error('Failed to update skills:', error);
+            set((state) => {
+                if (!state.resume) return {};
+                return {
+                    resume: {
+                        ...state.resume,
+                        skill_categories: originalCategories,
+                    },
+                };
+            });
+        }
+    },
+
+    updateStrengths: async (strengths) => {
+        const { resume } = get();
+        if (!resume) return;
+
+        const originalStrengths = resume.strengths || [];
+
+        // Optimistic update
         set((state) => {
             if (!state.resume) return {};
             return {
@@ -183,9 +295,32 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                     strengths,
                 },
             };
-        }),
+        });
 
-    updateHobbies: (hobbies) =>
+        // Sync with backend
+        try {
+            await get().autosaveResume();
+        } catch (error) {
+            console.error('Failed to update strengths:', error);
+            set((state) => {
+                if (!state.resume) return {};
+                return {
+                    resume: {
+                        ...state.resume,
+                        strengths: originalStrengths,
+                    },
+                };
+            });
+        }
+    },
+
+    updateHobbies: async (hobbies) => {
+        const { resume } = get();
+        if (!resume) return;
+
+        const originalHobbies = resume.hobbies || [];
+
+        // Optimistic update
         set((state) => {
             if (!state.resume) return {};
             return {
@@ -194,9 +329,32 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                     hobbies,
                 },
             };
-        }),
+        });
 
-    updateCustomSections: (sections) =>
+        // Sync with backend
+        try {
+            await get().autosaveResume();
+        } catch (error) {
+            console.error('Failed to update hobbies:', error);
+            set((state) => {
+                if (!state.resume) return {};
+                return {
+                    resume: {
+                        ...state.resume,
+                        hobbies: originalHobbies,
+                    },
+                };
+            });
+        }
+    },
+
+    updateCustomSections: async (sections) => {
+        const { resume } = get();
+        if (!resume) return;
+
+        const originalSections = resume.custom_sections || [];
+
+        // Optimistic update
         set((state) => {
             if (!state.resume) return {};
             return {
@@ -205,45 +363,35 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                     custom_sections: sections,
                 },
             };
-        }),
+        });
+
+        // Sync with backend
+        try {
+            await get().autosaveResume();
+        } catch (error) {
+            console.error('Failed to update custom sections:', error);
+            set((state) => {
+                if (!state.resume) return {};
+                return {
+                    resume: {
+                        ...state.resume,
+                        custom_sections: originalSections,
+                    },
+                };
+            });
+        }
+    },
 
     saveResume: async () => {
-        const { resume } = get();
-        if (!resume) {
-            console.error("Cannot save: resume is null");
-            return;
-        }
-        if (!resume.id) {
-            console.error("Cannot save resume: ID is missing from resume object", resume);
-            // Show user-friendly error
-            const toast = (await import("react-hot-toast")).default;
-            toast.error("Cannot save: Resume ID is missing. Please refresh the page.");
-            return;
-        }
+        const { resume, isSaving, isAutosaving } = get();
+        if (!resume || !resume.id || isSaving || isAutosaving) return;
 
         set({ isSaving: true });
         try {
-            // Ensure personal_info is initialized
-            const personal_info = resume.personal_info || {
-                first_name: "",
-                last_name: "",
-                headline: "",
-                summary: "",
-                email: "",
-                phone: "",
-                city: "",
-                country: "",
-                website: "",
-                linkedin_url: "",
-                github_url: "",
-                portfolio_url: "",
-                photo_url: "",
-            };
-
-            // We only send the fields that are editable.
             const updateData = {
                 title: resume.title,
-                personal_info,
+                personal_info: resume.personal_info,
+                section_settings: resume.section_settings || {},
                 work_experiences: resume.work_experiences || [],
                 educations: resume.educations || [],
                 skill_categories: resume.skill_categories || [],
@@ -252,22 +400,71 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 custom_sections: resume.custom_sections || [],
             };
 
-            console.log("Saving resume with ID:", resume.id, "Data:", updateData);
-
             const updatedResume = await updateResume(resume.id, updateData);
-            set({ resume: updatedResume, isSaving: false });
-            
-            // Show success message
+            console.log("Save response from backend:", updatedResume);
+
+            set({
+                resume: { ...resume, ...updatedResume },
+                isSaving: false,
+                lastSaved: new Date()
+            });
+
             const toast = (await import("react-hot-toast")).default;
             toast.success("Resume saved successfully!");
         } catch (err) {
             console.error("Failed to save resume", err);
-            set({ isSaving: false, error: "Failed to save changes" });
-            
-            // Show error message
+            const errorMessage = (err as Error).message || "Failed to save changes";
+            set({ isSaving: false, error: errorMessage });
             const toast = (await import("react-hot-toast")).default;
-            const errorMessage = err instanceof Error ? err.message : "Failed to save changes";
             toast.error(errorMessage);
         }
+    },
+
+    autosaveResume: async () => {
+        // Clear any existing timeout
+        if (autosaveTimeout) {
+            clearTimeout(autosaveTimeout);
+        }
+
+        // Set a new timeout to debounce the autosave
+        autosaveTimeout = setTimeout(async () => {
+            const { resume, isSaving, isAutosaving } = get();
+
+            // If we're already saving or autosaving, we'll try again in a moment
+            if (!resume || !resume.id || isSaving || isAutosaving) {
+                // If it's still autosaving, reschedule the check
+                if (isAutosaving) {
+                    get().autosaveResume();
+                }
+                return;
+            }
+
+            set({ isAutosaving: true });
+            try {
+                const updateData = {
+                    title: resume.title,
+                    personal_info: resume.personal_info,
+                    section_settings: resume.section_settings || {},
+                    work_experiences: resume.work_experiences || [],
+                    educations: resume.educations || [],
+                    skill_categories: resume.skill_categories || [],
+                    strengths: resume.strengths || [],
+                    hobbies: resume.hobbies || [],
+                    custom_sections: resume.custom_sections || [],
+                };
+
+                const updatedResume = await autosaveResume(resume.id, updateData);
+                console.log("Autosave response from backend:", updatedResume);
+
+                set({
+                    resume: { ...resume, ...updatedResume },
+                    isAutosaving: false,
+                    lastSaved: new Date()
+                });
+            } catch (err) {
+                console.error("Failed to autosave resume", err);
+                set({ isAutosaving: false });
+            }
+        }, 1500); // 1.5 second debounce
     },
 }));
