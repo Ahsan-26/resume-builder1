@@ -3,7 +3,7 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { CustomSection, CustomSectionItem } from "../../../types/resume";
-import { Plus, Trash2, ChevronDown, ChevronUp, Edit2 } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Edit2, Layers, Calendar, AlignLeft, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface CustomSectionFormProps {
@@ -11,9 +11,10 @@ interface CustomSectionFormProps {
 }
 
 export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections = [] }) => {
-    const { updateCustomSections, saveResume } = useResumeStore();
-    const [expandedSectionId, setExpandedSectionId] = React.useState<string | null>(null);
+    const { updateCustomSections, resume } = useResumeStore();
+    const [expandedSectionId, setExpandedSectionId] = React.useState<string | null>(sections[0]?.id || null);
     const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null);
+    const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
 
     const handleAddSection = () => {
         const newSection: CustomSection = {
@@ -89,13 +90,19 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
         updateCustomSections(newSections);
     };
 
+    const inputClasses = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all text-sm font-medium text-gray-900 placeholder-gray-400";
+    const labelClasses = "block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1";
+
     return (
         <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-[#00004d]">Custom Sections</h3>
+            <div className="flex justify-between items-center mb-2">
+                <div className="space-y-1">
+                    <h3 className="text-lg font-black text-gray-900">Custom Sections</h3>
+                    <p className="text-xs text-gray-500 font-medium">Add any other relevant information to your resume.</p>
+                </div>
                 <button
                     onClick={handleAddSection}
-                    className="flex items-center gap-2 text-sm font-medium text-[#00004d] hover:text-[#002366] transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all active:scale-95"
                 >
                     <Plus size={16} /> Add Section
                 </button>
@@ -103,33 +110,41 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
 
             <div className="space-y-6">
                 {sections.map((section) => (
-                    <div key={section.id} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                    <div key={section.id} className={`border rounded-[32px] overflow-hidden transition-all duration-300 ${expandedSectionId === section.id ? 'border-blue-200 shadow-xl shadow-blue-50/50 ring-1 ring-blue-100' : 'border-gray-100 bg-white'}`}>
                         {/* Section Header */}
-                        <div className="bg-gray-50 p-4 flex items-center justify-between border-b border-gray-200">
-                            <div className="flex-1 mr-4">
-                                <input
-                                    type="text"
-                                    value={section.title}
-                                    onChange={(e) => handleUpdateSectionTitle(section.id, e.target.value)}
-                                    
-                                    className="bg-transparent font-bold text-lg text-gray-900 border-b border-transparent hover:border-gray-300 focus:border-[#00004d] focus:outline-none w-full transition-colors"
-                                    placeholder="Section Title (e.g. Volunteering)"
-                                />
+                        <div
+                            className={`p-6 flex items-center justify-between cursor-pointer transition-colors ${expandedSectionId === section.id ? 'bg-blue-50/30' : 'hover:bg-gray-50/50'}`}
+                            onClick={() => setExpandedSectionId(expandedSectionId === section.id ? null : section.id)}
+                        >
+                            <div className="flex items-center gap-4 flex-1">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${expandedSectionId === section.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-gray-100 text-gray-400'}`}>
+                                    <Layers size={18} />
+                                </div>
+                                <div className="flex-1 max-w-md relative">
+                                    <input
+                                        type="text"
+                                        value={section.title}
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={(e) => handleUpdateSectionTitle(section.id, e.target.value)}
+                                        className="bg-transparent text-sm font-black text-gray-900 border-none focus:ring-0 p-0 placeholder-gray-300 w-full"
+                                        placeholder="Section Title (e.g. Volunteering)"
+                                    />
+                                    <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-blue-600 rounded-full" />
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                                 <button
-                                    onClick={() => handleDeleteSection(section.id)}
-                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                                    title="Delete Section"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteSection(section.id);
+                                    }}
+                                    className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                                 >
                                     <Trash2 size={18} />
                                 </button>
-                                <button
-                                    onClick={() => setExpandedSectionId(expandedSectionId === section.id ? null : section.id)}
-                                    className="p-2 text-gray-500 hover:text-[#00004d] transition-colors"
-                                >
+                                <div className={`p-1 rounded-lg transition-colors ${expandedSectionId === section.id ? 'text-blue-600' : 'text-gray-400'}`}>
                                     {expandedSectionId === section.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </button>
+                                </div>
                             </div>
                         </div>
 
@@ -140,75 +155,82 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: "auto", opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
-                                    className="p-4 bg-gray-50/50"
+                                    className="px-6 pb-6 space-y-4"
                                 >
                                     <div className="space-y-4">
                                         {section.items.map((item) => (
-                                            <div key={item.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                                            <div key={item.id} className={`border rounded-2xl overflow-hidden transition-all ${expandedItemId === item.id ? 'border-blue-100 bg-white shadow-sm' : 'border-gray-100 bg-gray-50/30'}`}>
                                                 <div
-                                                    className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                                                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-white transition-colors"
                                                     onClick={() => setExpandedItemId(expandedItemId === item.id ? null : item.id)}
                                                 >
-                                                    <span className="font-medium text-gray-700">{item.title || "(Untitled Item)"}</span>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-2 h-2 rounded-full ${expandedItemId === item.id ? 'bg-blue-600' : 'bg-gray-300'}`} />
+                                                        <span className="text-xs font-bold text-gray-700">{item.title || "New Item"}</span>
+                                                    </div>
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handleDeleteItem(section.id, item.id);
                                                             }}
-                                                            className="p-1.5 text-gray-400 hover:text-red-500"
+                                                            className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-all"
                                                         >
                                                             <Trash2 size={14} />
                                                         </button>
-                                                        {expandedItemId === item.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                        <div className="text-gray-400">
+                                                            {expandedItemId === item.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                                 {expandedItemId === item.id && (
-                                                    <div className="p-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        <div className="md:col-span-2">
-                                                            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Title</label>
+                                                    <div className="p-5 pt-0 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                        <div className="md:col-span-2 space-y-1.5">
+                                                            <label className={labelClasses}>Title</label>
                                                             <input
                                                                 type="text"
                                                                 value={item.title}
                                                                 onChange={(e) => handleUpdateItem(section.id, item.id, "title", e.target.value)}
-                                                                
-                                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
+                                                                className={inputClasses}
                                                                 placeholder="e.g. Volunteer"
                                                             />
                                                         </div>
-                                                        <div>
-                                                            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Subtitle</label>
+                                                        <div className="space-y-1.5">
+                                                            <label className={labelClasses}>Subtitle</label>
                                                             <input
                                                                 type="text"
                                                                 value={item.subtitle}
                                                                 onChange={(e) => handleUpdateItem(section.id, item.id, "subtitle", e.target.value)}
-                                                                
-                                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
+                                                                className={inputClasses}
                                                                 placeholder="e.g. Red Cross"
                                                             />
                                                         </div>
-                                                        <div>
-                                                            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date / Meta</label>
-                                                            <input
-                                                                type="text"
-                                                                value={item.meta}
-                                                                onChange={(e) => handleUpdateItem(section.id, item.id, "meta", e.target.value)}
-                                                                
-                                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
-                                                                placeholder="e.g. 2020 - 2022"
-                                                            />
+                                                        <div className="space-y-1.5">
+                                                            <label className={labelClasses}>Date / Meta</label>
+                                                            <div className="relative">
+                                                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.meta}
+                                                                    onChange={(e) => handleUpdateItem(section.id, item.id, "meta", e.target.value)}
+                                                                    className={`${inputClasses} pl-11`}
+                                                                    placeholder="e.g. 2020 - 2022"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                        <div className="md:col-span-2">
-                                                            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description</label>
-                                                            <textarea
-                                                                value={item.description}
-                                                                onChange={(e) => handleUpdateItem(section.id, item.id, "description", e.target.value)}
-                                                                
-                                                                rows={3}
-                                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all resize-none"
-                                                                placeholder="Details about this item..."
-                                                            />
+                                                        <div className="md:col-span-2 space-y-1.5">
+                                                            <label className={labelClasses}>Description</label>
+                                                            <div className="relative">
+                                                                <AlignLeft className="absolute left-4 top-4 text-gray-400" size={16} />
+                                                                <textarea
+                                                                    value={item.description}
+                                                                    onChange={(e) => handleUpdateItem(section.id, item.id, "description", e.target.value)}
+                                                                    rows={4}
+                                                                    className={`${inputClasses} pl-11 resize-none leading-relaxed`}
+                                                                    placeholder="Details about this item..."
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 )}
@@ -216,7 +238,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                         ))}
                                         <button
                                             onClick={() => handleAddItem(section.id)}
-                                            className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 font-medium hover:border-[#00004d] hover:text-[#00004d] transition-all flex items-center justify-center gap-2"
+                                            className="w-full py-4 border-2 border-dashed border-gray-100 rounded-2xl text-gray-400 text-xs font-bold hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2"
                                         >
                                             <Plus size={16} /> Add Item
                                         </button>
@@ -228,11 +250,15 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                 ))}
 
                 {sections.length === 0 && (
-                    <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                        <p className="text-gray-500 mb-4">No custom sections yet.</p>
+                    <div className="text-center py-16 bg-gray-50/50 rounded-[32px] border-2 border-dashed border-gray-100">
+                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-gray-300 mx-auto mb-4 shadow-sm">
+                            <Layers size={32} />
+                        </div>
+                        <h4 className="text-sm font-black text-gray-900 mb-1">No custom sections yet</h4>
+                        <p className="text-xs text-gray-500 font-medium mb-6">Add volunteering, awards, or any other section.</p>
                         <button
                             onClick={handleAddSection}
-                            className="px-4 py-2 bg-[#00004d] text-white rounded-lg hover:bg-[#002366] transition-colors font-medium"
+                            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold text-sm shadow-lg shadow-blue-200 active:scale-95"
                         >
                             Create Your First Section
                         </button>

@@ -33,7 +33,7 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
                     visible: settings?.visible ?? config.visible
                 };
             })
-            .filter(s => s.visible)
+            .filter(s => isEditable || s.visible)
             .sort((a, b) => a.order - b.order)
             .map(s => s.key);
     };
@@ -53,7 +53,7 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
             case 'hobbies':
                 return <HobbiesSection key={key} resume={resume} style={style} isEditable={isEditable} />;
             case 'custom_sections':
-                return <CustomSectionRenderer key={key} resume={resume} style={style} sectionId={key} isEditable={isEditable} />;
+                return <CustomSectionRenderer key={key} resume={resume} style={style} isEditable={isEditable} />;
             default:
                 return null;
         }

@@ -8,111 +8,193 @@ interface PersonalInfoFormProps {
     data: PersonalInfo;
 }
 
+import { Camera, Mail, Phone, MapPin, Globe, Linkedin, Github, Briefcase } from "lucide-react";
+
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as PersonalInfo }) => {
-    const { updatePersonalInfo } = useResumeStore();
+    const { updatePersonalInfo, resume } = useResumeStore();
+    const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         updatePersonalInfo({ [name]: value });
     };
 
+    const inputClasses = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all text-sm font-medium text-gray-900 placeholder-gray-400";
+    const labelClasses = "block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1";
+
     return (
-        <div className="space-y-6">
-            <h3 className="text-xl font-bold text-[#00004d]">Personal Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+        <div className="space-y-10">
+            {/* Profile Picture Section */}
+            <div className="flex items-center gap-8">
+                <div className="relative group">
+                    <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gray-100 flex items-center justify-center">
+                        {data.photo_url ? (
+                            <img src={data.photo_url} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                            <User size={40} className="text-gray-300" />
+                        )}
+                    </div>
+                    <button className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-blue-600 hover:scale-110 transition-transform">
+                        <Camera size={16} />
+                    </button>
+                </div>
+                <div className="space-y-2">
+                    <h4 className="text-lg font-black text-gray-900">Profile Picture</h4>
+                    <p className="text-xs text-gray-500 font-medium">Upload a professional photo to make your resume stand out.</p>
+                    <button className="text-xs font-bold text-blue-600 hover:underline">Remove photo</button>
+                </div>
+            </div>
+
+            {/* Form Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                <div className="space-y-1.5">
+                    <label className={labelClasses}>First Name</label>
                     <input
                         type="text"
                         name="first_name"
                         value={data.first_name || ""}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
-                        placeholder="e.g. John"
+                        className={inputClasses}
+                        placeholder="e.g. Ahsan"
                     />
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <div className="space-y-1.5">
+                    <label className={labelClasses}>Last Name</label>
                     <input
                         type="text"
                         name="last_name"
                         value={data.last_name || ""}
                         onChange={handleChange}
-                        
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
-                        placeholder="e.g. Doe"
+                        className={inputClasses}
+                        placeholder="e.g. Habib"
                     />
                 </div>
-                <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
-                    <input
-                        type="text"
-                        name="headline"
-                        value={data.headline || ""}
-                        onChange={handleChange}
-                        
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
-                        placeholder="e.g. Senior Software Engineer"
-                    />
+                <div className="md:col-span-2 space-y-1.5">
+                    <label className={labelClasses}>Professional Headline</label>
+                    <div className="relative">
+                        <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input
+                            type="text"
+                            name="headline"
+                            value={data.headline || ""}
+                            onChange={handleChange}
+                            className={`${inputClasses} pl-12`}
+                            placeholder="e.g. Senior Full Stack Developer"
+                        />
+                    </div>
                 </div>
-                <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Summary</label>
-                    <textarea
-                        name="summary"
-                        value={data.summary || ""}
-                        onChange={handleChange}
-                        
-                        rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all resize-none"
-                        placeholder="Briefly describe your professional background..."
-                    />
+                <div className="space-y-1.5">
+                    <label className={labelClasses}>Email Address</label>
+                    <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input
+                            type="email"
+                            name="email"
+                            value={data.email || ""}
+                            onChange={handleChange}
+                            className={`${inputClasses} pl-12`}
+                            placeholder="ahsan@example.com"
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={data.email || ""}
-                        onChange={handleChange}
-                        
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
-                        placeholder="john@example.com"
-                    />
+                <div className="space-y-1.5">
+                    <label className={labelClasses}>Phone Number</label>
+                    <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={data.phone || ""}
+                            onChange={handleChange}
+                            className={`${inputClasses} pl-12`}
+                            placeholder="+1 234 567 890"
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input
-                        type="tel"
-                        name="phone"
-                        value={data.phone || ""}
-                        onChange={handleChange}
-                        
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
-                        placeholder="+1 234 567 890"
-                    />
+                <div className="space-y-1.5">
+                    <label className={labelClasses}>City</label>
+                    <div className="relative">
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input
+                            type="text"
+                            name="city"
+                            value={data.city || ""}
+                            onChange={handleChange}
+                            className={`${inputClasses} pl-12`}
+                            placeholder="New York"
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                    <input
-                        type="text"
-                        name="city"
-                        value={data.city || ""}
-                        onChange={handleChange}
-                        
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
-                        placeholder="New York"
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                <div className="space-y-1.5">
+                    <label className={labelClasses}>Country</label>
                     <input
                         type="text"
                         name="country"
                         value={data.country || ""}
                         onChange={handleChange}
-                        
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none transition-all"
+                        className={inputClasses}
                         placeholder="USA"
+                    />
+                </div>
+
+                {/* Social Links */}
+                <div className="md:col-span-2 pt-4">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Social & Professional Links</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1.5">
+                            <label className={labelClasses}>Website / Portfolio</label>
+                            <div className="relative">
+                                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type="text"
+                                    name="website"
+                                    value={data.website || ""}
+                                    onChange={handleChange}
+                                    className={`${inputClasses} pl-12`}
+                                    placeholder="https://ahsan.dev"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelClasses}>LinkedIn</label>
+                            <div className="relative">
+                                <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type="text"
+                                    name="linkedin_url"
+                                    value={data.linkedin_url || ""}
+                                    onChange={handleChange}
+                                    className={`${inputClasses} pl-12`}
+                                    placeholder="linkedin.com/in/ahsan"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelClasses}>GitHub</label>
+                            <div className="relative">
+                                <Github className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type="text"
+                                    name="github_url"
+                                    value={data.github_url || ""}
+                                    onChange={handleChange}
+                                    className={`${inputClasses} pl-12`}
+                                    placeholder="github.com/ahsan"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="md:col-span-2 space-y-1.5 pt-4">
+                    <label className={labelClasses}>Professional Summary</label>
+                    <textarea
+                        name="summary"
+                        value={data.summary || ""}
+                        onChange={handleChange}
+                        rows={5}
+                        className={`${inputClasses} resize-none leading-relaxed`}
+                        placeholder="Write a compelling summary of your professional background and key achievements..."
                     />
                 </div>
             </div>

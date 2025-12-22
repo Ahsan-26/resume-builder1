@@ -48,21 +48,21 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             href={item.href}
                             onClick={onClose}
                             className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                                ? "bg-[#00004d]/5 dark:bg-[#FFF4BC]/10 text-[#00004d] dark:text-[#FFF4BC]"
                                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200"
                                 }`}
                         >
                             {isActive && (
                                 <motion.div
                                     layoutId="activeTab"
-                                    className="absolute left-0 w-1 h-8 bg-blue-600 rounded-r-full"
+                                    className="absolute left-0 w-1.5 h-8 bg-[#00004d] dark:bg-[#FFF4BC] rounded-r-full"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                 />
                             )}
-                            <item.icon className={`w-5 h-5 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"}`} />
-                            <span className="font-medium">{item.name}</span>
+                            <item.icon className={`w-5 h-5 ${isActive ? "text-[#00004d] dark:text-[#FFF4BC]" : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"}`} />
+                            <span className={`font-bold ${isActive ? "text-[#00004d] dark:text-[#FFF4BC]" : ""}`}>{item.name}</span>
                         </Link>
                     );
                 })}

@@ -93,3 +93,17 @@ export async function deleteResume(id: string): Promise<void> {
         throw new Error("Failed to delete resume");
     }
 }
+
+export async function downloadResumePdf(id: string): Promise<Blob> {
+    const res = await apiFetch(`/resumes/${id}/pdf/`);
+    if (!res.ok) {
+        if (res.status === 429) {
+            throw new Error("Too many requests. Please wait a moment and try again.");
+        }
+        if (res.status === 503) {
+            throw new Error("PDF generation service is currently unavailable. Please try again later.");
+        }
+        throw new Error("Failed to download resume PDF");
+    }
+    return res.blob();
+}

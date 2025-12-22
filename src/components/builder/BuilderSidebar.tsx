@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
-import { User, Briefcase, GraduationCap, Wrench, FileText, Layers, LayoutTemplate, Plus } from "lucide-react";
+import { User, Briefcase, GraduationCap, Wrench, FileText, Layers, LayoutTemplate, Plus, Home, Files, Sparkles, Languages, Share2, Search, Map, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { useResumeStore } from "@/store/useResumeStore";
 import { WorkExperience, Education, SkillCategory, Strength, Hobby, CustomSection } from "@/types/resume";
+import Link from "next/link";
 
 export type SectionType = "templates" | "personal" | "experience" | "education" | "skills" | "strengths" | "hobbies" | "custom";
 
@@ -13,9 +13,14 @@ interface BuilderSidebarProps {
     onSectionChange: (section: SectionType) => void;
 }
 
-const sections: { id: SectionType; label: string; icon: React.ElementType; hasAdd?: boolean }[] = [
-    { id: "templates", label: "Templates", icon: LayoutTemplate },
-    { id: "personal", label: "Personal Info", icon: User },
+const mainNav = [
+    { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
+    { id: "documents", label: "My Documents", icon: Files, href: "/dashboard/resumes" },
+];
+
+const editSections: { id: SectionType; label: string; icon: React.ElementType; hasAdd?: boolean }[] = [
+    { id: "personal", label: "Fill In", icon: User },
+    { id: "templates", label: "Design", icon: LayoutTemplate },
     { id: "experience", label: "Experience", icon: Briefcase, hasAdd: true },
     { id: "education", label: "Education", icon: GraduationCap, hasAdd: true },
     { id: "skills", label: "Skills", icon: Wrench, hasAdd: true },
@@ -24,10 +29,23 @@ const sections: { id: SectionType; label: string; icon: React.ElementType; hasAd
     { id: "custom", label: "Custom Sections", icon: Layers, hasAdd: true },
 ];
 
+const aiTools = [
+    { id: "improve", label: "Improve", icon: Sparkles },
+    { id: "proofread", label: "Proofread & Translate", icon: Languages },
+    { id: "share", label: "Download & Share", icon: Share2 },
+];
+
+const footerNav = [
+    { id: "career", label: "Career Map", icon: Map },
+    { id: "interviews", label: "Job Interviews", icon: MessageSquare },
+    { id: "jobs", label: "Find Jobs", icon: Search },
+];
+
 export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, onSectionChange }) => {
     const { addExperience, addEducation, updateSkillCategories, updateStrengths, updateHobbies, updateCustomSections, resume } = useResumeStore();
 
     const handleAddItem = (sectionId: SectionType) => {
+        // ... (keep existing handleAddItem logic)
         switch (sectionId) {
             case "experience":
                 const newExp: WorkExperience = {
@@ -62,12 +80,9 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                 addEducation(newEdu);
                 break;
             case "skills":
-                // Add a single skill to a "Skills" category
                 const existingCategories = resume?.skill_categories || [];
                 let skillsCategory = existingCategories.find(cat => cat.name === "Skills");
-
                 if (!skillsCategory) {
-                    // Create new category if doesn't exist
                     skillsCategory = {
                         id: crypto.randomUUID(),
                         name: "Skills",
@@ -76,15 +91,12 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                     };
                     existingCategories.push(skillsCategory);
                 }
-
-                // Add new skill item
                 skillsCategory.items.push({
                     id: crypto.randomUUID(),
                     name: "New Skill",
                     level: "intermediate",
                     order: skillsCategory.items.length,
                 });
-
                 updateSkillCategories([...existingCategories]);
                 break;
             case "strengths":
@@ -115,7 +127,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                             title: "Sample Project",
                             subtitle: "Personal Project",
                             meta: "2024",
-                            description: "Click to edit project description. Add details about what you built, technologies used, and impact.",
+                            description: "Click to edit project description.",
                             start_date: "",
                             end_date: "",
                             is_current: false,
@@ -129,45 +141,95 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
     };
 
     return (
-        <aside className="w-full h-full bg-white flex flex-col">
-            <div className="p-6 border-b border-gray-100">
-                <h2 className="text-xl font-bold text-gray-800">Builder</h2>
+        <aside className="w-full h-full bg-white flex flex-col overflow-y-auto border-r border-gray-100">
+            {/* User Profile Section */}
+            <div className="p-6 flex items-center gap-3 border-b border-gray-50">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md">
+                    {resume?.personal_info?.first_name?.[0] || "U"}
+                </div>
+                <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-900 truncate">
+                        {resume?.personal_info?.first_name} {resume?.personal_info?.last_name}
+                    </p>
+                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Free Plan</p>
+                </div>
             </div>
-            <nav className="flex-1 flex flex-col p-4 space-y-2 overflow-y-auto">
-                {sections.map((section) => {
-                    const Icon = section.icon;
-                    const isActive = activeSection === section.id;
-                    return (
-                        <div key={section.id} className="space-y-1">
-                            <button
-                                onClick={() => onSectionChange(section.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                                    ? "bg-blue-50 text-blue-600 font-medium shadow-sm"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                    }`}
-                            >
-                                <Icon size={20} className={isActive ? "text-blue-600" : "text-gray-400"} />
-                                <span className="flex-1 text-left">{section.label}</span>
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="active-indicator"
-                                        className="w-1.5 h-1.5 rounded-full bg-blue-600"
-                                    />
-                                )}
-                            </button>
-                            {section.hasAdd && isActive && (
+
+            <div className="flex-1 px-3 py-4 space-y-6">
+                {/* Global Navigation */}
+                <nav className="space-y-1">
+                    {mainNav.map((item) => (
+                        <Link
+                            key={item.id}
+                            href={item.href}
+                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all"
+                        >
+                            <item.icon size={18} className="text-gray-400" />
+                            {item.label}
+                        </Link>
+                    ))}
+                </nav>
+
+                {/* Edit Sections */}
+                <div className="space-y-1">
+                    <p className="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Editor</p>
+                    {editSections.map((section) => {
+                        const Icon = section.icon;
+                        const isActive = activeSection === section.id;
+                        return (
+                            <div key={section.id} className="space-y-1">
                                 <button
-                                    onClick={() => handleAddItem(section.id)}
-                                    className="w-full flex items-center gap-2 px-4 py-2 ml-9 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    onClick={() => onSectionChange(section.id)}
+                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${isActive
+                                        ? "bg-gray-900 text-white shadow-lg shadow-gray-200"
+                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                        }`}
                                 >
-                                    <Plus size={16} />
-                                    Add {section.label === "Custom Sections" ? "Section" : section.label.slice(0, -1)}
+                                    <Icon size={18} className={isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600"} />
+                                    <span className="flex-1 text-left font-semibold">{section.label}</span>
+                                    {isActive && section.hasAdd && (
+                                        <Plus
+                                            size={16}
+                                            className="text-gray-400 hover:text-white transition-colors"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddItem(section.id);
+                                            }}
+                                        />
+                                    )}
                                 </button>
-                            )}
-                        </div>
-                    );
-                })}
-            </nav>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* AI Tools */}
+                <div className="space-y-1">
+                    <p className="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">AI Tools</p>
+                    {aiTools.map((item) => (
+                        <button
+                            key={item.id}
+                            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all"
+                        >
+                            <item.icon size={18} className="text-gray-400" />
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Footer Navigation */}
+            <div className="p-4 bg-gray-50/50 border-t border-gray-100 space-y-1">
+                {footerNav.map((item) => (
+                    <button
+                        key={item.id}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-gray-500 hover:text-gray-900 transition-all"
+                    >
+                        <item.icon size={16} />
+                        {item.label}
+                    </button>
+                ))}
+            </div>
         </aside>
     );
 };

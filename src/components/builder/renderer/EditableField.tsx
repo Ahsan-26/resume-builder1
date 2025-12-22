@@ -8,6 +8,7 @@ interface EditableFieldProps {
     style?: React.CSSProperties;
     multiline?: boolean;
     isEditable?: boolean;
+    validate?: (value: string) => string | null;
 }
 
 export const EditableField: React.FC<EditableFieldProps> = ({
@@ -17,10 +18,12 @@ export const EditableField: React.FC<EditableFieldProps> = ({
     className = "",
     style,
     multiline = false,
-    isEditable = true
+    isEditable = true,
+    validate
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [localValue, setLocalValue] = useState(value);
+    const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
     useEffect(() => {
@@ -34,6 +37,15 @@ export const EditableField: React.FC<EditableFieldProps> = ({
     }, [isEditing]);
 
     const handleBlur = () => {
+        if (validate) {
+            const validationError = validate(localValue);
+            if (validationError) {
+                setError(validationError);
+                return; // Keep editing or show error
+            }
+        }
+
+        setError(null);
         setIsEditing(false);
         if (localValue !== value) {
             onChange(localValue);
@@ -43,6 +55,11 @@ export const EditableField: React.FC<EditableFieldProps> = ({
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !multiline) {
             handleBlur();
+        }
+        if (e.key === 'Escape') {
+            setLocalValue(value);
+            setError(null);
+            setIsEditing(false);
         }
     };
 
@@ -55,30 +72,45 @@ export const EditableField: React.FC<EditableFieldProps> = ({
     }
 
     if (isEditing) {
-        if (multiline) {
-            return (
-                <textarea
-                    ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-                    value={localValue}
-                    onChange={(e) => setLocalValue(e.target.value)}
-                    onBlur={handleBlur}
-                    className={`w-full bg-transparent border-b border-blue-500 focus:outline-none resize-none ${className}`}
-                    style={style}
-                    rows={3}
-                />
-            );
-        }
+        const inputClasses = `w-full bg-transparent border-b focus:outline-none transition-colors ${error ? 'border-red-500 bg-red-50' : 'border-blue-500'
+            } ${className}`;
+
         return (
-            <input
-                ref={inputRef as React.RefObject<HTMLInputElement>}
-                type="text"
-                value={localValue}
-                onChange={(e) => setLocalValue(e.target.value)}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                className={`w-full bg-transparent border-b border-blue-500 focus:outline-none ${className}`}
-                style={style}
-            />
+            <div className="relative w-full">
+                {multiline ? (
+                    <textarea
+                        ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                        value={localValue}
+                        onChange={(e) => {
+                            setLocalValue(e.target.value);
+                            if (error) setError(null);
+                        }}
+                        onBlur={handleBlur}
+                        className={`resize-none ${inputClasses}`}
+                        style={style}
+                        rows={3}
+                    />
+                ) : (
+                    <input
+                        ref={inputRef as React.RefObject<HTMLInputElement>}
+                        type="text"
+                        value={localValue}
+                        onChange={(e) => {
+                            setLocalValue(e.target.value);
+                            if (error) setError(null);
+                        }}
+                        onBlur={handleBlur}
+                        onKeyDown={handleKeyDown}
+                        className={inputClasses}
+                        style={style}
+                    />
+                )}
+                {error && (
+                    <div className="absolute left-0 top-full mt-1 z-50 bg-red-600 text-white text-[10px] px-2 py-1 rounded shadow-lg whitespace-nowrap animate-in fade-in slide-in-from-top-1">
+                        {error}
+                    </div>
+                )}
+            </div>
         );
     }
 

@@ -14,7 +14,7 @@ import Link from "next/link";
 export default function ResumeEditPage() {
     const params = useParams();
     const id = params.id as string;
-    const { fetchResume, isSaving, isAutosaving, lastSaved, resume, saveResume, autosaveResume, updateTitle, isPreviewMode, setIsPreviewMode } = useResumeStore();
+    const { fetchResume, isSaving, isAutosaving, lastSaved, resume, saveResume, autosaveResume, updateTitle, isPreviewMode, setIsPreviewMode, downloadResume } = useResumeStore();
     const [activeSection, setActiveSection] = useState<SectionType>("personal");
     const [isRearrangeOpen, setIsRearrangeOpen] = useState(false);
 
@@ -56,90 +56,32 @@ export default function ResumeEditPage() {
         <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
             {/* Top Bar - Hide on Mobile */}
             {!isMobile && (
-                <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 z-20 shrink-0 shadow-sm">
+                <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-20 shrink-0">
                     <div className="flex items-center gap-4">
-                        <Link
-                            href="/dashboard"
-                            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"
-                        >
-                            <ArrowLeft size={20} />
-                        </Link>
-                        <div className="hidden md:block">
-                            <input
-                                type="text"
-                                value={resume?.title || ""}
-                                onChange={(e) => updateTitle(e.target.value)}
-                                onBlur={() => saveResume()}
-                                className="text-base font-bold text-gray-900 bg-transparent border-none focus:ring-0 p-0 placeholder-gray-300 w-full max-w-md"
-                                placeholder="Untitled Resume"
-                            />
-                            <div className="flex items-center gap-2">
-                                <div className={`w-1.5 h-1.5 rounded-full ${isSaving || isAutosaving ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'}`} />
-                                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
-                                    {isSaving || isAutosaving ? "Saving changes..." : formatLastSaved(lastSaved) || "Syncing to cloud"}
-                                </p>
-                            </div>
+                        <div className="flex items-center gap-2 text-gray-400">
+                            <Files size={16} />
+                            <span className="text-xs font-medium">My Documents</span>
+                            <span className="text-gray-300">/</span>
+                            <span className="text-xs font-bold text-gray-900">{resume?.title || "Untitled Resume"}</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        {/* Mobile Toggle */}
-                        <div className="md:hidden flex bg-gray-100 rounded-lg p-1 mr-2">
-                            <button
-                                onClick={() => setIsMobilePreview(false)}
-                                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${!isMobilePreview ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
-                            >
-                                Edit
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2 text-emerald-500">
+                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                            <span className="text-xs font-bold uppercase tracking-wider">Saved</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
+                                <Share2 size={18} />
                             </button>
                             <button
-                                onClick={() => setIsMobilePreview(true)}
-                                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${isMobilePreview ? "bg-white shadow-sm text-gray-900" : "text-gray-500"}`}
+                                onClick={() => saveResume()}
+                                className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
                             >
-                                Preview
+                                {isSaving ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
-
-                        <div className="hidden md:flex items-center gap-1">
-                            <button
-                                onClick={() => setIsRearrangeOpen(true)}
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"
-                            >
-                                <Layout size={18} /> Rearrange
-                            </button>
-                            <button
-                                onClick={() => setIsPreviewMode(!isPreviewMode)}
-                                className={`flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-xl transition-all ${isPreviewMode
-                                    ? "bg-blue-50 text-blue-600"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                                    }`}
-                            >
-                                {isPreviewMode ? <EyeOff size={18} /> : <Eye size={18} />}
-                                {isPreviewMode ? "Edit Mode" : "Preview"}
-                            </button>
-                            <div className="w-px h-6 bg-gray-200 mx-2" />
-                        </div>
-
-                        <button className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
-                            <Download size={18} /> Export
-                        </button>
-                        <button
-                            onClick={() => saveResume()}
-                            disabled={isSaving || isAutosaving}
-                            className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                            style={{
-                                backgroundColor: resume?.template?.definition?.style?.accent_color || '#2563EB',
-                                boxShadow: `0 10px 25px -5px ${resume?.template?.definition?.style?.accent_color || '#2563EB'}40`
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isSaving && !isAutosaving) {
-                                    const color = resume?.template?.definition?.style?.accent_color || '#2563EB';
-                                    e.currentTarget.style.filter = 'brightness(0.9)';
-                                }
-                            }}
-                            onMouseLeave={(e) => e.currentTarget.style.filter = 'brightness(1)'}
-                        >
-                            <Save size={18} /> <span className="hidden md:inline">{isSaving ? "Saving..." : "Save"}</span>
-                        </button>
                     </div>
                 </header>
             )}
@@ -147,30 +89,71 @@ export default function ResumeEditPage() {
             <RearrangeModal isOpen={isRearrangeOpen} onClose={() => setIsRearrangeOpen(false)} />
 
             {/* Main Content */}
-            <div className="flex flex-1 relative overflow-hidden">
-                {/* Desktop: Sidebar + Preview */}
+            <div className="flex flex-1 relative overflow-hidden bg-[#F8FAFC]">
+                {/* Desktop View */}
                 {!isMobile && (
                     <>
-                        {/* Sidebar - Desktop Only */}
-                        <div className="flex flex-col w-64 bg-white border-r border-gray-200 overflow-hidden">
+                        {/* Column 1: Global Navigation Sidebar */}
+                        <div className="w-64 shrink-0 border-r border-gray-200 bg-white flex flex-col">
                             <BuilderSidebar
                                 activeSection={activeSection}
-                                onSectionChange={(section) => {
-                                    setActiveSection(section);
-                                }}
+                                onSectionChange={setActiveSection}
                             />
                         </div>
 
-                        {/* Preview Area - Full Width on Desktop */}
-                        <div className="flex-1 bg-gray-100/50 h-full overflow-hidden relative">
-                            <div className="absolute inset-0 overflow-y-auto flex justify-center p-4 md:p-8">
-                                <BuilderPreview isEditable={!isPreviewMode} />
+                        {/* Column 2: Editing Form */}
+                        {!isPreviewMode && (
+                            <div className="w-[500px] lg:w-[600px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
+                                <BuilderForm activeSection={activeSection} />
+                            </div>
+                        )}
+
+                        {/* Column 3: Live Preview Area */}
+                        <div className="flex-1 bg-[#F1F5F9] h-full overflow-hidden flex flex-col">
+                            {/* Preview Header */}
+                            <div className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0">
+                                <div className="flex bg-gray-100 rounded-full p-1">
+                                    <button className="px-4 py-1 text-xs font-bold rounded-full bg-white text-red-500 shadow-sm flex items-center gap-2">
+                                        <Eye size={14} /> Preview
+                                    </button>
+                                    <button className="px-4 py-1 text-xs font-bold text-gray-500 flex items-center gap-2">
+                                        <Sparkles size={14} /> Resume Tailoring <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-[8px]">Beta</span>
+                                    </button>
+                                </div>
+                                <button className="text-xs font-bold text-gray-500 flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <MessageSquare size={14} /> Help Center
+                                </button>
+                            </div>
+
+                            <div className="flex-1 relative overflow-hidden flex">
+                                {/* Side Actions */}
+                                <div className="w-16 flex flex-col items-center py-8 gap-4 border-r border-gray-100 bg-white/50">
+                                    <button
+                                        onClick={() => setIsPreviewMode(!isPreviewMode)}
+                                        className={`p-2 rounded-xl transition-all ${isPreviewMode ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-white hover:text-gray-900 shadow-sm'}`}
+                                    >
+                                        <Eye size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => downloadResume()}
+                                        className="p-2 text-gray-400 hover:bg-white hover:text-gray-900 rounded-xl transition-all shadow-sm"
+                                    >
+                                        <Download size={20} />
+                                    </button>
+                                </div>
+
+                                {/* Resume Container */}
+                                <div className="flex-1 overflow-y-auto flex justify-center p-8 lg:p-12">
+                                    <div className="w-full max-w-5xl">
+                                        <BuilderPreview isEditable={!isPreviewMode} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </>
                 )}
 
-                {/* Mobile: Show MobileEditView */}
+                {/* Mobile View */}
                 {isMobile && <MobileEditView />}
             </div>
         </div>

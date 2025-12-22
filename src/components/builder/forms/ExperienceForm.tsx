@@ -10,9 +10,12 @@ interface ExperienceFormProps {
     items: WorkExperience[];
 }
 
+import { Plus, Trash2, ChevronDown, ChevronUp, Briefcase, Calendar, MapPin, AlignLeft } from "lucide-react";
+
 export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) => {
-    const { addExperience, updateExperience, removeExperience, saveResume } = useResumeStore();
+    const { addExperience, updateExperience, removeExperience, resume } = useResumeStore();
     const [expandedId, setExpandedId] = React.useState<string | null>(items[0]?.id || null);
+    const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
 
     const handleAdd = () => {
         const newExperience: WorkExperience = {
@@ -36,18 +39,23 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
         updateExperience(id, { [field]: value });
     };
 
-
     const handleDelete = (id: string) => {
         removeExperience(id);
     };
 
+    const inputClasses = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all text-sm font-medium text-gray-900 placeholder-gray-400";
+    const labelClasses = "block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1";
+
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-[#00004d]">Work Experience</h3>
+        <div className="space-y-8">
+            <div className="flex justify-between items-center mb-2">
+                <div className="space-y-1">
+                    <h3 className="text-lg font-black text-gray-900">Work Experience</h3>
+                    <p className="text-xs text-gray-500 font-medium">List your relevant work history, starting with the most recent.</p>
+                </div>
                 <button
                     onClick={handleAdd}
-                    className="flex items-center gap-2 text-sm font-medium text-[#00004d] hover:text-[#002366]"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all active:scale-95"
                 >
                     <Plus size={16} /> Add Experience
                 </button>
@@ -61,114 +69,139 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="border border-gray-200 rounded-lg overflow-hidden bg-white"
+                            className={`border rounded-[24px] overflow-hidden transition-all duration-300 ${expandedId === item.id ? 'border-blue-200 shadow-xl shadow-blue-50/50 ring-1 ring-blue-100' : 'border-gray-100 hover:border-gray-200 bg-white'}`}
                         >
                             <div
-                                className="flex items-center justify-between p-4 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
+                                className={`flex items-center justify-between p-5 cursor-pointer transition-colors ${expandedId === item.id ? 'bg-blue-50/30' : 'hover:bg-gray-50/50'}`}
                                 onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                             >
-                                <div>
-                                    <h4 className="font-medium text-gray-900">
-                                        {item.position_title || "(Not specified)"}
-                                    </h4>
-                                    <p className="text-sm text-gray-500">
-                                        {item.company_name} {item.start_date ? `• ${item.start_date}` : ""}
-                                    </p>
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${expandedId === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-gray-100 text-gray-400'}`}>
+                                        <Briefcase size={18} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-black text-gray-900">
+                                            {item.position_title || "New Position"}
+                                        </h4>
+                                        <p className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">
+                                            {item.company_name || "Company Name"} {item.start_date ? `• ${item.start_date}` : ""}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleDelete(item.id);
                                         }}
-                                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                        className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                                     >
                                         <Trash2 size={16} />
                                     </button>
-                                    {expandedId === item.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    <div className={`p-1 rounded-lg transition-colors ${expandedId === item.id ? 'text-blue-600' : 'text-gray-400'}`}>
+                                        {expandedId === item.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                    </div>
                                 </div>
                             </div>
 
                             {expandedId === item.id && (
-                                <div className="p-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Job Title
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={item.position_title}
-                                            onChange={(e) => handleChange(item.id, "position_title", e.target.value)}
-                                            
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none"
-                                            placeholder="e.g. Product Manager"
-                                        />
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Company
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={item.company_name}
-                                            onChange={(e) => handleChange(item.id, "company_name", e.target.value)}
-                                            
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none"
-                                            placeholder="e.g. Google"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Start Date
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={item.start_date}
-                                            onChange={(e) => handleChange(item.id, "start_date", e.target.value)}
-                                            
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none"
-                                            placeholder="MM/YYYY"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            End Date
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={item.end_date}
-                                            disabled={item.is_current}
-                                            onChange={(e) => handleChange(item.id, "end_date", e.target.value)}
-                                            
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none disabled:bg-gray-100"
-                                            placeholder={item.is_current ? "Present" : "MM/YYYY"}
-                                        />
-                                    </div>
-                                    <div className="md:col-span-2 flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            id={`current-${item.id}`}
-                                            checked={item.is_current}
-                                            onChange={(e) => handleChange(item.id, "is_current", e.target.checked)}
-                                            
-                                            className="rounded border-gray-300 text-[#00004d] focus:ring-[#00004d]"
-                                        />
-                                        <label htmlFor={`current-${item.id}`} className="text-sm text-gray-700">
-                                            I currently work here
-                                        </label>
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Description
-                                        </label>
-                                        <textarea
-                                            value={item.description}
-                                            onChange={(e) => handleChange(item.id, "description", e.target.value)}
-                                            
-                                            rows={4}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] outline-none resize-none"
-                                            placeholder="Describe your responsibilities and achievements..."
-                                        />
+                                <div className="p-6 pt-2 border-t border-blue-50/50 bg-white space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="md:col-span-2 space-y-1.5">
+                                            <label className={labelClasses}>Job Title</label>
+                                            <input
+                                                type="text"
+                                                value={item.position_title}
+                                                onChange={(e) => handleChange(item.id, "position_title", e.target.value)}
+                                                className={inputClasses}
+                                                placeholder="e.g. Senior Product Designer"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2 space-y-1.5">
+                                            <label className={labelClasses}>Company</label>
+                                            <input
+                                                type="text"
+                                                value={item.company_name}
+                                                onChange={(e) => handleChange(item.id, "company_name", e.target.value)}
+                                                className={inputClasses}
+                                                placeholder="e.g. Kickresume"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={labelClasses}>Start Date</label>
+                                            <div className="relative">
+                                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                                <input
+                                                    type="text"
+                                                    value={item.start_date}
+                                                    onChange={(e) => handleChange(item.id, "start_date", e.target.value)}
+                                                    className={`${inputClasses} pl-11`}
+                                                    placeholder="MM/YYYY"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={labelClasses}>End Date</label>
+                                            <div className="relative">
+                                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                                <input
+                                                    type="text"
+                                                    value={item.end_date}
+                                                    disabled={item.is_current}
+                                                    onChange={(e) => handleChange(item.id, "end_date", e.target.value)}
+                                                    className={`${inputClasses} pl-11 disabled:bg-gray-100 disabled:text-gray-400`}
+                                                    placeholder={item.is_current ? "Present" : "MM/YYYY"}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-2 flex items-center gap-3 px-1">
+                                            <input
+                                                type="checkbox"
+                                                id={`current-${item.id}`}
+                                                checked={item.is_current}
+                                                onChange={(e) => handleChange(item.id, "is_current", e.target.checked)}
+                                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all"
+                                            />
+                                            <label htmlFor={`current-${item.id}`} className="text-sm font-bold text-gray-700 cursor-pointer">
+                                                I currently work here
+                                            </label>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={labelClasses}>City</label>
+                                            <div className="relative">
+                                                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                                <input
+                                                    type="text"
+                                                    value={item.city}
+                                                    onChange={(e) => handleChange(item.id, "city", e.target.value)}
+                                                    className={`${inputClasses} pl-11`}
+                                                    placeholder="e.g. San Francisco"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={labelClasses}>Country</label>
+                                            <input
+                                                type="text"
+                                                value={item.country}
+                                                onChange={(e) => handleChange(item.id, "country", e.target.value)}
+                                                className={inputClasses}
+                                                placeholder="e.g. USA"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2 space-y-1.5 pt-2">
+                                            <label className={labelClasses}>Description & Achievements</label>
+                                            <div className="relative">
+                                                <AlignLeft className="absolute left-4 top-4 text-gray-400" size={16} />
+                                                <textarea
+                                                    value={item.description}
+                                                    onChange={(e) => handleChange(item.id, "description", e.target.value)}
+                                                    rows={5}
+                                                    className={`${inputClasses} pl-11 resize-none leading-relaxed`}
+                                                    placeholder="Describe your key responsibilities and measurable achievements..."
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
