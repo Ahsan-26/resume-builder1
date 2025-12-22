@@ -91,12 +91,21 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
         }),
 
     updateSectionOrder: (sectionSettings) => {
+        // Filter out fields not supported by the backend (like 'area')
+        const filteredSettings = Object.entries(sectionSettings).reduce((acc, [key, value]) => {
+            acc[key] = {
+                order: value.order,
+                visible: value.visible
+            };
+            return acc;
+        }, {} as Record<string, { order: number; visible: boolean }>);
+
         set((state) => {
             if (!state.resume) return {};
             return {
                 resume: {
                     ...state.resume,
-                    section_settings: sectionSettings,
+                    section_settings: filteredSettings,
                 },
             };
         });

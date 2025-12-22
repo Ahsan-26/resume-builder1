@@ -98,6 +98,7 @@ export default function ResumeEditPage() {
                             <BuilderSidebar
                                 activeSection={activeSection}
                                 onSectionChange={setActiveSection}
+                                onRearrange={() => setIsRearrangeOpen(true)}
                             />
                         </div>
 

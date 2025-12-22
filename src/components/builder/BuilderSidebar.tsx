@@ -11,6 +11,7 @@ export type SectionType = "templates" | "personal" | "experience" | "education" 
 interface BuilderSidebarProps {
     activeSection: SectionType;
     onSectionChange: (section: SectionType) => void;
+    onRearrange?: () => void;
 }
 
 const mainNav = [
@@ -41,7 +42,7 @@ const footerNav = [
     { id: "jobs", label: "Find Jobs", icon: Search },
 ];
 
-export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, onSectionChange }) => {
+export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, onSectionChange, onRearrange }) => {
     const { addExperience, addEducation, updateSkillCategories, updateStrengths, updateHobbies, updateCustomSections, resume } = useResumeStore();
 
     const handleAddItem = (sectionId: SectionType) => {
@@ -209,6 +210,19 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                             </div>
                         );
                     })}
+
+                    {/* Rearrange Button */}
+                    {onRearrange && (
+                        <div className="pt-2 px-3">
+                            <button
+                                onClick={onRearrange}
+                                className="w-full flex items-center gap-3 px-4 py-3 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-all group shadow-sm"
+                            >
+                                <Layers size={18} className="text-indigo-500 group-hover:scale-110 transition-transform" />
+                                <span className="font-bold text-sm">Rearrange Sections</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* AI Tools */}
