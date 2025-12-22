@@ -3,13 +3,11 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { SkillCategory, SkillItem } from "../../../types/resume";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, Wrench, Sparkles } from "lucide-react";
 
 interface SkillsFormProps {
     categories: SkillCategory[];
 }
-
-import { Plus, Trash2, X, Wrench, Sparkles } from "lucide-react";
 
 export const SkillsForm: React.FC<SkillsFormProps> = ({ categories = [] }) => {
     const { updateSkillCategories, resume } = useResumeStore();

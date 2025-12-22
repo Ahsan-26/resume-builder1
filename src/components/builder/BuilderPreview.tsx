@@ -48,6 +48,7 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
     const contentRef = React.useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
     const [contentHeight, setContentHeight] = useState(0);
+    const [marginLeft, setMarginLeft] = useState(0);
 
     useEffect(() => {
         const updateScale = () => {
@@ -55,8 +56,17 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
             const containerWidth = containerRef.current.offsetWidth;
             const resumeWidthPx = 210 * 3.78; // 210mm in pixels (approx)
             const padding = 32; // 16px on each side
-            const newScale = (containerWidth - padding) / resumeWidthPx;
-            setScale(Math.min(newScale, 1));
+
+            // Calculate scale
+            let newScale = (containerWidth - padding) / resumeWidthPx;
+            newScale = Math.min(newScale, 1);
+            setScale(newScale);
+
+            // Calculate centering offset
+            const scaledWidth = resumeWidthPx * newScale;
+            const availableSpace = containerWidth - scaledWidth;
+            setMarginLeft(Math.max(0, availableSpace / 2));
+
             setContentHeight(contentRef.current.offsetHeight);
         };
 
@@ -105,12 +115,13 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
     };
 
     return (
-        <div ref={containerRef} className="flex justify-center w-full overflow-visible py-4 sm:py-8">
+        <div ref={containerRef} className="w-full overflow-visible py-4 sm:py-8">
             <div
                 ref={contentRef}
-                className="bg-white shadow-2xl w-[210mm] min-h-[297mm] origin-top transition-transform duration-300 ease-in-out mx-auto"
+                className="bg-white shadow-2xl w-[210mm] min-h-[297mm] origin-top-left transition-transform duration-300 ease-in-out"
                 style={{
                     transform: `scale(${scale})`,
+                    marginLeft: `${marginLeft}px`,
                     marginBottom: contentHeight ? `calc(${contentHeight}px * (${scale} - 1))` : 0,
                     boxShadow: `0 20px 60px -12px ${localTemplateDefinition.style.accent_color}20, 0 8px 16px -8px ${localTemplateDefinition.style.accent_color}10`
                 }}

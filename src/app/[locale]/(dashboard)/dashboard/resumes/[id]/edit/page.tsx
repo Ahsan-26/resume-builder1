@@ -8,7 +8,7 @@ import { BuilderForm } from "@/components/builder/BuilderForm";
 import { BuilderPreview } from "@/components/builder/BuilderPreview";
 import { MobileEditView } from "@/components/builder/MobileEditView";
 import { RearrangeModal } from "@/components/builder/RearrangeModal";
-import { ArrowLeft, Save, Download, Layout, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Save, Download, Layout, Eye, EyeOff, Files, Share2, Sparkles, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 export default function ResumeEditPage() {
@@ -103,7 +103,7 @@ export default function ResumeEditPage() {
 
                         {/* Column 2: Editing Form */}
                         {!isPreviewMode && (
-                            <div className="w-[500px] lg:w-[600px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
+                            <div className="w-[450px] lg:w-[500px] xl:w-[600px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
                                 <BuilderForm activeSection={activeSection} />
                             </div>
                         )}

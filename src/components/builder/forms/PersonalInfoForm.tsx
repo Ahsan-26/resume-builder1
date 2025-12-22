@@ -4,11 +4,11 @@ import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { PersonalInfo } from "../../../types/resume";
 
+import { Camera, Mail, Phone, MapPin, Globe, Linkedin, Github, Briefcase, User } from "lucide-react";
+
 interface PersonalInfoFormProps {
     data: PersonalInfo;
 }
-
-import { Camera, Mail, Phone, MapPin, Globe, Linkedin, Github, Briefcase } from "lucide-react";
 
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as PersonalInfo }) => {
     const { updatePersonalInfo, resume } = useResumeStore();

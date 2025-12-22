@@ -3,14 +3,12 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { WorkExperience } from "../../../types/resume";
-import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Briefcase, Calendar, MapPin, AlignLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ExperienceFormProps {
     items: WorkExperience[];
 }
-
-import { Plus, Trash2, ChevronDown, ChevronUp, Briefcase, Calendar, MapPin, AlignLeft } from "lucide-react";
 
 export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) => {
     const { addExperience, updateExperience, removeExperience, resume } = useResumeStore();

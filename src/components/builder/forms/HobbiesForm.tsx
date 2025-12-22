@@ -3,13 +3,11 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { Hobby } from "../../../types/resume";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, Heart } from "lucide-react";
 
 interface HobbiesFormProps {
     items: Hobby[];
 }
-
-import { Plus, Trash2, X, Heart } from "lucide-react";
 
 export const HobbiesForm: React.FC<HobbiesFormProps> = ({ items = [] }) => {
     const { updateHobbies, resume } = useResumeStore();

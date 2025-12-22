@@ -3,13 +3,11 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { Strength } from "../../../types/resume";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, Zap } from "lucide-react";
 
 interface StrengthsFormProps {
     items: Strength[];
 }
-
-import { Plus, Trash2, X, Zap } from "lucide-react";
 
 export const StrengthsForm: React.FC<StrengthsFormProps> = ({ items = [] }) => {
     const { updateStrengths, resume } = useResumeStore();
