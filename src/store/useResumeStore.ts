@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Resume, PersonalInfo, WorkExperience, Education, SkillCategory, CustomSection } from '../types/resume';
+import { Resume, PersonalInfo, WorkExperience, Education, SkillCategory, CustomSection, Template } from '../types/resume';
 import { fetchResume, updateResume, autosaveResume as bulkAutosaveResume, downloadResumePdf } from '../lib/api/resumes';
 import * as sectionApi from '../lib/api/sections';
 
@@ -43,6 +43,7 @@ interface ResumeState {
 
     // Custom Sections
     updateCustomSections: (sections: CustomSection[]) => Promise<void>;
+    updateTemplate: (template: Template) => void;
 
     // General Save
     saveResume: () => Promise<void>;
@@ -594,6 +595,20 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 };
             });
         }
+    },
+
+    updateTemplate: (template) => {
+        set((state) => {
+            if (!state.resume) return {};
+            return {
+                resume: {
+                    ...state.resume,
+                    template: template,
+                    template_id: template.id,
+                },
+            };
+        });
+        get().autosaveResume();
     },
 
     saveResume: async () => {

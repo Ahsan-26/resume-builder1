@@ -59,7 +59,7 @@ export const HobbiesForm: React.FC<HobbiesFormProps> = ({ items = [] }) => {
                             <Heart size={14} className="text-pink-500" />
                             <input
                                 type="text"
-                                value={item.label}
+                                value={item.label || ""}
                                 onChange={(e) => handleUpdate(item.id, e.target.value)}
                                 className="bg-transparent text-sm font-bold text-gray-700 w-36 focus:outline-none placeholder-gray-300"
                                 placeholder="e.g. Photography"

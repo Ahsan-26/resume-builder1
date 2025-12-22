@@ -109,7 +109,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                             <label className={labelClasses}>Job Title</label>
                                             <input
                                                 type="text"
-                                                value={item.position_title}
+                                                value={item.position_title || ""}
                                                 onChange={(e) => handleChange(item.id, "position_title", e.target.value)}
                                                 className={inputClasses}
                                                 placeholder="e.g. Senior Product Designer"
@@ -119,7 +119,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                             <label className={labelClasses}>Company</label>
                                             <input
                                                 type="text"
-                                                value={item.company_name}
+                                                value={item.company_name || ""}
                                                 onChange={(e) => handleChange(item.id, "company_name", e.target.value)}
                                                 className={inputClasses}
                                                 placeholder="e.g. Kickresume"
@@ -131,7 +131,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                                 <input
                                                     type="text"
-                                                    value={item.start_date}
+                                                    value={item.start_date || ""}
                                                     onChange={(e) => handleChange(item.id, "start_date", e.target.value)}
                                                     className={`${inputClasses} pl-11`}
                                                     placeholder="MM/YYYY"
@@ -144,7 +144,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                                 <input
                                                     type="text"
-                                                    value={item.end_date}
+                                                    value={item.end_date || ""}
                                                     disabled={item.is_current}
                                                     onChange={(e) => handleChange(item.id, "end_date", e.target.value)}
                                                     className={`${inputClasses} pl-11 disabled:bg-gray-100 disabled:text-gray-400`}
@@ -170,7 +170,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                                 <input
                                                     type="text"
-                                                    value={item.city}
+                                                    value={item.city || ""}
                                                     onChange={(e) => handleChange(item.id, "city", e.target.value)}
                                                     className={`${inputClasses} pl-11`}
                                                     placeholder="e.g. San Francisco"
@@ -181,7 +181,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                             <label className={labelClasses}>Country</label>
                                             <input
                                                 type="text"
-                                                value={item.country}
+                                                value={item.country || ""}
                                                 onChange={(e) => handleChange(item.id, "country", e.target.value)}
                                                 className={inputClasses}
                                                 placeholder="e.g. USA"
@@ -192,7 +192,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                             <div className="relative">
                                                 <AlignLeft className="absolute left-4 top-4 text-gray-400" size={16} />
                                                 <textarea
-                                                    value={item.description}
+                                                    value={item.description || ""}
                                                     onChange={(e) => handleChange(item.id, "description", e.target.value)}
                                                     rows={5}
                                                     className={`${inputClasses} pl-11 resize-none leading-relaxed`}

@@ -109,7 +109,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                             <label className={labelClasses}>School / University</label>
                                             <input
                                                 type="text"
-                                                value={item.school_name}
+                                                value={item.school_name || ""}
                                                 onChange={(e) => handleChange(item.id, "school_name", e.target.value)}
                                                 className={inputClasses}
                                                 placeholder="e.g. Harvard University"
@@ -119,7 +119,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                             <label className={labelClasses}>Degree</label>
                                             <input
                                                 type="text"
-                                                value={item.degree}
+                                                value={item.degree || ""}
                                                 onChange={(e) => handleChange(item.id, "degree", e.target.value)}
                                                 className={inputClasses}
                                                 placeholder="e.g. Bachelor's"
@@ -129,7 +129,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                             <label className={labelClasses}>Field of Study</label>
                                             <input
                                                 type="text"
-                                                value={item.field_of_study}
+                                                value={item.field_of_study || ""}
                                                 onChange={(e) => handleChange(item.id, "field_of_study", e.target.value)}
                                                 className={inputClasses}
                                                 placeholder="e.g. Computer Science"
@@ -141,7 +141,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                                 <input
                                                     type="text"
-                                                    value={item.start_date}
+                                                    value={item.start_date || ""}
                                                     onChange={(e) => handleChange(item.id, "start_date", e.target.value)}
                                                     className={`${inputClasses} pl-11`}
                                                     placeholder="MM/YYYY"
@@ -154,7 +154,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                                 <input
                                                     type="text"
-                                                    value={item.end_date}
+                                                    value={item.end_date || ""}
                                                     disabled={item.is_current}
                                                     onChange={(e) => handleChange(item.id, "end_date", e.target.value)}
                                                     className={`${inputClasses} pl-11 disabled:bg-gray-100 disabled:text-gray-400`}
@@ -180,7 +180,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                                 <input
                                                     type="text"
-                                                    value={item.city}
+                                                    value={item.city || ""}
                                                     onChange={(e) => handleChange(item.id, "city", e.target.value)}
                                                     className={`${inputClasses} pl-11`}
                                                     placeholder="e.g. Cambridge, MA"
@@ -191,7 +191,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                             <label className={labelClasses}>Country</label>
                                             <input
                                                 type="text"
-                                                value={item.country}
+                                                value={item.country || ""}
                                                 onChange={(e) => handleChange(item.id, "country", e.target.value)}
                                                 className={inputClasses}
                                                 placeholder="e.g. USA"
@@ -202,7 +202,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                             <div className="relative">
                                                 <AlignLeft className="absolute left-4 top-4 text-gray-400" size={16} />
                                                 <textarea
-                                                    value={item.description}
+                                                    value={item.description || ""}
                                                     onChange={(e) => handleChange(item.id, "description", e.target.value)}
                                                     rows={5}
                                                     className={`${inputClasses} pl-11 resize-none leading-relaxed`}

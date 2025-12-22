@@ -16,13 +16,16 @@ export const PersonalInfoSection: React.FC<SectionProps> = ({ resume, style, isE
 
     if (!personal_info) return null;
 
+    const displayMode = resume.template?.definition?.sections?.personal_info?.display || 'left';
+    const isCentered = displayMode === 'centered';
+
     return (
-        <div className="mb-6">
+        <div className={`mb-6 ${isCentered ? 'text-center' : ''}`}>
             <h1 style={{
                 fontSize: `${2.25 * style.heading_scale}rem`,
                 color: style.primary_color,
                 lineHeight: 1.2
-            }} className="font-bold mb-2 flex flex-wrap gap-2 items-baseline">
+            }} className={`font-bold mb-2 flex flex-wrap gap-2 items-baseline ${isCentered ? 'justify-center' : ''}`}>
                 <EditableField
                     value={personal_info.first_name}
                     onChange={(val) => updatePersonalInfo({ first_name: val })}
@@ -47,7 +50,7 @@ export const PersonalInfoSection: React.FC<SectionProps> = ({ resume, style, isE
                 />
             </div>
 
-            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+            <div className={`flex flex-wrap gap-4 text-sm text-gray-600 ${isCentered ? 'justify-center' : ''}`}>
                 <div className="flex items-center gap-1">
                     <Mail size={14} />
                     <EditableField
@@ -130,7 +133,7 @@ export const PersonalInfoSection: React.FC<SectionProps> = ({ resume, style, isE
             </div>
 
             <div className="mt-4">
-                <p style={{ lineHeight: style.line_height }} className="text-gray-700">
+                <p style={{ lineHeight: style.line_height }} className={`text-gray-700 ${isCentered ? 'text-center' : ''}`}>
                     <EditableField
                         value={personal_info.summary}
                         onChange={(val) => updatePersonalInfo({ summary: val })}
@@ -514,6 +517,8 @@ export const SkillsSection: React.FC<SectionProps> = ({ resume, style, isEditabl
         updateSectionOrder(settings);
     };
 
+    const displayMode = resume.template?.definition?.sections?.skill_categories?.display || 'tags';
+
     return (
         <div className={`mb-6 ${!isVisible ? 'opacity-50 grayscale' : ''}`}>
             <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
@@ -551,7 +556,7 @@ export const SkillsSection: React.FC<SectionProps> = ({ resume, style, isEditabl
                     </div>
                 )}
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
                 {skill_categories?.map((cat) => (
                     <div key={cat.id} className="group relative">
                         {isEditable && (
@@ -595,36 +600,95 @@ export const SkillsSection: React.FC<SectionProps> = ({ resume, style, isEditabl
                                 </button>
                             )}
                         </div>
-                        <div className="flex flex-wrap gap-3">
-                            {cat.items.map((item) => (
-                                <span
-                                    key={item.id}
-                                    className="group/skill relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
-                                >
-                                    <EditableField
-                                        value={item.name}
-                                        onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
-                                        placeholder="Skill"
-                                        isEditable={isEditable}
-                                    />
-                                    {isEditable && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteSkill(cat.id, item.id);
-                                            }}
-                                            className="absolute -right-2 -top-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover/skill:opacity-100 transition-all shadow-sm hover:bg-red-600 z-10"
-                                            title="Delete Skill"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    )}
-                                </span>
-                            ))}
-                        </div>
+
+                        {displayMode === 'bars' ? (
+                            <div className="grid grid-cols-1 gap-x-8 gap-y-4">
+                                {cat.items.map((item) => (
+                                    <div key={item.id} className="group/skill relative">
+                                        <div className="flex justify-between mb-1 text-xs font-medium text-gray-700">
+                                            <EditableField
+                                                value={item.name}
+                                                onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
+                                                placeholder="Skill"
+                                                isEditable={isEditable}
+                                            />
+                                            <span className="text-gray-400 capitalize">{item.level}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                            <div
+                                                className="h-1.5 rounded-full transition-all duration-500"
+                                                style={{
+                                                    backgroundColor: style.accent_color,
+                                                    width: item.level === 'expert' ? '100%' :
+                                                        item.level === 'professional' ? '75%' :
+                                                            item.level === 'intermediate' ? '50%' : '25%'
+                                                }}
+                                            />
+                                        </div>
+                                        {isEditable && (
+                                            <button
+                                                onClick={() => handleDeleteSkill(cat.id, item.id)}
+                                                className="absolute -right-6 top-0 p-1 text-red-400 opacity-0 group-hover/skill:opacity-100 transition-opacity"
+                                            >
+                                                <Plus size={14} className="rotate-45" />
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : displayMode === 'list' ? (
+                            <ul className="list-disc list-inside space-y-1">
+                                {cat.items.map((item) => (
+                                    <li key={item.id} className="group/skill relative text-sm text-gray-700">
+                                        <EditableField
+                                            value={item.name}
+                                            onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
+                                            placeholder="Skill"
+                                            isEditable={isEditable}
+                                        />
+                                        {isEditable && (
+                                            <button
+                                                onClick={() => handleDeleteSkill(cat.id, item.id)}
+                                                className="ml-2 text-red-400 opacity-0 group-hover/skill:opacity-100 transition-opacity"
+                                            >
+                                                <Plus size={12} className="rotate-45" />
+                                            </button>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="flex flex-wrap gap-3">
+                                {cat.items.map((item) => (
+                                    <span
+                                        key={item.id}
+                                        className="group/skill relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
+                                    >
+                                        <EditableField
+                                            value={item.name}
+                                            onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
+                                            placeholder="Skill"
+                                            isEditable={isEditable}
+                                        />
+                                        {isEditable && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteSkill(cat.id, item.id);
+                                                }}
+                                                className="absolute -right-2 -top-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover/skill:opacity-100 transition-all shadow-sm hover:bg-red-600 z-10"
+                                                title="Delete Skill"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

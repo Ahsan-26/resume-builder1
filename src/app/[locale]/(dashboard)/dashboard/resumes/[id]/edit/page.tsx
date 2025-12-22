@@ -94,7 +94,7 @@ export default function ResumeEditPage() {
                 {!isMobile && (
                     <>
                         {/* Column 1: Global Navigation Sidebar */}
-                        <div className="w-64 shrink-0 border-r border-gray-200 bg-white flex flex-col">
+                        <div className="w-60 shrink-0 border-r border-gray-200 bg-white flex flex-col">
                             <BuilderSidebar
                                 activeSection={activeSection}
                                 onSectionChange={setActiveSection}
@@ -103,7 +103,7 @@ export default function ResumeEditPage() {
 
                         {/* Column 2: Editing Form */}
                         {!isPreviewMode && (
-                            <div className="w-[450px] lg:w-[500px] xl:w-[600px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
+                            <div className="w-[400px] lg:w-[450px] xl:w-[600px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
                                 <BuilderForm activeSection={activeSection} />
                             </div>
                         )}

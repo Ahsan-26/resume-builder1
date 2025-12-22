@@ -8,7 +8,7 @@ import { Check } from "lucide-react";
 import Image from "next/image";
 
 export const TemplatesForm: React.FC = () => {
-    const { resume, saveResume, updateResumeData } = useResumeStore();
+    const { resume, updateTemplate } = useResumeStore();
     const [templates, setTemplates] = useState<Template[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -28,19 +28,7 @@ export const TemplatesForm: React.FC = () => {
 
     const handleSelectTemplate = (template: Template) => {
         if (!resume) return;
-
-        // Update the local store
-        updateResumeData({ template });
-
-        // Save to backend (assuming backend accepts template_id in PATCH)
-        // Note: The updateResumeData action in store might need to be created or we use a direct update
-        // For now, let's assume we can update the template object directly in the store
-
-        // We also need to trigger a save. 
-        // However, the backend might expect 'template_id' instead of the full template object.
-        // We'll handle this in the store's save function or here.
-
-        // Let's assume we update the store and then save.
+        updateTemplate(template);
     };
 
     if (isLoading) {
@@ -58,8 +46,8 @@ export const TemplatesForm: React.FC = () => {
                             key={template.id}
                             onClick={() => handleSelectTemplate(template)}
                             className={`relative cursor-pointer rounded-lg border-2 overflow-hidden transition-all ${isSelected
-                                    ? "border-blue-600 ring-2 ring-blue-100"
-                                    : "border-gray-200 hover:border-gray-300"
+                                ? "border-blue-600 ring-2 ring-blue-100"
+                                : "border-gray-200 hover:border-gray-300"
                                 }`}
                         >
                             <div className="aspect-[210/297] bg-gray-100 relative">

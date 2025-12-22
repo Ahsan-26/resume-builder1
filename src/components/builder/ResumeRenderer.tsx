@@ -100,15 +100,10 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
                 </div>
             ) : (
                 <div className="p-8 pt-0 flex flex-col gap-6">
-                    {/* Single Column Fallback */}
+                    {/* Single Column Layout */}
+                    {headerSections.length > 0 && headerSections.map(renderSection)}
                     {leftSections.map(renderSection)}
                     {rightSections.map(renderSection)}
-                </div>
-            )}
-
-            {/* Full Width Bottom Area */}
-            {fullSections.length > 0 && (
-                <div className="p-8 pt-6 flex flex-col gap-6">
                     {fullSections.map(renderSection)}
                 </div>
             )}

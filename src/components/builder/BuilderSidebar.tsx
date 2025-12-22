@@ -81,28 +81,36 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                 break;
             case "skills":
                 const existingCategories = resume?.skill_categories || [];
-                let skillsCategory = existingCategories.find(cat => cat.name === "Skills");
-                if (!skillsCategory) {
-                    skillsCategory = {
+                // If no categories exist, create a default one
+                if (existingCategories.length === 0) {
+                    const newCategory: SkillCategory = {
                         id: crypto.randomUUID(),
                         name: "Skills",
+                        order: 0,
+                        items: [{
+                            id: crypto.randomUUID(),
+                            name: "New Skill",
+                            level: "expert",
+                            order: 0,
+                        }],
+                    };
+                    updateSkillCategories([newCategory]);
+                } else {
+                    // Add to the first category for now, or maybe create a new category?
+                    // Let's add a new category from the sidebar "+" button to be safe/clear
+                    const newCategory: SkillCategory = {
+                        id: crypto.randomUUID(),
+                        name: "New Category",
                         order: existingCategories.length,
                         items: [],
                     };
-                    existingCategories.push(skillsCategory);
+                    updateSkillCategories([...existingCategories, newCategory]);
                 }
-                skillsCategory.items.push({
-                    id: crypto.randomUUID(),
-                    name: "New Skill",
-                    level: "intermediate",
-                    order: skillsCategory.items.length,
-                });
-                updateSkillCategories([...existingCategories]);
                 break;
             case "strengths":
                 const newStrength: Strength = {
                     id: crypto.randomUUID(),
-                    label: "Leadership",
+                    label: "New Strength",
                     order: resume?.strengths?.length || 0,
                 };
                 updateStrengths([...(resume?.strengths || []), newStrength]);
@@ -110,7 +118,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
             case "hobbies":
                 const newHobby: Hobby = {
                     id: crypto.randomUUID(),
-                    label: "Reading",
+                    label: "New Hobby",
                     order: resume?.hobbies?.length || 0,
                 };
                 updateHobbies([...(resume?.hobbies || []), newHobby]);

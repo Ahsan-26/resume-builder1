@@ -104,7 +104,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ categories = [] }) => {
                             <div className="flex-1 relative">
                                 <input
                                     type="text"
-                                    value={category.name}
+                                    value={category.name || ""}
                                     onChange={(e) => handleUpdateCategory(category.id, e.target.value)}
                                     className="bg-transparent text-sm font-black text-gray-900 border-none focus:ring-0 p-0 placeholder-gray-300 w-full"
                                     placeholder="Category Name (e.g. Programming Languages)"
@@ -127,7 +127,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ categories = [] }) => {
                                 >
                                     <input
                                         type="text"
-                                        value={item.name}
+                                        value={item.name || ""}
                                         onChange={(e) => handleUpdateItem(category.id, item.id, e.target.value)}
                                         className="bg-transparent text-xs font-bold text-gray-700 w-24 focus:outline-none placeholder-gray-300"
                                         placeholder="Skill name"

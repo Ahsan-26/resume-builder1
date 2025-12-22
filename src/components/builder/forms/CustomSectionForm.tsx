@@ -45,7 +45,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
             if (sec.id === sectionId) {
                 const newItem: CustomSectionItem = {
                     id: crypto.randomUUID(),
-                    title: "",
+                    title: "New Item",
                     subtitle: "",
                     meta: "",
                     description: "",
@@ -123,7 +123,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                 <div className="flex-1 max-w-md relative">
                                     <input
                                         type="text"
-                                        value={section.title}
+                                        value={section.title || ""}
                                         onClick={(e) => e.stopPropagation()}
                                         onChange={(e) => handleUpdateSectionTitle(section.id, e.target.value)}
                                         className="bg-transparent text-sm font-black text-gray-900 border-none focus:ring-0 p-0 placeholder-gray-300 w-full"
@@ -190,7 +190,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                                             <label className={labelClasses}>Title</label>
                                                             <input
                                                                 type="text"
-                                                                value={item.title}
+                                                                value={item.title || ""}
                                                                 onChange={(e) => handleUpdateItem(section.id, item.id, "title", e.target.value)}
                                                                 className={inputClasses}
                                                                 placeholder="e.g. Volunteer"
@@ -200,7 +200,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                                             <label className={labelClasses}>Subtitle</label>
                                                             <input
                                                                 type="text"
-                                                                value={item.subtitle}
+                                                                value={item.subtitle || ""}
                                                                 onChange={(e) => handleUpdateItem(section.id, item.id, "subtitle", e.target.value)}
                                                                 className={inputClasses}
                                                                 placeholder="e.g. Red Cross"
@@ -212,7 +212,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                                                 <input
                                                                     type="text"
-                                                                    value={item.meta}
+                                                                    value={item.meta || ""}
                                                                     onChange={(e) => handleUpdateItem(section.id, item.id, "meta", e.target.value)}
                                                                     className={`${inputClasses} pl-11`}
                                                                     placeholder="e.g. 2020 - 2022"
@@ -224,7 +224,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                                             <div className="relative">
                                                                 <AlignLeft className="absolute left-4 top-4 text-gray-400" size={16} />
                                                                 <textarea
-                                                                    value={item.description}
+                                                                    value={item.description || ""}
                                                                     onChange={(e) => handleUpdateItem(section.id, item.id, "description", e.target.value)}
                                                                     rows={4}
                                                                     className={`${inputClasses} pl-11 resize-none leading-relaxed`}
