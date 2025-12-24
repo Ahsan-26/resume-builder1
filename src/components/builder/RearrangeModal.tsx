@@ -24,7 +24,7 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
                 label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
                 order: currentSettings[key]?.order ?? config.order,
                 visible: currentSettings[key]?.visible ?? config.visible,
-                area: currentSettings[key]?.area ?? config.area
+                area: config.area
             })).sort((a, b) => a.order - b.order);
 
             setSections(initialSections);
@@ -42,9 +42,9 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
     };
 
     const handleSave = () => {
-        const newSettings: Record<string, { order: number; visible: boolean; area: any }> = {};
+        const newSettings: Record<string, { order: number; visible: boolean }> = {};
         sections.forEach(s => {
-            newSettings[s.id] = { order: s.order, visible: s.visible, area: s.area };
+            newSettings[s.id] = { order: s.order, visible: s.visible };
         });
         updateSectionOrder(newSettings);
         onClose();

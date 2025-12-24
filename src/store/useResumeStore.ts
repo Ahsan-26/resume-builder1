@@ -3,11 +3,20 @@ import { Resume, PersonalInfo, WorkExperience, Education, SkillCategory, CustomS
 import { fetchResume, updateResume, autosaveResume as bulkAutosaveResume, downloadResumePdf } from '../lib/api/resumes';
 import * as sectionApi from '../lib/api/sections';
 
-// Module-level variable to track autosave timeout
+// Module-level variables to track autosave timeouts
 let autosaveTimeout: NodeJS.Timeout | null = null;
+const sectionTimeouts: Record<string, NodeJS.Timeout> = {};
+
+const debounceSync = (key: string, fn: () => Promise<void>, delay = 1500) => {
+    if (sectionTimeouts[key]) {
+        clearTimeout(sectionTimeouts[key]);
+    }
+    sectionTimeouts[key] = setTimeout(fn, delay);
+};
 
 interface ResumeState {
     resume: Resume | null;
+    originalResume: Resume | null;
     isLoading: boolean;
     isSaving: boolean;
     isAutosaving: boolean;
@@ -35,30 +44,52 @@ interface ResumeState {
     removeEducation: (id: string) => Promise<void>;
 
     // Skills
-    updateSkillCategories: (categories: SkillCategory[]) => Promise<void>;
+    updateSkillCategories: (categories: SkillCategory[]) => void;
 
     // Strengths & Hobbies
-    updateStrengths: (strengths: any[]) => Promise<void>;
-    updateHobbies: (hobbies: any[]) => Promise<void>;
+    updateStrengths: (strengths: any[]) => void;
+    updateHobbies: (hobbies: any[]) => void;
 
     // Custom Sections
-    updateCustomSections: (sections: CustomSection[]) => Promise<void>;
+    updateCustomSections: (sections: CustomSection[]) => void;
     updateTemplate: (template: Template) => void;
 
     // General Save
     saveResume: () => Promise<void>;
     autosaveResume: () => Promise<void>;
+
+    // Granular Sync Actions
+    syncPersonalInfo: () => Promise<void>;
+    syncExperience: (id: string) => Promise<void>;
+    syncEducation: (id: string) => Promise<void>;
+    syncSkillCategories: () => Promise<void>;
+    syncStrengths: () => Promise<void>;
+    syncHobbies: () => Promise<void>;
+    syncCustomSections: () => Promise<void>;
+    syncMetadata: () => Promise<void>;
+
+    rollbackState: (errorMsg: string) => Promise<void>;
     downloadResume: () => Promise<void>;
 }
 
 export const useResumeStore = create<ResumeState>((set, get) => ({
     resume: null,
+    originalResume: null,
     isLoading: false,
     isSaving: false,
     isAutosaving: false,
     lastSaved: null,
     error: null,
     isPreviewMode: false,
+
+    rollbackState: async (errorMsg: string) => {
+        const { originalResume } = get();
+        if (originalResume) {
+            set({ resume: JSON.parse(JSON.stringify(originalResume)), error: errorMsg });
+            const toast = (await import("react-hot-toast")).default;
+            toast.error(errorMsg);
+        }
+    },
 
     fetchResume: async (id: string) => {
         set({ isLoading: true, error: null });
@@ -69,7 +100,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
             if (!resume.id) {
                 console.error("Fetched resume is missing ID:", resume);
             }
-            set({ resume, isLoading: false });
+            set({ resume, originalResume: JSON.parse(JSON.stringify(resume)), isLoading: false });
         } catch (err) {
             set({ error: (err as Error).message, isLoading: false });
         }
@@ -109,7 +140,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 },
             };
         });
-        get().autosaveResume();
+        get().syncMetadata();
     },
 
     updateTitle: (title) => {
@@ -122,7 +153,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 },
             };
         });
-        get().autosaveResume();
+        debounceSync('metadata', get().syncMetadata);
     },
 
     updatePersonalInfo: (info) => {
@@ -135,7 +166,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 },
             };
         });
-        get().autosaveResume();
+        debounceSync('personal_info', get().syncPersonalInfo);
     },
 
     addExperience: async (experience) => {
@@ -195,7 +226,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 },
             };
         });
-        get().autosaveResume();
+        debounceSync(`experience-${id}`, () => get().syncExperience(id));
     },
 
     removeExperience: async (id) => {
@@ -294,7 +325,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 },
             };
         });
-        get().autosaveResume();
+        debounceSync(`education-${id}`, () => get().syncEducation(id));
     },
 
     removeEducation: async (id) => {
@@ -336,13 +367,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
         }
     },
 
-    updateSkillCategories: async (categories) => {
-        const { resume } = get();
-        if (!resume) return;
-
-        const originalCategories = resume.skill_categories || [];
-
-        // Optimistic update
+    updateSkillCategories: (categories) => {
         set((state) => {
             if (!state.resume) return {};
             return {
@@ -352,8 +377,112 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                 },
             };
         });
+        debounceSync('skills', get().syncSkillCategories);
+    },
 
-        // Sync with backend
+    updateStrengths: (strengths) => {
+        set((state) => {
+            if (!state.resume) return {};
+            return {
+                resume: {
+                    ...state.resume,
+                    strengths,
+                },
+            };
+        });
+        debounceSync('strengths', get().syncStrengths);
+    },
+
+    updateHobbies: (hobbies) => {
+        set((state) => {
+            if (!state.resume) return {};
+            return {
+                resume: {
+                    ...state.resume,
+                    hobbies,
+                },
+            };
+        });
+        debounceSync('hobbies', get().syncHobbies);
+    },
+
+    updateCustomSections: (sections) => {
+        set((state) => {
+            if (!state.resume) return {};
+            return {
+                resume: {
+                    ...state.resume,
+                    custom_sections: sections,
+                },
+            };
+        });
+        debounceSync('custom_sections', get().syncCustomSections);
+    },
+
+    updateTemplate: (template) => {
+        set((state) => {
+            if (!state.resume) return {};
+            return {
+                resume: {
+                    ...state.resume,
+                    template: template,
+                    template_id: template.id,
+                },
+            };
+        });
+        // NOT saving anything automatically as per requirements
+    },
+
+    syncPersonalInfo: async () => {
+        const { resume } = get();
+        if (!resume || !resume.id) return;
+        try {
+            await sectionApi.updatePersonalInfo(resume.id, resume.personal_info);
+            set({ originalResume: JSON.parse(JSON.stringify(resume)) });
+            console.log("Personal info synced");
+        } catch (error) {
+            console.error("Failed to sync personal info:", error);
+            get().rollbackState("Failed to sync personal info");
+        }
+    },
+
+    syncExperience: async (id: string) => {
+        const { resume } = get();
+        if (!resume || !resume.id) return;
+        const experience = resume.work_experiences?.find(exp => exp.id === id);
+        if (!experience) return;
+        try {
+            await sectionApi.updateWorkExperience(resume.id, id, experience);
+            set({ originalResume: JSON.parse(JSON.stringify(resume)) });
+            console.log(`Experience ${id} synced`);
+        } catch (error) {
+            console.error(`Failed to sync experience ${id}:`, error);
+            get().rollbackState("Failed to sync experience");
+        }
+    },
+
+    syncEducation: async (id: string) => {
+        const { resume } = get();
+        if (!resume || !resume.id) return;
+        const education = resume.educations?.find(edu => edu.id === id);
+        if (!education) return;
+        try {
+            await sectionApi.updateEducation(resume.id, id, education);
+            set({ originalResume: JSON.parse(JSON.stringify(resume)) });
+            console.log(`Education ${id} synced`);
+        } catch (error) {
+            console.error(`Failed to sync education ${id}:`, error);
+            get().rollbackState("Failed to sync education");
+        }
+    },
+
+    syncSkillCategories: async () => {
+        const { resume, originalResume } = get();
+        if (!resume || !resume.id) return;
+
+        const categories = resume.skill_categories || [];
+        const originalCategories = originalResume?.skill_categories || [];
+
         try {
             // 1. Handle Deleted Categories
             const deletedCategories = originalCategories.filter(oc => !categories.find(c => c.id === oc.id));
@@ -411,136 +540,84 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                     }
                 }
             }
+            set({ originalResume: JSON.parse(JSON.stringify(get().resume)) });
+            console.log("Skills synced");
         } catch (error) {
-            console.error('Failed to update skills:', error);
-            set((state) => {
-                if (!state.resume) return {};
-                return {
-                    resume: {
-                        ...state.resume,
-                        skill_categories: originalCategories,
-                    },
-                };
-            });
+            console.error('Failed to sync skills:', error);
+            get().rollbackState("Failed to sync skills");
         }
     },
 
-    updateStrengths: async (strengths) => {
-        const { resume } = get();
-        if (!resume) return;
+    syncStrengths: async () => {
+        const { resume, originalResume } = get();
+        if (!resume || !resume.id) return;
 
-        const originalStrengths = resume.strengths || [];
-        const newStrengths = strengths.filter(s => !originalStrengths.find(os => os.id === s.id));
-        const deletedStrengths = originalStrengths.filter(os => !strengths.find(s => s.id === os.id));
+        const strengths = resume.strengths || [];
+        const originalStrengths = originalResume?.strengths || [];
 
-        // Optimistic update
-        set((state) => {
-            if (!state.resume) return {};
-            return {
-                resume: {
-                    ...state.resume,
-                    strengths,
-                },
-            };
-        });
-
-        // Sync with backend
         try {
-            for (const s of newStrengths) {
-                await sectionApi.createStrength(resume.id, s);
-            }
-            for (const s of deletedStrengths) {
-                await sectionApi.deleteStrength(resume.id, s.id);
-            }
-            // Handle updates for existing strengths
-            const existingStrengths = strengths.filter(s => originalStrengths.find(os => os.id === s.id));
-            for (const s of existingStrengths) {
-                const original = originalStrengths.find(os => os.id === s.id);
-                if (JSON.stringify(original) !== JSON.stringify(s)) {
-                    await sectionApi.updateStrength(resume.id, s.id, s);
-                }
-            }
-        } catch (error) {
-            console.error('Failed to update strengths:', error);
-            set((state) => {
-                if (!state.resume) return {};
-                return {
-                    resume: {
-                        ...state.resume,
-                        strengths: originalStrengths,
-                    },
-                };
+            // Identify changes
+            const toDelete = originalStrengths.filter(os => !strengths.find(s => s.id === os.id));
+            const toUpdate = strengths.filter(s => {
+                const os = originalStrengths.find(os => os.id === s.id);
+                return os && JSON.stringify(os) !== JSON.stringify(s);
             });
+            const toCreate = strengths.filter(s => !originalStrengths.find(os => os.id === s.id));
+
+            for (const s of toDelete) await sectionApi.deleteStrength(resume.id, s.id);
+            for (const s of toUpdate) await sectionApi.updateStrength(resume.id, s.id, s);
+            for (const s of toCreate) {
+                const newS = await sectionApi.createStrength(resume.id, s);
+                // Update state with real ID if needed, but for strengths we usually just replace the whole list
+            }
+
+            // Update originalResume
+            set({ originalResume: JSON.parse(JSON.stringify(resume)) });
+            console.log("Strengths synced");
+        } catch (error) {
+            console.error("Failed to sync strengths:", error);
+            get().rollbackState("Failed to sync strengths");
         }
     },
 
-    updateHobbies: async (hobbies) => {
-        const { resume } = get();
-        if (!resume) return;
+    syncHobbies: async () => {
+        const { resume, originalResume } = get();
+        if (!resume || !resume.id) return;
 
-        const originalHobbies = resume.hobbies || [];
-        const newHobbies = hobbies.filter(h => !originalHobbies.find(oh => oh.id === h.id));
-        const deletedHobbies = originalHobbies.filter(oh => !hobbies.find(h => h.id === oh.id));
+        const hobbies = resume.hobbies || [];
+        const originalHobbies = originalResume?.hobbies || [];
 
-        // Optimistic update
-        set((state) => {
-            if (!state.resume) return {};
-            return {
-                resume: {
-                    ...state.resume,
-                    hobbies,
-                },
-            };
-        });
-
-        // Sync with backend
         try {
-            for (const h of newHobbies) {
+            // Identify changes
+            const toDelete = originalHobbies.filter(oh => !hobbies.find(h => h.id === oh.id));
+            const toUpdate = hobbies.filter(h => {
+                const oh = originalHobbies.find(oh => oh.id === h.id);
+                return oh && JSON.stringify(oh) !== JSON.stringify(h);
+            });
+            const toCreate = hobbies.filter(h => !originalHobbies.find(oh => oh.id === h.id));
+
+            for (const h of toDelete) await sectionApi.deleteHobby(resume.id, h.id);
+            for (const h of toUpdate) await sectionApi.updateHobby(resume.id, h.id, h);
+            for (const h of toCreate) {
                 await sectionApi.createHobby(resume.id, h);
             }
-            for (const h of deletedHobbies) {
-                await sectionApi.deleteHobby(resume.id, h.id);
-            }
-            // Handle updates for existing hobbies
-            const existingHobbies = hobbies.filter(h => originalHobbies.find(oh => oh.id === h.id));
-            for (const h of existingHobbies) {
-                const original = originalHobbies.find(oh => oh.id === h.id);
-                if (JSON.stringify(original) !== JSON.stringify(h)) {
-                    await sectionApi.updateHobby(resume.id, h.id, h);
-                }
-            }
+
+            // Update originalResume
+            set({ originalResume: JSON.parse(JSON.stringify(resume)) });
+            console.log("Hobbies synced");
         } catch (error) {
-            console.error('Failed to update hobbies:', error);
-            set((state) => {
-                if (!state.resume) return {};
-                return {
-                    resume: {
-                        ...state.resume,
-                        hobbies: originalHobbies,
-                    },
-                };
-            });
+            console.error("Failed to sync hobbies:", error);
+            get().rollbackState("Failed to sync hobbies");
         }
     },
 
-    updateCustomSections: async (sections) => {
-        const { resume } = get();
-        if (!resume) return;
+    syncCustomSections: async () => {
+        const { resume, originalResume } = get();
+        if (!resume || !resume.id) return;
 
-        const originalSections = resume.custom_sections || [];
+        const sections = resume.custom_sections || [];
+        const originalSections = originalResume?.custom_sections || [];
 
-        // Optimistic update
-        set((state) => {
-            if (!state.resume) return {};
-            return {
-                resume: {
-                    ...state.resume,
-                    custom_sections: sections,
-                },
-            };
-        });
-
-        // Sync with backend
         try {
             // 1. Handle Deleted Sections
             const deletedSections = originalSections.filter(os => !sections.find(s => s.id === os.id));
@@ -592,32 +669,31 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
                     }
                 }
             }
+            set({ originalResume: JSON.parse(JSON.stringify(get().resume)) });
+            console.log("Custom sections synced");
         } catch (error) {
-            console.error('Failed to update custom sections:', error);
-            set((state) => {
-                if (!state.resume) return {};
-                return {
-                    resume: {
-                        ...state.resume,
-                        custom_sections: originalSections,
-                    },
-                };
-            });
+            console.error('Failed to sync custom sections:', error);
+            get().rollbackState("Failed to sync custom sections");
         }
     },
 
-    updateTemplate: (template) => {
-        set((state) => {
-            if (!state.resume) return {};
-            return {
-                resume: {
-                    ...state.resume,
-                    template: template,
-                    template_id: template.id,
-                },
+    syncMetadata: async () => {
+        const { resume } = get();
+        if (!resume || !resume.id) return;
+        try {
+            const updateData = {
+                title: resume.title,
+                section_settings: resume.section_settings || {},
+                status: resume.status,
+                template_id: resume.template_id || resume.template?.id
             };
-        });
-        get().autosaveResume();
+            await updateResume(resume.id, updateData);
+            set({ originalResume: JSON.parse(JSON.stringify(resume)) });
+            console.log("Metadata synced");
+        } catch (error) {
+            console.error("Failed to sync metadata:", error);
+            get().rollbackState("Failed to sync metadata");
+        }
     },
 
     saveResume: async () => {
@@ -632,61 +708,30 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
 
         set({ isSaving: true });
         try {
-            // 1. Sync Metadata (Title, Settings, Status)
-            const updateData = {
-                title: resume.title,
-                section_settings: resume.section_settings || {},
-                status: resume.status,
-            };
-            const updatedResume = await updateResume(resume.id, updateData);
-
-            // 2. Granular Sync of all sections
-            await sectionApi.updatePersonalInfo(resume.id, resume.personal_info);
+            // 1. Sync all sections using granular sync methods
+            await get().syncMetadata();
+            await get().syncPersonalInfo();
 
             for (const exp of (resume.work_experiences || [])) {
-                await sectionApi.updateWorkExperience(resume.id, exp.id, exp);
+                await get().syncExperience(exp.id);
             }
 
             for (const edu of (resume.educations || [])) {
-                await sectionApi.updateEducation(resume.id, edu.id, edu);
+                await get().syncEducation(edu.id);
             }
 
-            for (const cat of (resume.skill_categories || [])) {
-                await sectionApi.updateSkillCategory(resume.id, cat.id, cat);
-                for (const item of (cat.items || [])) {
-                    await sectionApi.updateSkillItem(resume.id, cat.id, item.id, item);
-                }
-            }
+            await get().syncSkillCategories();
+            await get().syncStrengths();
+            await get().syncHobbies();
+            await get().syncCustomSections();
 
-            for (const s of (resume.strengths || [])) {
-                await sectionApi.updateStrength(resume.id, s.id, s);
-            }
+            console.log("Manual save completed with granular syncs");
 
-            for (const h of (resume.hobbies || [])) {
-                await sectionApi.updateHobby(resume.id, h.id, h);
-            }
-
-            for (const sec of (resume.custom_sections || [])) {
-                await sectionApi.updateCustomSection(resume.id, sec.id, sec);
-                for (const item of (sec.items || [])) {
-                    await sectionApi.updateCustomItem(resume.id, sec.id, item.id, item);
-                }
-            }
-
-            console.log("Manual save completed with full granular sync");
-
-            // 3. Update state non-destructively
+            // 3. Update state
             set({
-                resume: {
-                    ...resume,
-                    title: updatedResume.title,
-                    section_settings: updatedResume.section_settings,
-                    status: updatedResume.status,
-                    updated_at: updatedResume.updated_at,
-                    last_edited_at: updatedResume.last_edited_at
-                },
                 isSaving: false,
-                lastSaved: new Date()
+                lastSaved: new Date(),
+                originalResume: JSON.parse(JSON.stringify(get().resume))
             });
 
             const toast = (await import("react-hot-toast")).default;
@@ -701,93 +746,8 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
     },
 
     autosaveResume: async () => {
-        // Clear any existing timeout
-        if (autosaveTimeout) {
-            clearTimeout(autosaveTimeout);
-        }
-
-        // Set a new timeout to debounce the autosave
-        autosaveTimeout = setTimeout(async () => {
-            const { resume, isSaving, isAutosaving } = get();
-
-            // If we're already saving or autosaving, we'll try again in a moment
-            if (!resume || !resume.id || isSaving || isAutosaving) {
-                // If it's still autosaving, reschedule the check
-                if (isAutosaving) {
-                    get().autosaveResume();
-                }
-                return;
-            }
-
-            set({ isAutosaving: true });
-            try {
-                // Sync metadata
-                const updateData = {
-                    title: resume.title,
-                    section_settings: resume.section_settings || {},
-                    status: resume.status,
-                };
-                const updatedResume = await bulkAutosaveResume(resume.id, updateData);
-
-                // Sync Personal Info
-                console.log("Syncing personal info:", resume.personal_info);
-                await sectionApi.updatePersonalInfo(resume.id, resume.personal_info);
-
-                // Sync Experiences
-                for (const exp of (resume.work_experiences || [])) {
-                    await sectionApi.updateWorkExperience(resume.id, exp.id, exp);
-                }
-
-                // Sync Educations
-                for (const edu of (resume.educations || [])) {
-                    await sectionApi.updateEducation(resume.id, edu.id, edu);
-                }
-
-                // Sync Skills
-                for (const cat of (resume.skill_categories || [])) {
-                    await sectionApi.updateSkillCategory(resume.id, cat.id, cat);
-                    for (const item of (cat.items || [])) {
-                        await sectionApi.updateSkillItem(resume.id, cat.id, item.id, item);
-                    }
-                }
-
-                // Sync Strengths
-                for (const s of (resume.strengths || [])) {
-                    await sectionApi.updateStrength(resume.id, s.id, s);
-                }
-
-                // Sync Hobbies
-                for (const h of (resume.hobbies || [])) {
-                    await sectionApi.updateHobby(resume.id, h.id, h);
-                }
-
-                // Sync Custom Sections
-                for (const sec of (resume.custom_sections || [])) {
-                    await sectionApi.updateCustomSection(resume.id, sec.id, sec);
-                    for (const item of (sec.items || [])) {
-                        await sectionApi.updateCustomItem(resume.id, sec.id, item.id, item);
-                    }
-                }
-
-                console.log("Autosave completed with granular sync");
-
-                set({
-                    resume: {
-                        ...resume,
-                        title: updatedResume.title,
-                        section_settings: updatedResume.section_settings,
-                        status: updatedResume.status,
-                        updated_at: updatedResume.updated_at,
-                        last_edited_at: updatedResume.last_edited_at
-                    },
-                    isAutosaving: false,
-                    lastSaved: new Date()
-                });
-            } catch (err) {
-                console.error("Failed to autosave resume", err);
-                set({ isAutosaving: false });
-            }
-        }, 1500); // 1.5 second debounce
+        // This is now a legacy method or can be used to trigger a full metadata sync
+        get().syncMetadata();
     },
 
     downloadResume: async () => {

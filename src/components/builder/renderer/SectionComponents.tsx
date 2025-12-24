@@ -165,7 +165,7 @@ export const ExperienceSection: React.FC<SectionProps> = ({ resume, style, isEdi
             start_date: "2024",
             end_date: "Present",
             description: "• Job responsibility or achievement",
-            bullets: "",
+            bullets: [],
             is_current: true,
             order: work_experiences.length
         };

@@ -310,7 +310,7 @@ const ExperienceMobile: React.FC = () => {
             end_date: "",
             is_current: false,
             description: "",
-            bullets: "",
+            bullets: [],
             order: resume?.work_experiences?.length || 0,
         };
         addExperience(newExp);
@@ -772,7 +772,13 @@ const ExperienceForm: React.FC<{ expId: string }> = ({ expId }) => {
             </div>
 
             <TextareaField label="Description" value={exp.description} onChange={(val) => updateExperience(expId, { description: val })} onBlur={() => autosaveResume()} placeholder="Describe your role and impact..." />
-            <TextareaField label="Key Achievements (Bullets)" value={exp.bullets} onChange={(val) => updateExperience(expId, { bullets: val })} onBlur={() => autosaveResume()} placeholder="• Achieved X using Y..." />
+            <TextareaField
+                label="Key Achievements (Bullets)"
+                value={Array.isArray(exp.bullets) ? exp.bullets.join('\n') : (exp.bullets || "")}
+                onChange={(val) => updateExperience(expId, { bullets: val.split('\n').filter(b => b.trim() !== "") })}
+                onBlur={() => autosaveResume()}
+                placeholder="Achieved X using Y..."
+            />
         </div>
     );
 };

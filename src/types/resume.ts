@@ -79,7 +79,7 @@ export interface WorkExperience {
     end_date: string;
     is_current: boolean;
     description: string;
-    bullets: string; // Assuming this is a string based on API response, potentially HTML or markdown
+    bullets: string[];
     order: number;
 }
 
@@ -154,7 +154,7 @@ export interface Resume {
     target_role: string;
     is_ai_generated: boolean;
     ai_model?: string;
-    ai_prompt?: string;
+    ai_prompt?: Record<string, any>;
     status: string; // "draft", "published", etc.
     created_at: string;
     updated_at: string;

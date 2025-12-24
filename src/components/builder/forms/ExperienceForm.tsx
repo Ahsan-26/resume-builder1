@@ -26,7 +26,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
             end_date: "",
             is_current: false,
             description: "",
-            bullets: "",
+            bullets: [],
             order: items.length,
         };
         addExperience(newExperience);
@@ -198,6 +198,47 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                                     className={`${inputClasses} pl-11 resize-none leading-relaxed`}
                                                     placeholder="Describe your key responsibilities and measurable achievements..."
                                                 />
+                                            </div>
+                                        </div>
+
+                                        <div className="md:col-span-2 space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <label className={labelClasses}>Bullet Points</label>
+                                                <button
+                                                    onClick={() => {
+                                                        const newBullets = [...(item.bullets || []), ""];
+                                                        handleChange(item.id, "bullets", newBullets);
+                                                    }}
+                                                    className="text-[10px] font-black text-blue-600 uppercase tracking-wider hover:underline"
+                                                >
+                                                    + Add Bullet
+                                                </button>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {(item.bullets || []).map((bullet, index) => (
+                                                    <div key={index} className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            value={bullet}
+                                                            onChange={(e) => {
+                                                                const newBullets = [...(item.bullets || [])];
+                                                                newBullets[index] = e.target.value;
+                                                                handleChange(item.id, "bullets", newBullets);
+                                                            }}
+                                                            className={inputClasses}
+                                                            placeholder="e.g. Increased sales by 20% in Q3"
+                                                        />
+                                                        <button
+                                                            onClick={() => {
+                                                                const newBullets = (item.bullets || []).filter((_, i) => i !== index);
+                                                                handleChange(item.id, "bullets", newBullets);
+                                                            }}
+                                                            className="p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>

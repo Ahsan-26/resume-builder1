@@ -66,10 +66,11 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
 
     return (
         <div
-            className="w-full h-full bg-white text-sm font-sans"
+            className="w-full h-full bg-white font-sans"
             style={{
                 fontFamily: style.font_family,
-                lineHeight: style.line_height
+                lineHeight: style.line_height,
+                fontSize: `${0.875 * style.body_scale}rem`
             }}
         >
             {/* Header Area */}
@@ -81,27 +82,40 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
 
             {/* Main Layout */}
             {layout.type === 'two_column' ? (
-                <div className="flex">
-                    {/* Left Column */}
-                    <div
-                        className="p-8 pt-0 flex flex-col gap-6"
-                        style={{ width: `${(layout.columns?.left || 0.35) * 100}%` }}
-                    >
-                        {leftSections.map(renderSection)}
-                    </div>
+                <>
+                    <div className="flex">
+                        {/* Left Column */}
+                        <div
+                            className="p-8 pt-0 flex flex-col"
+                            style={{
+                                width: `${(layout.columns?.left || 0.35) * 100}%`,
+                                gap: `${style.section_gap}px`
+                            }}
+                        >
+                            {leftSections.map(renderSection)}
+                        </div>
 
-                    {/* Right Column */}
-                    <div
-                        className="p-8 pt-0 flex flex-col gap-6 bg-gray-50 border-l border-gray-100"
-                        style={{ width: `${(layout.columns?.right || 0.65) * 100}%` }}
-                    >
-                        {rightSections.map(renderSection)}
+                        {/* Right Column */}
+                        <div
+                            className="p-8 pt-0 flex flex-col"
+                            style={{
+                                width: `${(layout.columns?.right || 0.65) * 100}%`,
+                                gap: `${style.section_gap}px`
+                            }}
+                        >
+                            {rightSections.map(renderSection)}
+                        </div>
                     </div>
-                </div>
+                    {/* Full width sections below columns if any */}
+                    {fullSections.length > 0 && (
+                        <div className="p-8 pt-0 flex flex-col" style={{ gap: `${style.section_gap}px` }}>
+                            {fullSections.map(renderSection)}
+                        </div>
+                    )}
+                </>
             ) : (
-                <div className="p-8 pt-0 flex flex-col gap-6">
+                <div className="p-8 pt-0 flex flex-col" style={{ gap: `${style.section_gap}px` }}>
                     {/* Single Column Layout */}
-                    {headerSections.length > 0 && headerSections.map(renderSection)}
                     {leftSections.map(renderSection)}
                     {rightSections.map(renderSection)}
                     {fullSections.map(renderSection)}

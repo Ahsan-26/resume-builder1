@@ -59,7 +59,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                     end_date: "Present",
                     is_current: true,
                     description: "Click to edit your job description and responsibilities here.",
-                    bullets: "",
+                    bullets: [],
                     order: resume?.work_experiences?.length || 0,
                 };
                 addExperience(newExp);
