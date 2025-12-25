@@ -1,6 +1,7 @@
 "use client";
 
-import { User, Briefcase, GraduationCap, Wrench, FileText, Layers, LayoutTemplate, Plus, Home, Files, Sparkles, Languages, Share2, Search, Map, MessageSquare } from "lucide-react";
+import React from "react";
+import { User, Briefcase, GraduationCap, Wrench, FileText, Layers, LayoutTemplate, Plus, Home, Files, Sparkles, Languages, Share2, Search, Map, MessageSquare, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useResumeStore } from "@/store/useResumeStore";
 import { WorkExperience, Education, SkillCategory, Strength, Hobby, CustomSection } from "@/types/resume";
@@ -12,6 +13,8 @@ interface BuilderSidebarProps {
     activeSection: SectionType;
     onSectionChange: (section: SectionType) => void;
     onRearrange?: () => void;
+    isCollapsed?: boolean;
+    onToggleCollapse?: () => void;
 }
 
 const mainNav = [
@@ -42,7 +45,7 @@ const footerNav = [
     { id: "jobs", label: "Find Jobs", icon: Search },
 ];
 
-export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, onSectionChange, onRearrange }) => {
+export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, onSectionChange, onRearrange, isCollapsed, onToggleCollapse }) => {
     const { addExperience, addEducation, updateSkillCategories, updateStrengths, updateHobbies, updateCustomSections, resume } = useResumeStore();
 
     const handleAddItem = (sectionId: SectionType) => {
@@ -150,18 +153,27 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
     };
 
     return (
-        <aside className="w-full h-full bg-white flex flex-col overflow-y-auto border-r border-gray-100">
+        <aside className={`${isCollapsed ? "w-16" : "w-full"} h-full bg-white flex flex-col overflow-y-auto border-r border-gray-100 transition-all duration-300 relative group/sidebar`}>
+            {/* Collapse Toggle */}
+            <button
+                onClick={onToggleCollapse}
+                className="absolute -right-3 top-20 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm z-30 opacity-0 group-hover/sidebar:opacity-100 transition-opacity hover:bg-gray-50"
+            >
+                {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+            </button>
             {/* User Profile Section */}
-            <div className="p-6 flex items-center gap-3 border-b border-gray-50">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md">
+            <div className={`p-6 flex items-center gap-3 border-b border-gray-50 ${isCollapsed ? "justify-center px-0" : ""}`}>
+                <div className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md">
                     {resume?.personal_info?.first_name?.[0] || "U"}
                 </div>
-                <div className="min-w-0">
-                    <p className="text-sm font-bold text-gray-900 truncate">
-                        {resume?.personal_info?.first_name} {resume?.personal_info?.last_name}
-                    </p>
-                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Free Plan</p>
-                </div>
+                {!isCollapsed && (
+                    <div className="min-w-0">
+                        <p className="text-sm font-bold text-gray-900 truncate">
+                            {resume?.personal_info?.first_name} {resume?.personal_info?.last_name}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Free Plan</p>
+                    </div>
+                )}
             </div>
 
             <div className="flex-1 px-3 py-4 space-y-6">
@@ -171,17 +183,18 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                         <Link
                             key={item.id}
                             href={item.href}
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all"
+                            className={`flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all ${isCollapsed ? "justify-center px-0" : ""}`}
+                            title={isCollapsed ? item.label : ""}
                         >
-                            <item.icon size={18} className="text-gray-400" />
-                            {item.label}
+                            <item.icon size={18} className="text-gray-400 shrink-0" />
+                            {!isCollapsed && <span>{item.label}</span>}
                         </Link>
                     ))}
                 </nav>
 
                 {/* Edit Sections */}
                 <div className="space-y-1">
-                    <p className="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Editor</p>
+                    {!isCollapsed && <p className="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Editor</p>}
                     {editSections.map((section) => {
                         const Icon = section.icon;
                         const isActive = activeSection === section.id;
@@ -189,14 +202,15 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
                             <div key={section.id} className="space-y-1">
                                 <button
                                     onClick={() => onSectionChange(section.id)}
-                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${isActive
+                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${isCollapsed ? "justify-center px-0" : ""} ${isActive
                                         ? "bg-gray-900 text-white shadow-lg shadow-gray-200"
                                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                         }`}
+                                    title={isCollapsed ? section.label : ""}
                                 >
-                                    <Icon size={18} className={isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600"} />
-                                    <span className="flex-1 text-left font-semibold">{section.label}</span>
-                                    {isActive && section.hasAdd && (
+                                    <Icon size={18} className={`shrink-0 ${isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600"}`} />
+                                    {!isCollapsed && <span className="flex-1 text-left font-semibold">{section.label}</span>}
+                                    {!isCollapsed && isActive && section.hasAdd && (
                                         <Plus
                                             size={16}
                                             className="text-gray-400 hover:text-white transition-colors"
@@ -213,13 +227,14 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
 
                     {/* Rearrange Button */}
                     {onRearrange && (
-                        <div className="pt-2 px-3">
+                        <div className={`pt-2 ${isCollapsed ? "px-0 flex justify-center" : "px-3"}`}>
                             <button
                                 onClick={onRearrange}
-                                className="w-full flex items-center gap-3 px-4 py-3 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-all group shadow-sm"
+                                className={`flex items-center gap-3 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-all group shadow-sm ${isCollapsed ? "p-2.5" : "w-full px-4 py-3"}`}
+                                title={isCollapsed ? "Rearrange Sections" : ""}
                             >
-                                <Layers size={18} className="text-indigo-500 group-hover:scale-110 transition-transform" />
-                                <span className="font-bold text-sm">Rearrange Sections</span>
+                                <Layers size={18} className="text-indigo-500 group-hover:scale-110 transition-transform shrink-0" />
+                                {!isCollapsed && <span className="font-bold text-sm">Rearrange Sections</span>}
                             </button>
                         </div>
                     )}
@@ -227,28 +242,30 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({ activeSection, o
 
                 {/* AI Tools */}
                 <div className="space-y-1">
-                    <p className="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">AI Tools</p>
+                    {!isCollapsed && <p className="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">AI Tools</p>}
                     {aiTools.map((item) => (
                         <button
                             key={item.id}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all"
+                            className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all ${isCollapsed ? "justify-center px-0" : ""}`}
+                            title={isCollapsed ? item.label : ""}
                         >
-                            <item.icon size={18} className="text-gray-400" />
-                            {item.label}
+                            <item.icon size={18} className="text-gray-400 shrink-0" />
+                            {!isCollapsed && <span>{item.label}</span>}
                         </button>
                     ))}
                 </div>
             </div>
 
             {/* Footer Navigation */}
-            <div className="p-4 bg-gray-50/50 border-t border-gray-100 space-y-1">
+            <div className={`p-4 bg-gray-50/50 border-t border-gray-100 space-y-1 ${isCollapsed ? "px-0" : ""}`}>
                 {footerNav.map((item) => (
                     <button
                         key={item.id}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-gray-500 hover:text-gray-900 transition-all"
+                        className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-gray-500 hover:text-gray-900 transition-all ${isCollapsed ? "justify-center px-0" : ""}`}
+                        title={isCollapsed ? item.label : ""}
                     >
-                        <item.icon size={16} />
-                        {item.label}
+                        <item.icon size={16} className="shrink-0" />
+                        {!isCollapsed && <span>{item.label}</span>}
                     </button>
                 ))}
             </div>

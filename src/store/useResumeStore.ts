@@ -31,7 +31,9 @@ interface ResumeState {
     updateResumeData: (data: Partial<Resume>) => void;
     updateTitle: (title: string) => void;
     updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
-    updateSectionOrder: (sectionSettings: Record<string, { order: number; visible: boolean }>) => void;
+    updateSectionOrder: (sectionSettings: Record<string, { order: number; visible: boolean; area?: string }>) => void;
+    updateSectionSettings: (sectionId: string, settings: Partial<Resume['section_settings'][string]>) => void;
+    reorderItems: (sectionId: string, itemIds: string[]) => void;
 
     // Experience
     addExperience: (experience: WorkExperience) => void;
@@ -122,25 +124,85 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
         }),
 
     updateSectionOrder: (sectionSettings) => {
-        // Filter out fields not supported by the backend (like 'area')
-        const filteredSettings = Object.entries(sectionSettings).reduce((acc, [key, value]) => {
-            acc[key] = {
-                order: value.order,
-                visible: value.visible
-            };
-            return acc;
-        }, {} as Record<string, { order: number; visible: boolean }>);
-
         set((state) => {
             if (!state.resume) return {};
+            const currentSettings = state.resume.section_settings || {};
+            const newSettings = { ...currentSettings };
+
+            Object.entries(sectionSettings).forEach(([key, value]) => {
+                newSettings[key] = {
+                    ...currentSettings[key],
+                    order: value.order,
+                    visible: value.visible,
+                    area: (value.area as any) || currentSettings[key]?.area
+                };
+            });
+
             return {
                 resume: {
                     ...state.resume,
-                    section_settings: filteredSettings,
+                    section_settings: newSettings,
                 },
             };
         });
-        get().syncMetadata();
+        debounceSync('metadata', get().syncMetadata);
+    },
+
+    updateSectionSettings: (sectionId, settings) => {
+        set((state) => {
+            if (!state.resume) return {};
+            const currentSettings = state.resume.section_settings || {};
+            return {
+                resume: {
+                    ...state.resume,
+                    section_settings: {
+                        ...currentSettings,
+                        [sectionId]: {
+                            ...currentSettings[sectionId],
+                            ...settings
+                        }
+                    },
+                },
+            };
+        });
+        debounceSync('metadata', get().syncMetadata);
+    },
+
+    reorderItems: (sectionId, itemIds) => {
+        set((state) => {
+            if (!state.resume) return {};
+            const resume = state.resume;
+
+            // Generic reordering logic based on sectionId
+            const updateItems = (items: any[]) => {
+                return [...items].sort((a, b) => {
+                    const indexA = itemIds.indexOf(a.id);
+                    const indexB = itemIds.indexOf(b.id);
+                    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+                }).map((item, index) => ({ ...item, order: index }));
+            };
+
+            const updates: Partial<Resume> = {};
+            if (sectionId === 'work_experiences') updates.work_experiences = updateItems(resume.work_experiences || []);
+            else if (sectionId === 'educations') updates.educations = updateItems(resume.educations || []);
+            else if (sectionId === 'skill_categories') updates.skill_categories = updateItems(resume.skill_categories || []);
+            else if (sectionId === 'strengths') updates.strengths = updateItems(resume.strengths || []);
+            else if (sectionId === 'hobbies') updates.hobbies = updateItems(resume.hobbies || []);
+
+            return {
+                resume: {
+                    ...resume,
+                    ...updates
+                }
+            };
+        });
+        // Trigger sync for the specific section
+        const { resume } = get();
+        if (sectionId === 'work_experiences') resume?.work_experiences.forEach(exp => get().syncExperience(exp.id));
+        else if (sectionId === 'educations') resume?.educations.forEach(edu => get().syncEducation(edu.id));
+        else if (sectionId === 'skill_categories') get().syncSkillCategories();
+        else if (sectionId === 'strengths') get().syncStrengths();
+        else if (sectionId === 'hobbies') get().syncHobbies();
     },
 
     updateTitle: (title) => {

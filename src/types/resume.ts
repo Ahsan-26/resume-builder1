@@ -159,7 +159,14 @@ export interface Resume {
     created_at: string;
     updated_at: string;
     last_edited_at: string;
-    section_settings: Record<string, { order: number; visible: boolean }>;
+    section_settings: Record<string, {
+        order: number;
+        visible: boolean;
+        area?: 'header' | 'left' | 'right' | 'full';
+        title?: string; // Rename section heading
+        fields?: Record<string, boolean>; // hide/show individual fields (date, link, etc.)
+        items?: Record<string, { hide_date?: boolean }>; // hide dates per item
+    }>;
     personal_info: PersonalInfo;
     work_experiences: WorkExperience[];
     educations: Education[];

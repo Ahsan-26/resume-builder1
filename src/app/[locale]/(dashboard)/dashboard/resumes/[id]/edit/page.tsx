@@ -17,6 +17,7 @@ export default function ResumeEditPage() {
     const { fetchResume, isSaving, isAutosaving, lastSaved, resume, saveResume, autosaveResume, updateTitle, isPreviewMode, setIsPreviewMode, downloadResume } = useResumeStore();
     const [activeSection, setActiveSection] = useState<SectionType>("personal");
     const [isRearrangeOpen, setIsRearrangeOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const [isMobilePreview, setIsMobilePreview] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -94,11 +95,13 @@ export default function ResumeEditPage() {
                 {!isMobile && (
                     <>
                         {/* Column 1: Global Navigation Sidebar */}
-                        <div className="w-60 shrink-0 border-r border-gray-200 bg-white flex flex-col">
+                        <div className={`${isSidebarCollapsed ? "w-16" : "w-60"} shrink-0 border-r border-gray-200 bg-white flex flex-col transition-all duration-300`}>
                             <BuilderSidebar
                                 activeSection={activeSection}
                                 onSectionChange={setActiveSection}
                                 onRearrange={() => setIsRearrangeOpen(true)}
+                                isCollapsed={isSidebarCollapsed}
+                                onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                             />
                         </div>
 

@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { useResumeStore } from "@/store/useResumeStore";
-import { ArrowLeft, Plus, Edit2, Trash2, Save, Eye, Layout } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, Trash2, Save, Eye, Layout, EyeOff, ChevronUp, ChevronDown } from "lucide-react";
+import { DatePicker } from "./renderer/DatePicker";
 import Link from "next/link";
 import { BuilderPreview } from "./BuilderPreview";
 import { RearrangeModal } from "./RearrangeModal";
@@ -90,60 +91,66 @@ export const MobileEditView: React.FC = () => {
                 <div className="max-w-2xl mx-auto p-4 space-y-4">
                     {/* Personal Info Section */}
                     <SectionCard
-                        title="Personal Information"
+                        title={resume.section_settings?.personal_info?.title || "Personal Information"}
                         isExpanded={expandedSection === "personal"}
                         onToggle={() => setExpandedSection(expandedSection === "personal" ? null : "personal")}
                         accentColor={accentColor}
+                        onRename={(val) => useResumeStore.getState().updateSectionSettings('personal_info', { title: val })}
                     >
                         <PersonalInfoMobile />
                     </SectionCard>
 
                     {/* Experience Section */}
                     <SectionCard
-                        title="Experience"
+                        title={resume.section_settings?.work_experiences?.title || "Experience"}
                         isExpanded={expandedSection === "experience"}
                         onToggle={() => setExpandedSection(expandedSection === "experience" ? null : "experience")}
                         accentColor={accentColor}
+                        onRename={(val) => useResumeStore.getState().updateSectionSettings('work_experiences', { title: val })}
                     >
                         <ExperienceMobile />
                     </SectionCard>
 
                     {/* Education Section */}
                     <SectionCard
-                        title="Education"
+                        title={resume.section_settings?.educations?.title || "Education"}
                         isExpanded={expandedSection === "education"}
                         onToggle={() => setExpandedSection(expandedSection === "education" ? null : "education")}
                         accentColor={accentColor}
+                        onRename={(val) => useResumeStore.getState().updateSectionSettings('educations', { title: val })}
                     >
                         <EducationMobile />
                     </SectionCard>
 
                     {/* Skills Section */}
                     <SectionCard
-                        title="Skills"
+                        title={resume.section_settings?.skill_categories?.title || "Skills"}
                         isExpanded={expandedSection === "skills"}
                         onToggle={() => setExpandedSection(expandedSection === "skills" ? null : "skills")}
                         accentColor={accentColor}
+                        onRename={(val) => useResumeStore.getState().updateSectionSettings('skill_categories', { title: val })}
                     >
                         <SkillsMobile />
                     </SectionCard>
 
                     {/* Strengths Section */}
                     <SectionCard
-                        title="Strengths"
+                        title={resume.section_settings?.strengths?.title || "Strengths"}
                         isExpanded={expandedSection === "strengths"}
                         onToggle={() => setExpandedSection(expandedSection === "strengths" ? null : "strengths")}
                         accentColor={accentColor}
+                        onRename={(val) => useResumeStore.getState().updateSectionSettings('strengths', { title: val })}
                     >
                         <StrengthsMobile />
                     </SectionCard>
 
                     {/* Hobbies Section */}
                     <SectionCard
-                        title="Hobbies"
+                        title={resume.section_settings?.hobbies?.title || "Hobbies"}
                         isExpanded={expandedSection === "hobbies"}
                         onToggle={() => setExpandedSection(expandedSection === "hobbies" ? null : "hobbies")}
                         accentColor={accentColor}
+                        onRename={(val) => useResumeStore.getState().updateSectionSettings('hobbies', { title: val })}
                     >
                         <HobbiesMobile />
                     </SectionCard>
@@ -152,10 +159,11 @@ export const MobileEditView: React.FC = () => {
                     {resume?.custom_sections?.map((section) => (
                         <SectionCard
                             key={section.id}
-                            title={section.title || "Custom Section"}
+                            title={resume.section_settings?.[section.id]?.title || section.title || "Custom Section"}
                             isExpanded={expandedSection === `custom-${section.id}`}
                             onToggle={() => setExpandedSection(expandedSection === `custom-${section.id}` ? null : `custom-${section.id}`)}
                             accentColor={accentColor}
+                            onRename={(val) => useResumeStore.getState().updateSectionSettings(section.id, { title: val })}
                         >
                             <CustomSectionMobile sectionId={section.id} />
                         </SectionCard>
@@ -173,20 +181,33 @@ const SectionCard: React.FC<{
     onToggle: () => void;
     children: React.ReactNode;
     accentColor: string;
-}> = ({ title, isExpanded, onToggle, children, accentColor }) => {
+    onRename?: (newTitle: string) => void;
+}> = ({ title, isExpanded, onToggle, children, accentColor, onRename }) => {
     return (
         <div className={`bg-white rounded-2xl shadow-sm border transition-all duration-300 ${isExpanded ? "border-blue-200 ring-4 ring-blue-50" : "border-gray-200"}`}>
-            <button
-                onClick={onToggle}
-                className="w-full px-5 py-4 flex items-center justify-between font-bold text-left"
-            >
-                <span className={isExpanded ? "text-blue-700" : "text-gray-700"}>{title}</span>
-                <div className={`p-1 rounded-full transition-all ${isExpanded ? "bg-blue-100 text-blue-700 rotate-180" : "bg-gray-100 text-gray-400"}`}>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-            </button>
+            <div className="flex items-center">
+                <button
+                    onClick={onToggle}
+                    className="flex-1 px-5 py-4 flex items-center justify-between font-bold text-left"
+                >
+                    {onRename && isExpanded ? (
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => onRename(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-transparent border-b border-blue-300 focus:outline-none focus:border-blue-500 text-blue-700 w-full mr-4"
+                        />
+                    ) : (
+                        <span className={isExpanded ? "text-blue-700" : "text-gray-700"}>{title}</span>
+                    )}
+                    <div className={`p-1 rounded-full transition-all ${isExpanded ? "bg-blue-100 text-blue-700 rotate-180" : "bg-gray-100 text-gray-400"}`}>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </button>
+            </div>
             {isExpanded && (
                 <div className="px-5 pb-6 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="h-px bg-gray-100 mb-5" />
@@ -325,7 +346,7 @@ const ExperienceMobile: React.FC = () => {
 
     return (
         <div className="space-y-4">
-            {resume?.work_experiences?.map((exp) => (
+            {resume?.work_experiences?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((exp, index) => (
                 <ItemCard
                     key={exp.id}
                     title={exp.position_title || "Untitled Position"}
@@ -334,6 +355,16 @@ const ExperienceMobile: React.FC = () => {
                     onDelete={() => handleDelete(exp.id)}
                     isEditing={editingId === exp.id}
                     onClose={() => setEditingId(null)}
+                    onMoveUp={index > 0 ? () => {
+                        const newIds = resume.work_experiences.map(e => e.id);
+                        [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
+                        useResumeStore.getState().reorderItems('work_experiences', newIds);
+                    } : undefined}
+                    onMoveDown={index < resume.work_experiences.length - 1 ? () => {
+                        const newIds = resume.work_experiences.map(e => e.id);
+                        [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
+                        useResumeStore.getState().reorderItems('work_experiences', newIds);
+                    } : undefined}
                 >
                     <ExperienceForm expId={exp.id} />
                 </ItemCard>
@@ -382,7 +413,7 @@ const EducationMobile: React.FC = () => {
 
     return (
         <div className="space-y-4">
-            {resume?.educations?.map((edu) => (
+            {resume?.educations?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((edu, index) => (
                 <ItemCard
                     key={edu.id}
                     title={edu.degree || "Untitled Degree"}
@@ -391,6 +422,16 @@ const EducationMobile: React.FC = () => {
                     onDelete={() => handleDelete(edu.id)}
                     isEditing={editingId === edu.id}
                     onClose={() => setEditingId(null)}
+                    onMoveUp={index > 0 ? () => {
+                        const newIds = resume.educations.map(e => e.id);
+                        [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
+                        useResumeStore.getState().reorderItems('educations', newIds);
+                    } : undefined}
+                    onMoveDown={index < resume.educations.length - 1 ? () => {
+                        const newIds = resume.educations.map(e => e.id);
+                        [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
+                        useResumeStore.getState().reorderItems('educations', newIds);
+                    } : undefined}
                 >
                     <EducationForm eduId={edu.id} />
                 </ItemCard>
@@ -641,7 +682,9 @@ const ItemCard: React.FC<{
     isEditing: boolean;
     onClose: () => void;
     children: React.ReactNode;
-}> = ({ title, subtitle, onEdit, onDelete, isEditing, onClose, children }) => {
+    onMoveUp?: () => void;
+    onMoveDown?: () => void;
+}> = ({ title, subtitle, onEdit, onDelete, isEditing, onClose, children, onMoveUp, onMoveDown }) => {
     if (isEditing) {
         return (
             <div className="bg-white p-5 rounded-2xl border-2 border-blue-100 shadow-md animate-in zoom-in-95 duration-200">
@@ -658,9 +701,29 @@ const ItemCard: React.FC<{
 
     return (
         <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between hover:bg-white hover:shadow-md hover:border-blue-100 transition-all group">
-            <div className="flex-1 min-w-0 pr-4">
-                <div className="font-bold text-gray-900 truncate">{title}</div>
-                {subtitle && <div className="text-sm text-gray-500 truncate mt-0.5">{subtitle}</div>}
+            <div className="flex items-center gap-3 flex-1 min-w-0 pr-4">
+                {(onMoveUp || onMoveDown) && (
+                    <div className="flex flex-col gap-1">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onMoveUp?.(); }}
+                            disabled={!onMoveUp}
+                            className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"
+                        >
+                            <ChevronUp size={14} />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onMoveDown?.(); }}
+                            disabled={!onMoveDown}
+                            className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"
+                        >
+                            <ChevronDown size={14} />
+                        </button>
+                    </div>
+                )}
+                <div className="flex-1 min-w-0">
+                    <div className="font-bold text-gray-900 truncate">{title}</div>
+                    {subtitle && <div className="text-sm text-gray-500 truncate mt-0.5">{subtitle}</div>}
+                </div>
             </div>
             <div className="flex gap-2 shrink-0">
                 <button onClick={onEdit} className="p-2.5 text-blue-600 bg-white border border-gray-100 rounded-xl shadow-sm hover:bg-blue-50 hover:border-blue-200 transition-all active:scale-90">
@@ -760,9 +823,26 @@ const ExperienceForm: React.FC<{ expId: string }> = ({ expId }) => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <InputField label="Start Date" value={exp.start_date} onChange={(val) => updateExperience(expId, { start_date: val })} onBlur={() => autosaveResume()} placeholder="MM/YYYY" />
+                <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Start Date</label>
+                    <DatePicker
+                        value={exp.start_date}
+                        onChange={(val) => updateExperience(expId, { start_date: val })}
+                        onBlur={() => autosaveResume()}
+                    />
+                </div>
                 {!exp.is_current && (
-                    <InputField label="End Date" value={exp.end_date} onChange={(val) => updateExperience(expId, { end_date: val })} onBlur={() => autosaveResume()} placeholder="MM/YYYY" />
+                    <div className="space-y-1.5">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">End Date</label>
+                        <DatePicker
+                            value={exp.end_date}
+                            onChange={(val) => updateExperience(expId, { end_date: val })}
+                            isCurrent={exp.is_current}
+                            onCurrentChange={(val) => updateExperience(expId, { is_current: val })}
+                            onBlur={() => autosaveResume()}
+                            placeholder="Present"
+                        />
+                    </div>
                 )}
             </div>
 
@@ -810,9 +890,26 @@ const EducationForm: React.FC<{ eduId: string }> = ({ eduId }) => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <InputField label="Start Date" value={edu.start_date} onChange={(val) => updateEducation(eduId, { start_date: val })} onBlur={() => autosaveResume()} placeholder="MM/YYYY" />
+                <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Start Date</label>
+                    <DatePicker
+                        value={edu.start_date}
+                        onChange={(val) => updateEducation(eduId, { start_date: val })}
+                        onBlur={() => autosaveResume()}
+                    />
+                </div>
                 {!edu.is_current && (
-                    <InputField label="End Date" value={edu.end_date} onChange={(val) => updateEducation(eduId, { end_date: val })} onBlur={() => autosaveResume()} placeholder="MM/YYYY" />
+                    <div className="space-y-1.5">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">End Date</label>
+                        <DatePicker
+                            value={edu.end_date}
+                            onChange={(val) => updateEducation(eduId, { end_date: val })}
+                            isCurrent={edu.is_current}
+                            onCurrentChange={(val) => updateEducation(eduId, { is_current: val })}
+                            onBlur={() => autosaveResume()}
+                            placeholder="Present"
+                        />
+                    </div>
                 )}
             </div>
 

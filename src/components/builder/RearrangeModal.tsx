@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
-import { X, GripVertical, Eye, EyeOff } from "lucide-react";
+import { X, GripVertical, Eye, EyeOff, ArrowLeftRight, ArrowLeft, ArrowRight } from "lucide-react";
 import { useResumeStore } from "@/store/useResumeStore";
 
 interface RearrangeModalProps {
@@ -24,7 +24,7 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
                 label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
                 order: currentSettings[key]?.order ?? config.order,
                 visible: currentSettings[key]?.visible ?? config.visible,
-                area: config.area
+                area: currentSettings[key]?.area ?? config.area
             })).sort((a, b) => a.order - b.order);
 
             setSections(initialSections);
@@ -41,10 +41,24 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
         setSections(prev => prev.map(s => s.id === id ? { ...s, visible: !s.visible } : s));
     };
 
+    const moveArea = (id: string, newArea: string) => {
+        setSections(prev => {
+            const updated = prev.map(s => s.id === id ? { ...s, area: newArea, order: 999 } : s);
+            // Re-index orders within areas
+            const areas = ['header', 'left', 'right', 'full'];
+            let final: typeof sections = [];
+            areas.forEach(a => {
+                const areaSections = updated.filter(s => s.area === a).sort((x, y) => x.order - y.order);
+                final = [...final, ...areaSections.map((s, i) => ({ ...s, order: i }))];
+            });
+            return final;
+        });
+    };
+
     const handleSave = () => {
-        const newSettings: Record<string, { order: number; visible: boolean }> = {};
+        const newSettings: Record<string, { order: number; visible: boolean; area: string }> = {};
         sections.forEach(s => {
-            newSettings[s.id] = { order: s.order, visible: s.visible };
+            newSettings[s.id] = { order: s.order, visible: s.visible, area: s.area };
         });
         updateSectionOrder(newSettings);
         onClose();
@@ -66,16 +80,36 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
         >
             <GripVertical size={14} className="text-gray-400 shrink-0" />
             <span className="flex-1 text-[10px] font-bold text-gray-700 truncate">{section.label}</span>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    toggleVisibility(section.id);
-                }}
-                className={`p-1 rounded transition-colors ${section.visible ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-400 hover:bg-gray-200'
-                    }`}
-            >
-                {section.visible ? <Eye size={14} /> : <EyeOff size={14} />}
-            </button>
+            <div className="flex items-center gap-1">
+                {section.area === 'left' && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); moveArea(section.id, 'right'); }}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                        title="Move to Right Column"
+                    >
+                        <ArrowRight size={12} />
+                    </button>
+                )}
+                {section.area === 'right' && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); moveArea(section.id, 'left'); }}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                        title="Move to Left Column"
+                    >
+                        <ArrowLeft size={12} />
+                    </button>
+                )}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleVisibility(section.id);
+                    }}
+                    className={`p-1 rounded transition-colors ${section.visible ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-400 hover:bg-gray-200'
+                        }`}
+                >
+                    {section.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                </button>
+            </div>
         </Reorder.Item>
     );
 

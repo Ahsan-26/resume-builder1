@@ -21,18 +21,19 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
 
     // Helper to get sorted sections for a specific area
     const getSectionsForArea = (area: string) => {
-        const templateSections = Object.entries(sections)
-            .filter(([_, config]) => config.area === area);
+        const allSections = Object.entries(sections);
 
-        return templateSections
+        return allSections
             .map(([key, config]) => {
                 const settings = resume.section_settings?.[key];
                 return {
                     key,
+                    area: settings?.area ?? config.area,
                     order: settings?.order ?? config.order,
                     visible: settings?.visible ?? config.visible
                 };
             })
+            .filter(s => s.area === area)
             .filter(s => isEditable || s.visible)
             .sort((a, b) => a.order - b.order)
             .map(s => s.key);
