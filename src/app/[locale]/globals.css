@@ -183,3 +183,19 @@ input[type="radio"]:checked {
   background-color: var(--color-brand-primary);
   border-color: var(--color-brand-primary);
 }
+
+/* Toast notification animation */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideInUp {
+  animation: slideInUp 0.3s ease-out forwards;
+}

@@ -181,7 +181,21 @@
     "changePassword": "Changer le Mot de Passe",
     "notifications": "Notifications par E-mail",
     "marketingEmails": "Recevoir des e-mails marketing",
-    "productUpdates": "Recevoir les mises à jour de produit"
+    "productUpdates": "Recevoir les mises à jour de produit",
+    "loading": "Chargement du profil...",
+    "loadingError": "Échec du chargement du profil",
+    "updateSuccess": "Profil mis à jour avec succès",
+    "updateError": "Échec de la mise à jour du profil",
+    "uploadingPhoto": "Téléchargement de la photo...",
+    "photoUploadError": "Échec du téléchargement de la photo",
+    "retry": "Réessayer",
+    "saving": "Enregistrement...",
+    "requiredField": "Ce champ est obligatoire",
+    "invalidEmail": "Veuillez entrer une adresse e-mail valide",
+    "invalidPhone": "Veuillez entrer un numéro de téléphone valide",
+    "photoSizeError": "La photo doit faire moins de 5 Mo",
+    "photoFormatError": "Veuillez télécharger une image valide (JPG, PNG ou GIF)",
+    "settingsSaved": "Paramètres enregistrés avec succès"
   },
   "resumeBuilderSection": {
     "tagline": "Créateur de CV",

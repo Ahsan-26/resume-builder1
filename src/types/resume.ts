@@ -162,10 +162,10 @@ export interface Resume {
     section_settings: Record<string, {
         order: number;
         visible: boolean;
-        area?: 'header' | 'left' | 'right' | 'full';
-        title?: string; // Rename section heading
-        fields?: Record<string, boolean>; // hide/show individual fields (date, link, etc.)
-        items?: Record<string, { hide_date?: boolean }>; // hide dates per item
+        area?: 'header' | 'left' | 'right' | 'full'; // Client-side only, not persisted
+        title?: string; // Client-side only
+        fields?: Record<string, boolean>; // Client-side only
+        items?: Record<string, { hide_date?: boolean }>; // Client-side only
     }>;
     personal_info: PersonalInfo;
     work_experiences: WorkExperience[];

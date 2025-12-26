@@ -181,7 +181,21 @@
     "changePassword": "Change Password",
     "notifications": "Email Notifications",
     "marketingEmails": "Receive marketing emails",
-    "productUpdates": "Receive product updates"
+    "productUpdates": "Receive product updates",
+    "loading": "Loading profile...",
+    "loadingError": "Failed to load profile",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Failed to update profile",
+    "uploadingPhoto": "Uploading photo...",
+    "photoUploadError": "Failed to upload photo",
+    "retry": "Retry",
+    "saving": "Saving...",
+    "requiredField": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPhone": "Please enter a valid phone number",
+    "photoSizeError": "Photo must be less than 5MB",
+    "photoFormatError": "Please upload a valid image (JPG, PNG, or GIF)",
+    "settingsSaved": "Settings saved successfully"
   },
   "resumeBuilderSection": {
     "tagline": "Resume Builder",

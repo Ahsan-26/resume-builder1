@@ -19,9 +19,9 @@ export default function AdminLayout({
         if (!loading) {
             if (!user) {
                 toast.error("Please login to access admin panel");
-                router.push("/en/login");
-            } else if (user.role !== "admin") {
-                toast.error("You do not have permission to access this area");
+                router.push("/admin-login");
+            } else if (!user.is_staff && user.role !== "admin") {
+                toast.error("Access Denied: You do not have permission to access this area");
                 router.push("/");
             }
         }
@@ -35,7 +35,7 @@ export default function AdminLayout({
         );
     }
 
-    if (!user || user.role !== "admin") {
+    if (!user || (!user.is_staff && user.role !== "admin")) {
         return null;
     }
 

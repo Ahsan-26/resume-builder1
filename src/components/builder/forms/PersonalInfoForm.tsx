@@ -13,6 +13,28 @@ interface PersonalInfoFormProps {
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as PersonalInfo }) => {
     const { updatePersonalInfo, resume } = useResumeStore();
     const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
+    const [errors, setErrors] = React.useState<Record<string, string>>({});
+
+    const validateUrl = (name: string, value: string) => {
+        if (!value) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+            return;
+        }
+        try {
+            new URL(value);
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        } catch (e) {
+            setErrors(prev => ({ ...prev, [name]: "Please enter a valid URL (e.g. https://example.com)" }));
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -150,10 +172,12 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
                                     name="website"
                                     value={data.website || ""}
                                     onChange={handleChange}
-                                    className={`${inputClasses} pl-12`}
+                                    onBlur={(e) => validateUrl(e.target.name, e.target.value)}
+                                    className={`${inputClasses} pl-12 ${errors.website ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : ''}`}
                                     placeholder="https://ahsan.dev"
                                 />
                             </div>
+                            {errors.website && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1">{errors.website}</p>}
                         </div>
                         <div className="space-y-1.5">
                             <label className={labelClasses}>LinkedIn</label>
@@ -164,10 +188,12 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
                                     name="linkedin_url"
                                     value={data.linkedin_url || ""}
                                     onChange={handleChange}
-                                    className={`${inputClasses} pl-12`}
-                                    placeholder="linkedin.com/in/ahsan"
+                                    onBlur={(e) => validateUrl(e.target.name, e.target.value)}
+                                    className={`${inputClasses} pl-12 ${errors.linkedin_url ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : ''}`}
+                                    placeholder="https://linkedin.com/in/ahsan"
                                 />
                             </div>
+                            {errors.linkedin_url && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1">{errors.linkedin_url}</p>}
                         </div>
                         <div className="space-y-1.5">
                             <label className={labelClasses}>GitHub</label>
@@ -178,10 +204,12 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
                                     name="github_url"
                                     value={data.github_url || ""}
                                     onChange={handleChange}
-                                    className={`${inputClasses} pl-12`}
-                                    placeholder="github.com/ahsan"
+                                    onBlur={(e) => validateUrl(e.target.name, e.target.value)}
+                                    className={`${inputClasses} pl-12 ${errors.github_url ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : ''}`}
+                                    placeholder="https://github.com/ahsan"
                                 />
                             </div>
+                            {errors.github_url && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1">{errors.github_url}</p>}
                         </div>
                     </div>
                 </div>

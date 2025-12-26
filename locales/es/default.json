@@ -181,7 +181,21 @@
     "changePassword": "Cambiar Contraseña",
     "notifications": "Notificaciones por Correo",
     "marketingEmails": "Recibir correos de marketing",
-    "productUpdates": "Recibir actualizaciones de producto"
+    "productUpdates": "Recibir actualizaciones de producto",
+    "loading": "Cargando perfil...",
+    "loadingError": "Error al cargar el perfil",
+    "updateSuccess": "Perfil actualizado exitosamente",
+    "updateError": "Error al actualizar el perfil",
+    "uploadingPhoto": "Subiendo foto...",
+    "photoUploadError": "Error al subir la foto",
+    "retry": "Reintentar",
+    "saving": "Guardando...",
+    "requiredField": "Este campo es obligatorio",
+    "invalidEmail": "Por favor ingrese un correo electrónico válido",
+    "invalidPhone": "Por favor ingrese un número de teléfono válido",
+    "photoSizeError": "La foto debe ser menor a 5MB",
+    "photoFormatError": "Por favor suba una imagen válida (JPG, PNG o GIF)",
+    "settingsSaved": "Configuración guardada exitosamente"
   },
   "resumeBuilderSection": {
     "tagline": "Creador de Currículum",

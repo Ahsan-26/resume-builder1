@@ -11,7 +11,7 @@ type User = Record<string, any> | null;
 type AuthContextType = {
   user: User;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string; user?: User }>;
   logout: () => Promise<void>;
   registerInit: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   registerVerify: (email: string, code: string) => Promise<{ ok: boolean; error?: string }>;
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setTokens({ access, refresh });
         setUser(userObj ?? null);
         toast.success("Welcome back!");
-        return { ok: true };
+        return { ok: true, user: userObj };
       }
 
       return { ok: false, error: "Invalid server response" };

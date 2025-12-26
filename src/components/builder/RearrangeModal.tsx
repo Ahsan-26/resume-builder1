@@ -81,6 +81,8 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
             <GripVertical size={14} className="text-gray-400 shrink-0" />
             <span className="flex-1 text-[10px] font-bold text-gray-700 truncate">{section.label}</span>
             <div className="flex items-center gap-1">
+                {/* Move Left/Right buttons hidden as backend doesn't support area persistence yet */}
+                {/* 
                 {section.area === 'left' && (
                     <button
                         onClick={(e) => { e.stopPropagation(); moveArea(section.id, 'right'); }}
@@ -99,6 +101,7 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
                         <ArrowLeft size={12} />
                     </button>
                 )}
+                */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();

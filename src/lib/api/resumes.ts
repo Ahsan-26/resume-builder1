@@ -42,11 +42,39 @@ export async function createResume(data: CreateResumeData): Promise<Resume> {
     return res.json();
 }
 
+// Helper to clean section_settings before sending to backend
+function cleanSectionSettings(settings: Record<string, any> | undefined) {
+    if (!settings) return settings;
+
+    const cleaned: Record<string, any> = {};
+    const validKeys = ['order', 'visible'];
+
+    Object.keys(settings).forEach(key => {
+        const section = settings[key];
+        if (section && typeof section === 'object') {
+            cleaned[key] = {};
+            validKeys.forEach(validKey => {
+                if (validKey in section) {
+                    cleaned[key][validKey] = section[validKey];
+                }
+            });
+        }
+    });
+    return cleaned;
+}
+
 export async function updateResume(id: string, data: UpdateResumeData): Promise<Resume> {
     console.log("Updating resume:", id, "with data:", data);
+
+    // Clean section_settings if present
+    const payload = { ...data };
+    if (payload.section_settings) {
+        payload.section_settings = cleanSectionSettings(payload.section_settings);
+    }
+
     const res = await apiFetch(`/resumes/${id}/`, {
         method: "PATCH",
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
     });
     if (!res.ok) {
         if (res.status === 429) {
@@ -64,9 +92,16 @@ export async function updateResume(id: string, data: UpdateResumeData): Promise<
 
 export async function autosaveResume(id: string, data: UpdateResumeData): Promise<Resume> {
     console.log("Autosaving resume:", id, "with data:", data);
+
+    // Clean section_settings if present
+    const payload = { ...data };
+    if (payload.section_settings) {
+        payload.section_settings = cleanSectionSettings(payload.section_settings);
+    }
+
     const res = await apiFetch(`/resumes/${id}/autosave/`, {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
     });
     if (!res.ok) {
         if (res.status === 429) {

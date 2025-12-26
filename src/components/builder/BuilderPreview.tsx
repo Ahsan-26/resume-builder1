@@ -48,31 +48,32 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
     const contentRef = React.useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
     const [contentHeight, setContentHeight] = useState(0);
-    const [marginLeft, setMarginLeft] = useState(0);
 
     useEffect(() => {
         const updateScale = () => {
             if (!containerRef.current || !contentRef.current) return;
-            const containerWidth = containerRef.current.offsetWidth;
-            const resumeWidthPx = 210 * 3.78; // 210mm in pixels (approx)
-            const padding = 32; // 16px on each side
 
-            // Calculate scale
+            const containerWidth = containerRef.current.clientWidth;
+            const resumeWidthPx = 793.7; // 210mm at 96 DPI
+            const padding = 0; // Zero padding as requested
+
+            // Calculate scale to fit container width
             let newScale = (containerWidth - padding) / resumeWidthPx;
+
+            // On very large screens, don't scale up beyond 1
             newScale = Math.min(newScale, 1);
+
+            // On very small screens, ensure we don't scale to 0
+            newScale = Math.max(newScale, 0.2);
+
             setScale(newScale);
-
-            // Calculate centering offset
-            const scaledWidth = resumeWidthPx * newScale;
-            const availableSpace = containerWidth - scaledWidth;
-            setMarginLeft(Math.max(0, availableSpace / 2));
-
             setContentHeight(contentRef.current.offsetHeight);
         };
 
         const observer = new ResizeObserver(updateScale);
         if (containerRef.current) observer.observe(containerRef.current);
         if (contentRef.current) observer.observe(contentRef.current);
+
         updateScale();
 
         return () => observer.disconnect();
@@ -115,13 +116,12 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
     };
 
     return (
-        <div ref={containerRef} className="w-full overflow-visible py-4 sm:py-8">
+        <div ref={containerRef} className="w-full h-full flex justify-center overflow-visible py-4 sm:py-8">
             <div
                 ref={contentRef}
-                className="bg-white shadow-2xl w-[210mm] min-h-[297mm] origin-top-left transition-transform duration-300 ease-in-out"
+                className="bg-white shadow-2xl w-[210mm] min-h-[297mm] origin-top transition-transform duration-300 ease-in-out"
                 style={{
                     transform: `scale(${scale})`,
-                    marginLeft: `${marginLeft}px`,
                     marginBottom: contentHeight ? `calc(${contentHeight}px * (${scale} - 1))` : 0,
                     boxShadow: `0 20px 60px -12px ${localTemplateDefinition.style.accent_color}20, 0 8px 16px -8px ${localTemplateDefinition.style.accent_color}10`
                 }}

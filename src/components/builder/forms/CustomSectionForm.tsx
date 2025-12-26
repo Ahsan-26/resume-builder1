@@ -5,6 +5,7 @@ import { useResumeStore } from "../../../store/useResumeStore";
 import { CustomSection, CustomSectionItem } from "../../../types/resume";
 import { Plus, Trash2, ChevronDown, ChevronUp, Edit2, Layers, Calendar, AlignLeft, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { DatePicker } from "../renderer/DatePicker";
 
 interface CustomSectionFormProps {
     sections: CustomSection[];
@@ -207,17 +208,33 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                                             />
                                                         </div>
                                                         <div className="space-y-1.5">
-                                                            <label className={labelClasses}>Date / Meta</label>
-                                                            <div className="relative">
-                                                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                                                                <input
-                                                                    type="text"
-                                                                    value={item.meta || ""}
-                                                                    onChange={(e) => handleUpdateItem(section.id, item.id, "meta", e.target.value)}
-                                                                    className={`${inputClasses} pl-11`}
-                                                                    placeholder="e.g. 2020 - 2022"
-                                                                />
-                                                            </div>
+                                                            <label className={labelClasses}>Start Date</label>
+                                                            <DatePicker
+                                                                value={item.start_date || ""}
+                                                                onChange={(val) => handleUpdateItem(section.id, item.id, "start_date", val)}
+                                                                placeholder="MM/YYYY"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className={labelClasses}>End Date</label>
+                                                            <DatePicker
+                                                                value={item.end_date || ""}
+                                                                onChange={(val) => handleUpdateItem(section.id, item.id, "end_date", val)}
+                                                                placeholder="MM/YYYY"
+                                                                disabled={item.is_current}
+                                                            />
+                                                        </div>
+                                                        <div className="md:col-span-2 flex items-center gap-3 px-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                id={`current-${item.id}`}
+                                                                checked={item.is_current}
+                                                                onChange={(e) => handleUpdateItem(section.id, item.id, "is_current", e.target.checked)}
+                                                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all"
+                                                            />
+                                                            <label htmlFor={`current-${item.id}`} className="text-sm font-bold text-gray-700 cursor-pointer">
+                                                                I currently do this
+                                                            </label>
                                                         </div>
                                                         <div className="md:col-span-2 space-y-1.5">
                                                             <label className={labelClasses}>Description</label>

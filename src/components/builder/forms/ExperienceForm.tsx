@@ -5,6 +5,7 @@ import { useResumeStore } from "../../../store/useResumeStore";
 import { WorkExperience } from "../../../types/resume";
 import { Plus, Trash2, ChevronDown, ChevronUp, Briefcase, Calendar, MapPin, AlignLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { DatePicker } from "../renderer/DatePicker";
 
 interface ExperienceFormProps {
     items: WorkExperience[];
@@ -127,30 +128,20 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className={labelClasses}>Start Date</label>
-                                            <div className="relative">
-                                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                                                <input
-                                                    type="text"
-                                                    value={item.start_date || ""}
-                                                    onChange={(e) => handleChange(item.id, "start_date", e.target.value)}
-                                                    className={`${inputClasses} pl-11`}
-                                                    placeholder="MM/YYYY"
-                                                />
-                                            </div>
+                                            <DatePicker
+                                                value={item.start_date || ""}
+                                                onChange={(val) => handleChange(item.id, "start_date", val)}
+                                                placeholder="MM/YYYY"
+                                            />
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className={labelClasses}>End Date</label>
-                                            <div className="relative">
-                                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                                                <input
-                                                    type="text"
-                                                    value={item.end_date || ""}
-                                                    disabled={item.is_current}
-                                                    onChange={(e) => handleChange(item.id, "end_date", e.target.value)}
-                                                    className={`${inputClasses} pl-11 disabled:bg-gray-100 disabled:text-gray-400`}
-                                                    placeholder={item.is_current ? "Present" : "MM/YYYY"}
-                                                />
-                                            </div>
+                                            <DatePicker
+                                                value={item.end_date || ""}
+                                                onChange={(val) => handleChange(item.id, "end_date", val)}
+                                                placeholder="MM/YYYY"
+                                                disabled={item.is_current}
+                                            />
                                         </div>
                                         <div className="md:col-span-2 flex items-center gap-3 px-1">
                                             <input

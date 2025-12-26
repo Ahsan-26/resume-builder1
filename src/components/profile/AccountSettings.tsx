@@ -1,12 +1,20 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import type { AccountSettings as AccountSettingsType } from "@/types/profile";
 
-export default function AccountSettings() {
+interface AccountSettingsProps {
+    settings: AccountSettingsType;
+    onChange: (settings: AccountSettingsType) => void;
+    userEmail: string;
+}
+
+export default function AccountSettings({ settings, onChange, userEmail }: AccountSettingsProps) {
     const t = useTranslations("profile");
-    const [marketingEmails, setMarketingEmails] = useState(false);
-    const [productUpdates, setProductUpdates] = useState(true);
+
+    const handleToggle = (field: keyof AccountSettingsType) => {
+        onChange({ ...settings, [field]: !settings[field] });
+    };
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
@@ -22,9 +30,13 @@ export default function AccountSettings() {
                     </label>
                     <input
                         type="email"
-                        placeholder="ahsan7habib@gmail.com"
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-brand-primary)] focus:border-transparent transition-all duration-200 outline-none"
+                        value={userEmail}
+                        disabled
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed transition-all duration-200 outline-none"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                        Email cannot be changed. Contact support if you need to update it.
+                    </p>
                 </div>
             </div>
 
@@ -37,6 +49,9 @@ export default function AccountSettings() {
                 <button className="px-6 py-2.5 bg-[var(--color-brand-primary)] text-white rounded-lg hover:bg-[var(--color-brand-hover)] transition-all duration-300 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                     {t("changePassword")}
                 </button>
+                <p className="text-xs text-gray-500 mt-2">
+                    Password change functionality will be available in a future update.
+                </p>
             </div>
 
             {/* Notification Settings */}
@@ -49,13 +64,16 @@ export default function AccountSettings() {
                     <label className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer transition-all duration-200">
                         <input
                             type="checkbox"
-                            checked={marketingEmails}
-                            onChange={(e) => setMarketingEmails(e.target.checked)}
+                            checked={settings.marketing_emails}
+                            onChange={() => handleToggle("marketing_emails")}
                             className="w-5 h-5 text-[var(--color-brand-primary)] border-gray-300 rounded focus:ring-[var(--color-brand-primary)] cursor-pointer"
                         />
                         <div className="flex-1">
                             <span className="block text-sm font-medium text-gray-900">
                                 {t("marketingEmails")}
+                            </span>
+                            <span className="block text-xs text-gray-500 mt-1">
+                                Receive promotional emails about new features and offers
                             </span>
                         </div>
                     </label>
@@ -63,24 +81,28 @@ export default function AccountSettings() {
                     <label className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer transition-all duration-200">
                         <input
                             type="checkbox"
-                            checked={productUpdates}
-                            onChange={(e) => setProductUpdates(e.target.checked)}
+                            checked={settings.product_updates}
+                            onChange={() => handleToggle("product_updates")}
                             className="w-5 h-5 text-[var(--color-brand-primary)] border-gray-300 rounded focus:ring-[var(--color-brand-primary)] cursor-pointer"
                         />
                         <div className="flex-1">
                             <span className="block text-sm font-medium text-gray-900">
                                 {t("productUpdates")}
                             </span>
+                            <span className="block text-xs text-gray-500 mt-1">
+                                Receive updates about product improvements and new features
+                            </span>
                         </div>
                     </label>
                 </div>
-            </div>
 
-            {/* Save Button */}
-            <div className="flex justify-end">
-                <button className="px-8 py-3 bg-[var(--color-brand-primary)] text-white rounded-lg hover:bg-[var(--color-brand-hover)] transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base">
-                    {t("saveChanges")}
-                </button>
+                {/* Info about localStorage storage */}
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                        <strong>Note:</strong> Notification preferences are currently stored locally on your device.
+                        They will be synced to your account in a future update.
+                    </p>
+                </div>
             </div>
         </div>
     );

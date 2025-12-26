@@ -11,11 +11,17 @@ function cleanPayload(data: any, excludeKeys: string[] = [], defaults: Record<st
     const cleaned = { ...rest };
     excludeKeys.forEach(key => delete cleaned[key]);
 
-    // Apply defaults for empty strings ONLY if the key exists in the payload
-    Object.entries(defaults).forEach(([key, value]) => {
-        if (Object.prototype.hasOwnProperty.call(cleaned, key)) {
-            if (!cleaned[key] || (typeof cleaned[key] === 'string' && cleaned[key].trim() === "")) {
-                cleaned[key] = value;
+    // Process all keys
+    Object.keys(cleaned).forEach(key => {
+        const value = cleaned[key];
+        if (typeof value === 'string' && value.trim() === "") {
+            // If a default exists, use it
+            if (Object.prototype.hasOwnProperty.call(defaults, key)) {
+                cleaned[key] = defaults[key];
+            }
+            // Otherwise keep as empty string (required for backend blank=True, null=False)
+            else {
+                cleaned[key] = "";
             }
         }
     });

@@ -20,15 +20,16 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export default function LoginForm() {
+export default function LoginForm({ isAdmin = false }: { isAdmin?: boolean }) {
   const t = useTranslations("auth");
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -37,10 +38,30 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     const res = await login(data.email, data.password);
-    setIsLoading(false);
+
     if (res.ok) {
-      router.push("/dashboard"); // Redirect to dashboard
+      // For admin login, verify the user has staff privileges
+      if (isAdmin) {
+        const user = res.user;
+
+        // Check if user is staff or has admin role
+        if (user?.is_staff || user?.role === "admin") {
+          router.push("/admin");
+        } else {
+          // User is not authorized for admin panel
+          setError("root", {
+            type: "manual",
+            message: "Access Denied: You do not have permission to access the admin panel."
+          });
+          // Logout the user since they tried to access admin
+          await logout();
+        }
+      } else {
+        // Regular user login - redirect to dashboard
+        router.push("/dashboard");
+      }
     }
+    setIsLoading(false);
   };
 
   return (
@@ -85,6 +106,13 @@ export default function LoginForm() {
             <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
           )}
         </div>
+
+        {/* Display access denied or other root errors */}
+        {errors.root && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {errors.root.message}
+          </div>
+        )}
 
         <motion.button
           whileHover={{ scale: 1.01 }}

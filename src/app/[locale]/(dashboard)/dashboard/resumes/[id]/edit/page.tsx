@@ -19,14 +19,29 @@ export default function ResumeEditPage() {
     const [isRearrangeOpen, setIsRearrangeOpen] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-    const [isMobilePreview, setIsMobilePreview] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1280);
+    const [showPreview, setShowPreview] = useState(true);
+
+    const isDesktop = windowWidth >= 1280;
+    const isMedium = windowWidth >= 1024 && windowWidth < 1280;
+    const isSmall = windowWidth < 1024;
 
     useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        const handleResize = () => {
+            const width = window.innerWidth;
+            setWindowWidth(width);
+
+            // Auto-collapse sidebar on medium screens
+            if (width >= 1024 && width < 1280) {
+                setIsSidebarCollapsed(true);
+            } else if (width >= 1280) {
+                setIsSidebarCollapsed(false);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     useEffect(() => {
@@ -35,131 +50,174 @@ export default function ResumeEditPage() {
         }
     }, [id, fetchResume]);
 
-    /* 
-    // Debounced Autosave
-    useEffect(() => {
-        if (!resume) return;
-
-        const timer = setTimeout(() => {
-            autosaveResume();
-        }, 10000); // Autosave after 10 seconds of inactivity
-
-        return () => clearTimeout(timer);
-    }, [resume, autosaveResume]);
-    */
-
     const formatLastSaved = (date: Date | null) => {
         if (!date) return "";
         return `Last saved at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     };
 
-    return (
-        <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
-            {/* Top Bar - Hide on Mobile */}
-            {!isMobile && (
-                <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-20 shrink-0">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 text-gray-400">
-                            <Files size={16} />
-                            <span className="text-xs font-medium">My Documents</span>
-                            <span className="text-gray-300">/</span>
-                            <span className="text-xs font-bold text-gray-900">{resume?.title || "Untitled Resume"}</span>
-                        </div>
-                    </div>
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2 text-emerald-500">
-                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                            <span className="text-xs font-bold uppercase tracking-wider">Saved</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
-                                <Share2 size={18} />
-                            </button>
-                            <button
-                                onClick={() => saveResume()}
-                                className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
-                            >
-                                {isSaving ? "Saving..." : "Save Changes"}
-                            </button>
-                        </div>
+    return (
+        <div className="flex flex-col h-screen bg-gray-100 overflow-hidden font-sans">
+            {/* Top Bar */}
+            <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 z-20 shrink-0">
+                <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
+                    <Link href="/dashboard/resumes" className="p-2 hover:bg-gray-100 rounded-lg transition-colors md:hidden">
+                        <ArrowLeft size={18} className="text-gray-600" />
+                    </Link>
+                    <div className="flex items-center gap-2 text-gray-400 overflow-hidden">
+                        <Files size={16} className="hidden md:block shrink-0" />
+                        <span className="text-xs font-medium hidden md:block shrink-0">My Documents</span>
+                        <span className="text-gray-300 hidden md:block shrink-0">/</span>
+                        <span className="text-xs font-bold text-gray-900 truncate">{resume?.title || "Untitled Resume"}</span>
                     </div>
-                </header>
-            )}
+                </div>
+
+                <div className="flex items-center gap-2 md:gap-6">
+                    <div className="hidden sm:flex items-center gap-2 text-emerald-500">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Saved</span>
+                    </div>
+                    <div className="flex items-center gap-2 md:gap-3">
+                        {isSmall && (
+                            <button
+                                onClick={() => setShowPreview(!showPreview)}
+                                className={`p-2 rounded-lg transition-all ${showPreview ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
+                                title={showPreview ? "Show Editor" : "Show Preview"}
+                            >
+                                <Eye size={18} />
+                            </button>
+                        )}
+                        <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all hidden sm:block">
+                            <Share2 size={18} />
+                        </button>
+                        <button
+                            onClick={() => saveResume()}
+                            className="px-3 md:px-4 py-1.5 bg-blue-600 text-white text-[10px] md:text-xs font-bold rounded-full shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 whitespace-nowrap"
+                        >
+                            {isSaving ? "Saving..." : "Save"}
+                        </button>
+                    </div>
+                </div>
+            </header>
 
             <RearrangeModal isOpen={isRearrangeOpen} onClose={() => setIsRearrangeOpen(false)} />
 
             {/* Main Content */}
             <div className="flex flex-1 relative overflow-hidden bg-[#F8FAFC]">
-                {/* Desktop View */}
-                {!isMobile && (
-                    <>
-                        {/* Column 1: Global Navigation Sidebar */}
-                        <div className={`${isSidebarCollapsed ? "w-16" : "w-60"} shrink-0 border-r border-gray-200 bg-white flex flex-col transition-all duration-300`}>
-                            <BuilderSidebar
-                                activeSection={activeSection}
-                                onSectionChange={setActiveSection}
-                                onRearrange={() => setIsRearrangeOpen(true)}
-                                isCollapsed={isSidebarCollapsed}
-                                onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                            />
-                        </div>
+                {/* Sidebar - Hidden on small, collapsible on medium/desktop */}
+                <div className={`
+                    ${isSmall ? "fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out" : "relative"}
+                    ${isSmall && !isSidebarCollapsed ? "-translate-x-full" : "translate-x-0"}
+                    ${isSidebarCollapsed ? "w-16" : "w-60"} 
+                    shrink-0 border-r border-gray-200 bg-white flex flex-col transition-all duration-300
+                `}>
+                    <BuilderSidebar
+                        activeSection={activeSection}
+                        onSectionChange={(s) => {
+                            setActiveSection(s);
+                            if (isSmall) setIsSidebarCollapsed(true);
+                        }}
+                        onRearrange={() => setIsRearrangeOpen(true)}
+                        isCollapsed={isSidebarCollapsed}
+                        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                    />
+                </div>
 
-                        {/* Column 2: Editing Form */}
-                        {!isPreviewMode && (
-                            <div className="w-[400px] lg:w-[450px] xl:w-[600px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
-                                <BuilderForm activeSection={activeSection} />
-                            </div>
-                        )}
-
-                        {/* Column 3: Live Preview Area */}
-                        <div className="flex-1 bg-[#F1F5F9] h-full overflow-hidden flex flex-col">
-                            {/* Preview Header */}
-                            <div className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0">
-                                <div className="flex bg-gray-100 rounded-full p-1">
-                                    <button className="px-4 py-1 text-xs font-bold rounded-full bg-white text-red-500 shadow-sm flex items-center gap-2">
-                                        <Eye size={14} /> Preview
-                                    </button>
-                                    <button className="px-4 py-1 text-xs font-bold text-gray-500 flex items-center gap-2">
-                                        <Sparkles size={14} /> Resume Tailoring <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-[8px]">Beta</span>
-                                    </button>
-                                </div>
-                                <button className="text-xs font-bold text-gray-500 flex items-center gap-2 hover:text-gray-900 transition-colors">
-                                    <MessageSquare size={14} /> Help Center
-                                </button>
-                            </div>
-
-                            <div className="flex-1 relative overflow-hidden flex">
-                                {/* Side Actions */}
-                                <div className="w-16 flex flex-col items-center py-8 gap-4 border-r border-gray-100 bg-white/50">
-                                    <button
-                                        onClick={() => setIsPreviewMode(!isPreviewMode)}
-                                        className={`p-2 rounded-xl transition-all ${isPreviewMode ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-white hover:text-gray-900 shadow-sm'}`}
-                                    >
-                                        <Eye size={20} />
-                                    </button>
-                                    <button
-                                        onClick={() => downloadResume()}
-                                        className="p-2 text-gray-400 hover:bg-white hover:text-gray-900 rounded-xl transition-all shadow-sm"
-                                    >
-                                        <Download size={20} />
-                                    </button>
-                                </div>
-
-                                {/* Resume Container */}
-                                <div className="flex-1 overflow-y-auto flex justify-center p-8 lg:p-12">
-                                    <div className="w-full max-w-5xl">
-                                        <BuilderPreview isEditable={!isPreviewMode} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </>
+                {/* Overlay for mobile sidebar */}
+                {isSmall && !isSidebarCollapsed && (
+                    <div
+                        className="fixed inset-0 bg-black/20 z-30 backdrop-blur-sm"
+                        onClick={() => setIsSidebarCollapsed(true)}
+                    />
                 )}
 
-                {/* Mobile View */}
-                {isMobile && <MobileEditView />}
+                {/* Editor Area - Narrowed width */}
+                <div className={`
+                    flex-1 flex flex-col overflow-hidden transition-all duration-300
+                    ${isSmall && showPreview ? "hidden" : "flex"}
+                    ${isMedium && showPreview ? "w-[360px] md:w-[400px] shrink-0" : ""}
+                    ${isDesktop ? "w-[360px] md:w-[400px] lg:w-[450px] shrink-0" : ""}
+                `}>
+                    <div className="flex-1 overflow-y-auto border-r border-gray-200 bg-white">
+                        <BuilderForm activeSection={activeSection} />
+                    </div>
+                </div>
+
+                {/* Preview Area */}
+                <div className={`
+                    flex-1 bg-[#F1F5F9] h-full overflow-hidden flex flex-col transition-all duration-300
+                    ${isSmall && !showPreview ? "hidden" : "flex"}
+                    ${isMedium && !showPreview ? "hidden" : "flex"}
+                `}>
+                    {/* Preview Header */}
+                    <div className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 shrink-0">
+                        <div className="flex bg-gray-100 rounded-full p-1">
+                            <button
+                                onClick={() => setIsPreviewModalOpen(true)}
+                                className="px-3 md:px-4 py-1 text-[10px] md:text-xs font-bold rounded-full bg-white text-blue-600 shadow-sm flex items-center gap-2 hover:bg-blue-50 transition-colors"
+                            >
+                                <Eye size={14} /> Preview
+                            </button>
+                            <button
+                                onClick={() => downloadResume()}
+                                className="px-3 md:px-4 py-1 text-[10px] md:text-xs font-bold text-gray-500 flex items-center gap-2 hover:text-gray-900 transition-colors"
+                            >
+                                <Download size={14} /> Download
+                            </button>
+                        </div>
+
+                        {(isMedium || isSmall) && (
+                            <button
+                                onClick={() => setShowPreview(false)}
+                                className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+                            >
+                                <Layout size={18} />
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="flex-1 relative overflow-hidden flex">
+                        {/* Resume Container - Centered and Full Width */}
+                        <div className="flex-1 overflow-y-auto flex justify-center p-0 scrollbar-hide">
+                            <div className="w-full max-w-5xl flex justify-center">
+                                <BuilderPreview isEditable={!isPreviewMode} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Floating Toggle for Mobile Sidebar */}
+                {isSmall && isSidebarCollapsed && (
+                    <button
+                        onClick={() => setIsSidebarCollapsed(false)}
+                        className="fixed bottom-6 left-6 w-12 h-12 bg-gray-900 text-white rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-95 transition-transform"
+                    >
+                        <Layout size={20} />
+                    </button>
+                )}
+
+                {/* Full Screen Preview Modal */}
+                {isPreviewModalOpen && (
+                    <div className="fixed inset-0 z-50 bg-gray-900/95 backdrop-blur-sm flex flex-col animate-in fade-in duration-200">
+                        <div className="h-16 flex items-center justify-between px-6 shrink-0">
+                            <h2 className="text-white font-bold text-lg">Resume Preview</h2>
+                            <button
+                                onClick={() => setIsPreviewModalOpen(false)}
+                                className="p-2 bg-white/10 text-white hover:bg-white/20 rounded-full transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8 flex justify-center">
+                            <div className="w-full max-w-5xl flex justify-center">
+                                <BuilderPreview isEditable={false} />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
+

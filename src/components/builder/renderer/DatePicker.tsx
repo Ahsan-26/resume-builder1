@@ -10,6 +10,7 @@ interface DatePickerProps {
     isEditable?: boolean;
     className?: string;
     onBlur?: () => void;
+    disabled?: boolean;
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -20,7 +21,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     placeholder = "Select Date",
     isEditable = true,
     className = "",
-    onBlur
+    onBlur,
+    disabled = false
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -84,12 +86,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     return (
         <div className={`relative ${className}`} ref={containerRef}>
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-white hover:border-blue-400 transition-all text-sm font-medium text-gray-700"
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                disabled={disabled}
+                className={`flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg transition-all text-sm font-medium text-gray-700 ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'hover:bg-white hover:border-blue-400'}`}
             >
                 <Calendar size={14} className="text-gray-400" />
                 <span>{isCurrent ? "Present" : (value || placeholder)}</span>
-                <ChevronDown size={14} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                {!disabled && <ChevronDown size={14} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />}
             </button>
 
             {isOpen && (
