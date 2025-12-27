@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import TemplateForm from "@/components/admin/TemplateForm";
+import TemplateForm from "@/components/admin/templates/TemplateForm";
 import { apiFetch } from "@/lib/apiClient";
 import toast from "react-hot-toast";
 

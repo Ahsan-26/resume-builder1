@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import {
     LayoutDashboard,
     FileText,
@@ -46,7 +47,14 @@ const sidebarItems = [
     },
 ];
 
+
 export default function AdminSidebar() {
+    const { logout } = useAuth();
+    const router = useRouter();
+    const handleLogout = async () => {
+        await logout();
+        router.push("/auth/login");
+    };
     const pathname = usePathname();
 
     return (
@@ -84,10 +92,13 @@ export default function AdminSidebar() {
                 })}
             </nav>
 
-            <div className="p-4 border-t border-white/10">
-                <button className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
-                    <LogOut className="w-5 h-5" />
-                    <span>Logout</span>
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 group"
+                >
+                    <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">("logout")</span>
                 </button>
             </div>
         </aside>

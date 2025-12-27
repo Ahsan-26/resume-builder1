@@ -11,6 +11,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@react-oauth/google": "^0.12.2",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.555.0",
     "next": "16.0.5",
@@ -21,10 +22,9 @@
     "react-hook-form": "^7.67.0",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
+    "tailwind-merge": "^2.3.0",
     "zod": "^4.1.13",
-    "zustand": "^5.0.9",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.3.0"
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
