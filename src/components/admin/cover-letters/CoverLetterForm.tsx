@@ -3,19 +3,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { apiFetch } from "@/lib/apiClient";
+import { Save } from "lucide-react";
 
+import { apiFetch } from "@/lib/apiClient";
 import CoverLetterLayout from "./CoverLetterLayout";
 import CoverLetterStyle from "./CoverLetterStyle";
 import CoverLetterSections from "./CoverLetterSections";
 import CoverLetterPreview from "./CoverLetterPreview";
 
-export default function CoverLetterForm({ initialData }: { initialData?: any }) {
+interface Props {
+    initialData?: any;
+}
+
+export default function CoverLetterForm({ initialData }: Props) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
-        id: initialData?.id || "",
+        id: initialData?.id || undefined,
         name: initialData?.name || "",
         slug: initialData?.slug || "",
         description: initialData?.description || "",
@@ -23,45 +28,33 @@ export default function CoverLetterForm({ initialData }: { initialData?: any }) 
         is_premium: initialData?.is_premium || false,
         is_active: initialData?.is_active ?? true,
         preview_image_url: initialData?.preview_image_url || "",
-        layout: initialData?.definition?.layout || {},
-        style: initialData?.definition?.style || {},
-        sections: initialData?.definition?.sections || {},
-        schema_version: initialData?.definition?.schema_version || 1,
+        definition: initialData?.definition || {
+            schema_version: 1,
+            layout: { type: "single-column", spacing: "normal", margins: "1in" },
+            style: { font_family: "Arial, sans-serif", font_size: "11pt", color: "#333333" },
+            sections: { header: { visible: true, order: 0 }, body: { visible: true, order: 1 }, signature: { visible: true, order: 2 } },
+        },
     });
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
         setLoading(true);
 
-        const payload = {
-            id: formData.id,
-            name: formData.name,
-            slug: formData.slug,
-            description: formData.description,
-            category: formData.category,
-            is_active: formData.is_active,
-            is_premium: formData.is_premium,
-            preview_image_url: formData.preview_image_url,
-            definition: {
-                schema_version: formData.schema_version,
-                layout: formData.layout,
-                style: formData.style,
-                sections: formData.sections,
-            },
-        };
-
         try {
+            const payload = { ...formData };
+            if (!initialData) delete payload.id;
+
             const url = initialData
-                ? `/api/admin/cover-letter-templates/${initialData.id}/`
-                : "/api/admin/cover-letter-templates/";
+                ? `/admin/cover-letter-templates/${initialData.id}/`
+                : "/admin/cover-letter-templates/";
             const method = initialData ? "PATCH" : "POST";
 
             const res = await apiFetch(url, { method, body: JSON.stringify(payload) });
-            if (!res.ok) throw new Error("Failed to save cover letter template");
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || data.detail || "Failed to save template");
 
             toast.success(`Cover letter template ${initialData ? "updated" : "created"} successfully`);
             router.push("/admin/cover-letters");
-            router.refresh();
         } catch (err: any) {
             toast.error(err.message);
         } finally {
@@ -73,29 +66,20 @@ export default function CoverLetterForm({ initialData }: { initialData?: any }) 
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Basic Info Inputs */}
-                    <div className="space-y-2">
-                        <input
-                            className="w-full border p-2 rounded"
-                            placeholder="Name"
-                            value={formData.name}
+                    {/* Basic Info */}
+                    <div className="space-y-3">
+                        <input type="text" placeholder="Template Name" value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
-                        <input
-                            className="w-full border p-2 rounded"
-                            placeholder="Slug"
-                            value={formData.slug}
+                            className="w-full border rounded px-3 py-2" required />
+                        <input type="text" placeholder="Slug" value={formData.slug}
                             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                        />
-                        <textarea
-                            className="w-full border p-2 rounded"
-                            placeholder="Description"
-                            value={formData.description}
+                            className="w-full border rounded px-3 py-2" />
+                        <textarea placeholder="Description" value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        />
+                            className="w-full border rounded px-3 py-2" />
                     </div>
 
-                    {/* Layout / Style / Sections */}
+                    {/* Dynamic Sections */}
                     <CoverLetterLayout formData={formData} setFormData={setFormData} />
                     <CoverLetterStyle formData={formData} setFormData={setFormData} />
                     <CoverLetterSections formData={formData} setFormData={setFormData} />
@@ -105,13 +89,9 @@ export default function CoverLetterForm({ initialData }: { initialData?: any }) 
                 <CoverLetterPreview formData={formData} />
             </div>
 
-            <div className="flex justify-end">
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-800 disabled:opacity-50"
-                >
-                    {loading ? "Saving..." : "Save Cover Letter Template"}
+            <div className="flex justify-end gap-3">
+                <button type="submit" disabled={loading} className="bg-[#2f6a46] text-white px-6 py-2 rounded hover:bg-[#245436] transition">
+                    <Save className="inline w-5 h-5 mr-2" /> {loading ? "Saving..." : "Save Template"}
                 </button>
             </div>
         </form>

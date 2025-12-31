@@ -3,9 +3,11 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { WorkExperience } from "../../../types/resume";
-import { Plus, Trash2, ChevronDown, ChevronUp, Briefcase, Calendar, MapPin, AlignLeft } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Briefcase, Calendar, MapPin, AlignLeft, Sparkles, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DatePicker } from "../renderer/DatePicker";
+import { generateExperienceDescription, generateBullets } from "@/lib/api/ai";
+import toast from "react-hot-toast";
 
 interface ExperienceFormProps {
     items: WorkExperience[];
@@ -40,6 +42,59 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
 
     const handleDelete = (id: string) => {
         removeExperience(id);
+    };
+
+    const [generatingId, setGeneratingId] = React.useState<string | null>(null);
+    const [activeGenerator, setActiveGenerator] = React.useState<'desc' | 'bullets' | null>(null);
+
+    const handleGenerateDescription = async (id: string, item: WorkExperience) => {
+        if (!item.position_title || !item.company_name) {
+            toast.error("Please enter Job Title and Company first.");
+            return;
+        }
+        setGeneratingId(id);
+        setActiveGenerator('desc');
+        try {
+            const result = await generateExperienceDescription({
+                role: item.position_title,
+                company: item.company_name,
+                tone: 'professional'
+            });
+            updateExperience(id, { description: result.description });
+            toast.success("Description generated!");
+        } catch (e: any) {
+            console.error(e);
+            toast.error(e.message || "Failed to generate description");
+        } finally {
+            setGeneratingId(null);
+            setActiveGenerator(null);
+        }
+    };
+
+    const handleGenerateBullets = async (id: string, item: WorkExperience) => {
+        if (!item.position_title || !item.company_name || !item.description) {
+            toast.error("Please ensure Role, Company and Description are filled.");
+            return;
+        }
+        setGeneratingId(id);
+        setActiveGenerator('bullets');
+        try {
+            const result = await generateBullets({
+                role: item.position_title,
+                company: item.company_name,
+                description: item.description,
+                count: 4,
+                tone: 'professional'
+            });
+            updateExperience(id, { bullets: result.bullets });
+            toast.success("Bullets generated!");
+        } catch (e: any) {
+            console.error(e);
+            toast.error(e.message || "Failed to generate bullets");
+        } finally {
+            setGeneratingId(null);
+            setActiveGenerator(null);
+        }
     };
 
     const inputClasses = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all text-sm font-medium text-gray-900 placeholder-gray-400";
@@ -179,7 +234,21 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                             />
                                         </div>
                                         <div className="md:col-span-2 space-y-1.5 pt-2">
-                                            <label className={labelClasses}>Description & Achievements</label>
+                                            <div className="flex justify-between items-center">
+                                                <label className={labelClasses}>Description & Achievements</label>
+                                                <button
+                                                    onClick={() => handleGenerateDescription(item.id, item)}
+                                                    disabled={generatingId === item.id}
+                                                    className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50"
+                                                >
+                                                    {generatingId === item.id && activeGenerator === 'desc' ? (
+                                                        <Loader2 className="animate-spin" size={12} />
+                                                    ) : (
+                                                        <Sparkles size={12} />
+                                                    )}
+                                                    Generate with AI
+                                                </button>
+                                            </div>
                                             <div className="relative">
                                                 <AlignLeft className="absolute left-4 top-4 text-gray-400" size={16} />
                                                 <textarea
@@ -187,7 +256,7 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                                     onChange={(e) => handleChange(item.id, "description", e.target.value)}
                                                     rows={5}
                                                     className={`${inputClasses} pl-11 resize-none leading-relaxed`}
-                                                    placeholder="Describe your key responsibilities and measurable achievements..."
+                                                    placeholder="Describe your key responsibilities... Or click Generate to let AI write it for you!"
                                                 />
                                             </div>
                                         </div>
@@ -195,15 +264,29 @@ export const ExperienceForm: React.FC<ExperienceFormProps> = ({ items = [] }) =>
                                         <div className="md:col-span-2 space-y-3">
                                             <div className="flex items-center justify-between">
                                                 <label className={labelClasses}>Bullet Points</label>
-                                                <button
-                                                    onClick={() => {
-                                                        const newBullets = [...(item.bullets || []), ""];
-                                                        handleChange(item.id, "bullets", newBullets);
-                                                    }}
-                                                    className="text-[10px] font-black text-blue-600 uppercase tracking-wider hover:underline"
-                                                >
-                                                    + Add Bullet
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleGenerateBullets(item.id, item)}
+                                                        disabled={generatingId === item.id}
+                                                        className="flex items-center gap-1.5 px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-purple-200 transition-colors disabled:opacity-50"
+                                                    >
+                                                        {generatingId === item.id && activeGenerator === 'bullets' ? (
+                                                            <Loader2 className="animate-spin" size={12} />
+                                                        ) : (
+                                                            <Sparkles size={12} />
+                                                        )}
+                                                        AI Bullets
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            const newBullets = [...(item.bullets || []), ""];
+                                                            handleChange(item.id, "bullets", newBullets);
+                                                        }}
+                                                        className="text-[10px] font-black text-blue-600 uppercase tracking-wider hover:underline"
+                                                    >
+                                                        + Add Bullet
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className="space-y-2">
                                                 {(item.bullets || []).map((bullet, index) => (

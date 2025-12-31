@@ -12,6 +12,14 @@ export async function fetchResumes(): Promise<Resume[]> {
     return res.json();
 }
 
+export async function fetchTemplates(): Promise<any[]> {
+    const res = await apiFetch("/templates/");
+    if (!res.ok) {
+        throw new Error("Failed to fetch templates");
+    }
+    return res.json();
+}
+
 export async function fetchResume(id: string): Promise<Resume> {
     const res = await apiFetch(`/resumes/${id}/`);
     if (!res.ok) {

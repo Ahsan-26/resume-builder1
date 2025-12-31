@@ -4,7 +4,9 @@ import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { PersonalInfo } from "../../../types/resume";
 
-import { Camera, Mail, Phone, MapPin, Globe, Linkedin, Github, Briefcase, User } from "lucide-react";
+import { Camera, Mail, Phone, MapPin, Globe, Linkedin, Github, Briefcase, User, Sparkles, Loader2 } from "lucide-react";
+import { generateSummary } from "@/lib/api/ai";
+import toast from "react-hot-toast";
 
 interface PersonalInfoFormProps {
     data: PersonalInfo;
@@ -14,6 +16,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
     const { updatePersonalInfo, resume } = useResumeStore();
     const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
     const [errors, setErrors] = React.useState<Record<string, string>>({});
+    const [isGeneratingSummary, setIsGeneratingSummary] = React.useState(false);
 
     const validateUrl = (name: string, value: string) => {
         if (!value) {
@@ -39,6 +42,48 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         updatePersonalInfo({ [name]: value });
+    };
+
+    const calculateExperienceYears = () => {
+        if (!resume?.work_experiences?.length) return 0;
+        // Simple calculation: sum of durations? Or difference between oldest start and newest end?
+        // Let's take earliest start date and now (or latest end date).
+        const dates = resume.work_experiences.flatMap(exp => [
+            exp.start_date ? new Date(exp.start_date).getTime() : Date.now(),
+            exp.end_date ? new Date(exp.end_date).getTime() : (exp.is_current ? Date.now() : 0)
+        ]).filter(d => d > 0);
+
+        if (dates.length === 0) return 0;
+        const minDate = Math.min(...dates);
+        const maxDate = Math.max(...dates);
+        const years = (maxDate - minDate) / (1000 * 60 * 60 * 24 * 365);
+        return Math.max(0, Math.round(years * 10) / 10); // Round to 1 decimal
+    };
+
+    const handleGenerateSummary = async () => {
+        if (!data.headline) {
+            toast.error("Please enter your Professional Headline first.");
+            return;
+        }
+
+        setIsGeneratingSummary(true);
+        try {
+            const expYears = calculateExperienceYears();
+            const result = await generateSummary({
+                current_role: data.headline,
+                target_role: data.headline, // Assuming target is same as current for now
+                experience_years: Math.max(1, Math.round(expYears)), // API expects int min 0
+                tone: 'professional'
+            });
+
+            updatePersonalInfo({ summary: result.summary });
+            toast.success("Summary generated!");
+        } catch (e: any) {
+            console.error(e);
+            toast.error(e.message || "Failed to generate summary");
+        } finally {
+            setIsGeneratingSummary(false);
+        }
     };
 
     const inputClasses = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all text-sm font-medium text-gray-900 placeholder-gray-400";
@@ -215,7 +260,21 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
                 </div>
 
                 <div className="md:col-span-2 space-y-1.5 pt-4">
-                    <label className={labelClasses}>Professional Summary</label>
+                    <div className="flex justify-between items-center">
+                        <label className={labelClasses}>Professional Summary</label>
+                        <button
+                            onClick={handleGenerateSummary}
+                            disabled={isGeneratingSummary}
+                            className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50"
+                        >
+                            {isGeneratingSummary ? (
+                                <Loader2 className="animate-spin" size={12} />
+                            ) : (
+                                <Sparkles size={12} />
+                            )}
+                            Generate with AI
+                        </button>
+                    </div>
                     <textarea
                         name="summary"
                         value={data.summary || ""}

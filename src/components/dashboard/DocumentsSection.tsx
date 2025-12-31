@@ -9,6 +9,8 @@ import { Resume } from "@/types/resume";
 import toast from "react-hot-toast";
 import { CreateResumeDialog } from "./CreateResumeDialog";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
+import { AIWizardDialog } from "./ai/AIWizardDialog";
+import { Sparkles } from "lucide-react";
 
 interface DocumentsSectionProps {
     filter?: "resume" | "coverLetter";
@@ -25,6 +27,7 @@ export default function DocumentsSection({ filter }: DocumentsSectionProps) {
         isOpen: false,
         resume: null,
     });
+    const [isAIWizardOpen, setIsAIWizardOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isDownloading, setIsDownloading] = useState<string | null>(null);
     const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
@@ -121,6 +124,13 @@ export default function DocumentsSection({ filter }: DocumentsSectionProps) {
                     >
                         <Plus className="w-5 h-5" />
                         {t("createNew")}
+                    </button>
+                    <button
+                        onClick={() => setIsAIWizardOpen(true)}
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-900/20"
+                    >
+                        <Sparkles className="w-5 h-5" />
+                        <span>Create with AI</span>
                     </button>
                 </div>
 
@@ -265,6 +275,11 @@ export default function DocumentsSection({ filter }: DocumentsSectionProps) {
                 onClose={closeDeleteDialog}
                 onConfirm={handleDeleteResume}
                 isDeleting={isDeleting}
+            />
+
+            <AIWizardDialog
+                isOpen={isAIWizardOpen}
+                onClose={() => setIsAIWizardOpen(false)}
             />
         </>
     );

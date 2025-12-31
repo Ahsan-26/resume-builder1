@@ -98,7 +98,7 @@ export default function AdminSidebar() {
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 group"
                 >
                     <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">("logout")</span>
+                    <span className="font-medium">logout</span>
                 </button>
             </div>
         </aside>

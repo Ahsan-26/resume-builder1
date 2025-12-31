@@ -1,47 +1,58 @@
 "use client";
 
-export default function CoverLetterStyle({ formData, setFormData }: any) {
-    const style = formData.style || {};
+interface Props {
+    formData: any;
+    setFormData: (data: any) => void;
+}
+
+export default function CoverLetterStyle({ formData, setFormData }: Props) {
+    const style = formData.definition.style || {};
+
+    const handleChange = (key: string, value: any) => {
+        setFormData({
+            ...formData,
+            definition: {
+                ...formData.definition,
+                style: { ...style, [key]: value },
+            },
+        });
+    };
 
     return (
-        <div className="border p-4 rounded space-y-3">
-            <h3 className="font-bold">Style</h3>
-
-            {style.font_family !== undefined && (
-                <label className="flex flex-col">
-                    Font Family
+        <div className="bg-white p-4 rounded shadow-sm space-y-4">
+            <h3 className="font-bold text-lg text-[#2f6a46]">Style</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label className="block text-sm font-medium">Font Family</label>
                     <input
                         type="text"
-                        value={style.font_family || style.fonts?.body || ""}
-                        onChange={(e) => setFormData({ ...formData, style: { ...style, font_family: e.target.value } })}
-                        className="border p-2 rounded"
+                        value={style.font_family || ""}
+                        onChange={(e) => handleChange("font_family", e.target.value)}
+                        className="w-full border rounded px-2 py-1"
                     />
-                </label>
-            )}
+                </div>
 
-            {style.font_size !== undefined && (
-                <label className="flex flex-col">
-                    Font Size
+                <div>
+                    <label className="block text-sm font-medium">Font Size</label>
                     <input
                         type="text"
                         value={style.font_size || ""}
-                        onChange={(e) => setFormData({ ...formData, style: { ...style, font_size: e.target.value } })}
-                        className="border p-2 rounded"
+                        onChange={(e) => handleChange("font_size", e.target.value)}
+                        placeholder="11pt"
+                        className="w-full border rounded px-2 py-1"
                     />
-                </label>
-            )}
+                </div>
 
-            {style.color !== undefined && (
-                <label className="flex flex-col">
-                    Color
+                <div>
+                    <label className="block text-sm font-medium">Color</label>
                     <input
                         type="color"
-                        value={style.color || "#000000"}
-                        onChange={(e) => setFormData({ ...formData, style: { ...style, color: e.target.value } })}
-                        className="w-16 h-8"
+                        value={style.color || "#333333"}
+                        onChange={(e) => handleChange("color", e.target.value)}
+                        className="w-full h-10 p-1 border rounded"
                     />
-                </label>
-            )}
+                </div>
+            </div>
         </div>
     );
 }

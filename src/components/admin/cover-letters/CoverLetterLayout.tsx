@@ -1,119 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import { apiFetch } from "@/lib/apiClient";
+interface Props {
+    formData: any;
+    setFormData: (data: any) => void;
+}
 
-import CoverLetterLayout from "./CoverLetterLayout";
-import CoverLetterStyle from "./CoverLetterStyle";
-import CoverLetterSections from "./CoverLetterSections";
-import CoverLetterPreview from "./CoverLetterPreview";
+export default function CoverLetterLayout({ formData, setFormData }: Props) {
+    const layout = formData.definition.layout;
 
-export default function CoverLetterForm({ initialData }: { initialData?: any }) {
-    const router = useRouter();
-    const [loading, setLoading] = useState(false);
-
-    const [formData, setFormData] = useState({
-        id: initialData?.id || "",
-        name: initialData?.name || "",
-        slug: initialData?.slug || "",
-        description: initialData?.description || "",
-        category: initialData?.category || "professional",
-        is_premium: initialData?.is_premium || false,
-        is_active: initialData?.is_active ?? true,
-        preview_image_url: initialData?.preview_image_url || "",
-        layout: initialData?.definition?.layout || {},
-        style: initialData?.definition?.style || {},
-        sections: initialData?.definition?.sections || {},
-        schema_version: initialData?.definition?.schema_version || 1,
-    });
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-
-        const payload = {
-            id: formData.id,
-            name: formData.name,
-            slug: formData.slug,
-            description: formData.description,
-            category: formData.category,
-            is_active: formData.is_active,
-            is_premium: formData.is_premium,
-            preview_image_url: formData.preview_image_url,
+    const handleChange = (key: string, value: any) => {
+        setFormData({
+            ...formData,
             definition: {
-                schema_version: formData.schema_version,
-                layout: formData.layout,
-                style: formData.style,
-                sections: formData.sections,
+                ...formData.definition,
+                layout: { ...layout, [key]: value },
             },
-        };
-
-        try {
-            const url = initialData
-                ? `/api/admin/cover-letter-templates/${initialData.id}/`
-                : "/api/admin/cover-letter-templates/";
-            const method = initialData ? "PATCH" : "POST";
-
-            const res = await apiFetch(url, { method, body: JSON.stringify(payload) });
-            if (!res.ok) throw new Error("Failed to save cover letter template");
-
-            toast.success(`Cover letter template ${initialData ? "updated" : "created"} successfully`);
-            router.push("/admin/cover-letters");
-            router.refresh();
-        } catch (err: any) {
-            toast.error(err.message);
-        } finally {
-            setLoading(false);
-        }
+        });
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Basic Info Inputs */}
-                    <div className="space-y-2">
-                        <input
-                            className="w-full border p-2 rounded"
-                            placeholder="Name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
-                        <input
-                            className="w-full border p-2 rounded"
-                            placeholder="Slug"
-                            value={formData.slug}
-                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                        />
-                        <textarea
-                            className="w-full border p-2 rounded"
-                            placeholder="Description"
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        />
-                    </div>
+        <div className="bg-white p-4 rounded shadow-sm space-y-4">
+            <h3 className="font-bold text-lg text-[#2f6a46]">Layout</h3>
 
-                    {/* Layout / Style / Sections */}
-                    <CoverLetterLayout formData={formData} setFormData={setFormData} />
-                    <CoverLetterStyle formData={formData} setFormData={setFormData} />
-                    <CoverLetterSections formData={formData} setFormData={setFormData} />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label className="block text-sm font-medium">Type</label>
+                    <select
+                        value={layout.type || ""}
+                        onChange={(e) => handleChange("type", e.target.value)}
+                        className="w-full border rounded px-2 py-1"
+                    >
+                        <option value="single-column">Single Column</option>
+                        <option value="two-column">Two Column</option>
+                    </select>
                 </div>
 
-                {/* Preview */}
-                <CoverLetterPreview formData={formData} />
-            </div>
+                <div>
+                    <label className="block text-sm font-medium">Spacing</label>
+                    <input
+                        type="text"
+                        value={layout.spacing || ""}
+                        onChange={(e) => handleChange("spacing", e.target.value)}
+                        placeholder="normal, tight, wide"
+                        className="w-full border rounded px-2 py-1"
+                    />
+                </div>
 
-            <div className="flex justify-end">
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-800 disabled:opacity-50"
-                >
-                    {loading ? "Saving..." : "Save Cover Letter Template"}
-                </button>
+                <div>
+                    <label className="block text-sm font-medium">Margins</label>
+                    <input
+                        type="text"
+                        value={layout.margins || ""}
+                        onChange={(e) => handleChange("margins", e.target.value)}
+                        placeholder="1in"
+                        className="w-full border rounded px-2 py-1"
+                    />
+                </div>
             </div>
-        </form>
+        </div>
     );
 }
