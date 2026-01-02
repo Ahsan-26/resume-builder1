@@ -21,7 +21,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const menuItems = [
         { name: t("resumes"), icon: FileText, href: "/dashboard/resumes" },
         { name: t("coverLetters"), icon: File, href: "/dashboard/cover-letters" },
-        { name: "Templates", icon: File, href: "/dashboard/templates" }, // TODO: Add translation
+        { name: "Resume Templates", icon: FileText, href: "/dashboard/templates?type=resume" },
+        { name: "Cover Letter Templates", icon: File, href: "/dashboard/templates?type=cover_letter" },
         { name: t("myAccount"), icon: User, href: "/profile" },
     ];
 

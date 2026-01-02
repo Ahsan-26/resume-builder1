@@ -23,10 +23,13 @@ export default function TemplatesPage() {
     const [isCreating, setIsCreating] = useState<string | null>(null);
     const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
 
+    const documentType = searchParams.get("type") || "resume"; // 'resume' | 'cover_letter'
+
     useEffect(() => {
         const loadTemplates = async () => {
             try {
-                const data = await fetchTemplates();
+                // Pass documentType to fetchTemplates to filter dynamically
+                const data = await fetchTemplates(documentType);
                 setTemplates(data);
             } catch (error) {
                 console.error("Failed to load templates", error);
@@ -36,7 +39,7 @@ export default function TemplatesPage() {
             }
         };
         loadTemplates();
-    }, []);
+    }, [documentType]);
 
     const handlePreview = (template: Template) => {
         setPreviewTemplate(template);
@@ -48,19 +51,31 @@ export default function TemplatesPage() {
 
     const handleUseTemplate = async (template: Template) => {
         setIsCreating(template.id);
+        const title = resumeName || `My ${template.name} ${documentType === 'cover_letter' ? 'Cover Letter' : 'Resume'}`;
+
         try {
-            const title = resumeName || `My ${template.name} Resume`;
-            const newResume = await createResume({
-                title,
-                template_id: template.id,
-                language: "en",
-                target_role: "Professional",
-            });
-            toast.success("Resume created!");
-            router.push(`/${locale}/dashboard/resumes/${newResume.id}/edit`);
+            if (documentType === 'cover_letter') {
+                // Dynamic import to avoid heavy bundle if unused, or just standard import
+                const { createCoverLetter } = await import("@/lib/api/cover-letters");
+                const newLetter = await createCoverLetter({
+                    title,
+                    template_id: template.id,
+                });
+                toast.success("Cover letter created!");
+                router.push(`/${locale}/dashboard/cover-letters/${newLetter.id}/edit`);
+            } else {
+                const newResume = await createResume({
+                    title,
+                    template_id: template.id,
+                    language: "en",
+                    target_role: "Professional",
+                });
+                toast.success("Resume created!");
+                router.push(`/${locale}/dashboard/resumes/${newResume.id}/edit`);
+            }
         } catch (error) {
-            console.error("Failed to create resume", error);
-            toast.error("Failed to create resume");
+            console.error(`Failed to create ${documentType}`, error);
+            toast.error(`Failed to create ${documentType.replace('_', ' ')}`);
         } finally {
             setIsCreating(null);
             closePreview();
@@ -71,10 +86,10 @@ export default function TemplatesPage() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                    Resume Templates
+                    {documentType === 'cover_letter' ? 'Cover Letter Templates' : 'Resume Templates'}
                 </h1>
                 <p className="text-gray-500 dark:text-gray-400">
-                    Choose a professional template to start building your resume.
+                    Choose a professional template to start building your {documentType === 'cover_letter' ? 'cover letter' : 'resume'}.
                 </p>
             </div>
 
@@ -90,7 +105,7 @@ export default function TemplatesPage() {
                             className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-300"
                         >
                             <div className="aspect-[210/297] bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
-                                {template.preview_image_url ? (
+                                {template.preview_image_url && (template.preview_image_url.startsWith('/') || template.preview_image_url.startsWith('http')) ? (
                                     <Image
                                         src={template.preview_image_url}
                                         alt={template.name}
@@ -98,8 +113,9 @@ export default function TemplatesPage() {
                                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                 ) : (
-                                    <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                                        No Preview
+                                    <div className="flex items-center justify-center h-full text-gray-400 text-sm bg-gray-50 flex-col gap-2">
+                                        <div className="w-12 h-16 border-2 border-dashed border-gray-300 rounded-md"></div>
+                                        <span>No Preview</span>
                                     </div>
                                 )}
 
@@ -169,7 +185,7 @@ export default function TemplatesPage() {
                             {/* In a real app, we would render the actual template component here with dummy data.
                    For now, we'll show the preview image large. */}
                             <div className="relative shadow-2xl w-[210mm] min-h-[297mm] bg-white">
-                                {previewTemplate.preview_image_url ? (
+                                {previewTemplate.preview_image_url && (previewTemplate.preview_image_url.startsWith('/') || previewTemplate.preview_image_url.startsWith('http')) ? (
                                     <Image
                                         src={previewTemplate.preview_image_url}
                                         alt={previewTemplate.name}
@@ -177,7 +193,10 @@ export default function TemplatesPage() {
                                         className="object-contain"
                                     />
                                 ) : (
-                                    <div className="flex items-center justify-center h-full text-gray-400">No Preview Available</div>
+                                    <div className="flex items-center justify-center h-full text-gray-400 flex-col gap-4">
+                                        <div className="w-24 h-32 border-4 border-dashed border-gray-200 rounded-lg"></div>
+                                        <p>No Preview Available</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
