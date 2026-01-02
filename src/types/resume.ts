@@ -22,6 +22,10 @@ export interface SectionConfig {
     order: number;
     visible: boolean;
     display?: string;
+    default_area?: 'header' | 'left' | 'right' | 'full';
+    allowed_areas?: ('header' | 'left' | 'right' | 'full')[];
+    min_width?: number;
+    max_width?: number;
 }
 
 export interface TemplateSections {
@@ -34,10 +38,22 @@ export interface TemplateSections {
     custom_sections: SectionConfig;
 }
 
+export interface PageConfig {
+    size: 'A4' | 'LETTER' | 'CUSTOM';
+    orientation: 'portrait' | 'landscape';
+    margins_mm: {
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+    };
+}
+
 export interface TemplateDefinition {
     schema_version: number;
     layout: TemplateLayout;
     style: TemplateStyle;
+    page: PageConfig;
     sections: TemplateSections;
 }
 
@@ -174,6 +190,7 @@ export interface Resume {
     strengths: Strength[];
     hobbies: Hobby[];
     custom_sections: CustomSection[];
+    page: PageConfig;
 }
 
 export interface CreateResumeData {

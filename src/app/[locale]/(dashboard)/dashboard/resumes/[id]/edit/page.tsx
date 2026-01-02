@@ -6,7 +6,7 @@ import { useResumeStore } from "@/store/useResumeStore";
 import { BuilderSidebar, SectionType } from "@/components/builder/BuilderSidebar";
 import { BuilderForm } from "@/components/builder/BuilderForm";
 import { BuilderPreview } from "@/components/builder/BuilderPreview";
-import { MobileEditView } from "@/components/builder/MobileEditView";
+// MobileEditView was unused
 import { RearrangeModal } from "@/components/builder/RearrangeModal";
 import { ArrowLeft, Save, Download, Layout, Eye, EyeOff, Files, Share2, Sparkles, MessageSquare } from "lucide-react";
 import Link from "next/link";
@@ -19,30 +19,34 @@ export default function ResumeEditPage() {
     const [isRearrangeOpen, setIsRearrangeOpen] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1280);
+    // Initial hydration fix
+    const [mounted, setMounted] = useState(false);
     const [showPreview, setShowPreview] = useState(true);
 
-    const isDesktop = windowWidth >= 1280;
-    const isMedium = windowWidth >= 1024 && windowWidth < 1280;
-    const isSmall = windowWidth < 1024;
-
     useEffect(() => {
+        setMounted(true);
         const handleResize = () => {
-            const width = window.innerWidth;
-            setWindowWidth(width);
-
-            // Auto-collapse sidebar on medium screens
-            if (width >= 1024 && width < 1280) {
+            if (window.innerWidth < 1280 && window.innerWidth >= 1024) {
                 setIsSidebarCollapsed(true);
-            } else if (width >= 1280) {
+            } else if (window.innerWidth >= 1280) {
                 setIsSidebarCollapsed(false);
             }
         };
-
-        handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Derived state for rendering
+    // Default to desktop view during SSR to prevent layout shift/flashing
+    const isSmall = mounted ? window.innerWidth < 1024 : false;
+    const isMedium = mounted ? (window.innerWidth >= 1024 && window.innerWidth < 1280) : false;
+    const isDesktop = mounted ? window.innerWidth >= 1280 : true;
+
+    useEffect(() => {
+        if (id) {
+            fetchResume(id);
+        }
+    }, [id, fetchResume]);
 
     useEffect(() => {
         if (id) {
@@ -137,7 +141,7 @@ export default function ResumeEditPage() {
                     flex-1 flex flex-col overflow-hidden transition-all duration-300
                     ${isSmall && showPreview ? "hidden" : "flex"}
                     ${isMedium && showPreview ? "w-[360px] md:w-[400px] shrink-0" : ""}
-                    ${isDesktop ? "w-[360px] md:w-[400px] lg:w-[450px] shrink-0" : ""}
+                    ${isDesktop ? "w-[360px] md:w-[400px] shrink-0" : ""}
                 `}>
                     <div className="flex-1 overflow-y-auto border-r border-gray-200 bg-white">
                         <BuilderForm activeSection={activeSection} />

@@ -12,22 +12,43 @@ interface RearrangeModalProps {
 
 export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose }) => {
     const { resume, updateSectionOrder } = useResumeStore();
-    const [sections, setSections] = useState<{ id: string; label: string; order: number; visible: boolean; area: string }[]>([]);
+    const [sections, setSections] = useState<{ id: string; label: string; order: number; visible: boolean; area: string; allowed_areas?: string[] }[]>([]);
 
     useEffect(() => {
         if (resume && isOpen) {
             const templateSections = resume.template.definition.sections;
             const currentSettings = resume.section_settings || {};
+            const customSections = resume.custom_sections || [];
 
-            const initialSections = Object.entries(templateSections).map(([key, config]) => ({
-                id: key,
-                label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-                order: currentSettings[key]?.order ?? config.order,
-                visible: currentSettings[key]?.visible ?? config.visible,
-                area: currentSettings[key]?.area ?? config.area
-            })).sort((a, b) => a.order - b.order);
+            // 1. Map standard sections
+            const standardSections = Object.entries(templateSections)
+                .filter(([key]) => key !== 'custom_sections') // Skip monolithic block
+                .map(([key, config]) => ({
+                    id: key,
+                    label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+                    order: currentSettings[key]?.order ?? config.order,
+                    visible: currentSettings[key]?.visible ?? config.visible,
+                    area: currentSettings[key]?.area ?? config.area,
+                    allowed_areas: config.allowed_areas
+                }));
 
-            setSections(initialSections);
+            // 2. Map individual custom sections
+            const customSectionConfig = templateSections['custom_sections'] || { area: 'full', visible: true, allowed_areas: ['header', 'left', 'right', 'full'] };
+
+            const customSectionItems = customSections.map(section => {
+                const settings = currentSettings[section.id];
+                return {
+                    id: section.id,
+                    label: settings?.title || section.title || "Custom Section",
+                    order: settings?.order ?? section.order ?? 99,
+                    visible: settings?.visible ?? true,
+                    area: settings?.area ?? (customSectionConfig.area as string) ?? 'full',
+                    allowed_areas: customSectionConfig.allowed_areas
+                };
+            });
+
+            const allSections = [...standardSections, ...customSectionItems].sort((a, b) => a.order - b.order);
+            setSections(allSections);
         }
     }, [resume, isOpen]);
 
@@ -81,9 +102,9 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
             <GripVertical size={14} className="text-gray-400 shrink-0" />
             <span className="flex-1 text-[10px] font-bold text-gray-700 truncate">{section.label}</span>
             <div className="flex items-center gap-1">
-                {/* Move Left/Right buttons hidden as backend doesn't support area persistence yet */}
-                {/* 
-                {section.area === 'left' && (
+                {/* Move Area Buttons */}
+                {/* Logic: Show Right arrow if current area is left and right is allowed. etc */}
+                {(section.area === 'left' && (section.allowed_areas?.includes('right') || !section.allowed_areas)) && (
                     <button
                         onClick={(e) => { e.stopPropagation(); moveArea(section.id, 'right'); }}
                         className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
@@ -92,7 +113,7 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
                         <ArrowRight size={12} />
                     </button>
                 )}
-                {section.area === 'right' && (
+                {(section.area === 'right' && (section.allowed_areas?.includes('left') || !section.allowed_areas)) && (
                     <button
                         onClick={(e) => { e.stopPropagation(); moveArea(section.id, 'left'); }}
                         className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
@@ -101,7 +122,6 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
                         <ArrowLeft size={12} />
                     </button>
                 )}
-                */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();

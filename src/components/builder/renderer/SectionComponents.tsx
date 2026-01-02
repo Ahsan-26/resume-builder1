@@ -5,7 +5,7 @@ import { EditableField } from './EditableField';
 import { useResumeStore } from '@/store/useResumeStore';
 import { DatePicker } from './DatePicker';
 
-interface SectionProps {
+export interface SectionProps {
     resume: Resume;
     style: TemplateStyle;
     isEditable?: boolean;
@@ -1303,3 +1303,5 @@ export const CustomSectionRenderer: React.FC<SectionProps> = ({ resume, style, i
         </div>
     );
 };
+// ... existing exports ...
+export * from './SingleCustomSectionRenderer';
