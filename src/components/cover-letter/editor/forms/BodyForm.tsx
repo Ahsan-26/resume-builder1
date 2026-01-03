@@ -5,15 +5,12 @@ import { useCoverLetterStore } from "@/store/useCoverLetterStore";
 
 export const BodyForm = () => {
     const { currentCoverLetter, updateCoverLetter } = useCoverLetterStore();
-    const body = currentCoverLetter?.content?.body || "";
+
+    if (!currentCoverLetter) return null;
 
     const handleChange = (value: string) => {
-        if (!currentCoverLetter) return;
         updateCoverLetter(currentCoverLetter.id, {
-            content: {
-                ...currentCoverLetter.content,
-                body: value
-            }
+            body: value
         });
     };
 
@@ -22,7 +19,7 @@ export const BodyForm = () => {
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Cover Letter Body</label>
                 <textarea
-                    value={body}
+                    value={currentCoverLetter.body || ""}
                     onChange={e => handleChange(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none min-h-[400px] font-sans"
                     placeholder="Dear Hiring Manager,\n\nI am writing to express my interest in..."

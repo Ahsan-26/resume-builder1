@@ -3,14 +3,14 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { SkillCategory, SkillItem } from "../../../types/resume";
-import { Plus, Trash2, X, Wrench, Sparkles } from "lucide-react";
+import { Plus, Trash2, X, Wrench, Sparkles, ChevronUp, ChevronDown } from "lucide-react";
 
 interface SkillsFormProps {
     categories: SkillCategory[];
 }
 
 export const SkillsForm: React.FC<SkillsFormProps> = ({ categories = [] }) => {
-    const { updateSkillCategories, resume } = useResumeStore();
+    const { updateSkillCategories, reorderItems, resume } = useResumeStore();
     const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
 
     const handleAddCategory = () => {
@@ -111,12 +111,42 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ categories = [] }) => {
                                 />
                                 <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-blue-600 rounded-full" />
                             </div>
-                            <button
-                                onClick={() => handleDeleteCategory(category.id)}
-                                className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            >
-                                <Trash2 size={16} />
-                            </button>
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={() => {
+                                        const newIds = categories.map(c => c.id);
+                                        const idx = categories.indexOf(category);
+                                        if (idx > 0) {
+                                            [newIds[idx - 1], newIds[idx]] = [newIds[idx], newIds[idx - 1]];
+                                            reorderItems('skill_categories', newIds);
+                                        }
+                                    }}
+                                    disabled={categories.indexOf(category) === 0}
+                                    className="p-2 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-lg transition-all"
+                                >
+                                    <ChevronUp size={16} />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const newIds = categories.map(c => c.id);
+                                        const idx = categories.indexOf(category);
+                                        if (idx < categories.length - 1) {
+                                            [newIds[idx + 1], newIds[idx]] = [newIds[idx], newIds[idx + 1]];
+                                            reorderItems('skill_categories', newIds);
+                                        }
+                                    }}
+                                    disabled={categories.indexOf(category) === categories.length - 1}
+                                    className="p-2 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-lg transition-all"
+                                >
+                                    <ChevronDown size={16} />
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteCategory(category.id)}
+                                    className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex flex-wrap gap-3 pt-2">
@@ -132,12 +162,46 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({ categories = [] }) => {
                                         className="bg-transparent text-xs font-bold text-gray-700 w-24 focus:outline-none placeholder-gray-300"
                                         placeholder="Skill name"
                                     />
-                                    <button
-                                        onClick={() => handleDeleteItem(category.id, item.id)}
-                                        className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-all"
-                                    >
-                                        <X size={14} />
-                                    </button>
+                                    <div className="flex items-center gap-0.5 border-l border-gray-100 ml-1 pl-1">
+                                        <button
+                                            onClick={() => {
+                                                const idx = category.items.indexOf(item);
+                                                if (idx > 0) {
+                                                    const newItems = [...category.items];
+                                                    [newItems[idx - 1], newItems[idx]] = [newItems[idx], newItems[idx - 1]];
+                                                    const newCategories = categories.map(c => c.id === category.id ? { ...c, items: newItems.map((it, i) => ({ ...it, order: i })) } : c);
+                                                    updateSkillCategories(newCategories);
+                                                }
+                                            }}
+                                            disabled={category.items.indexOf(item) === 0}
+                                            className="p-1 text-gray-300 hover:text-blue-600 disabled:opacity-30 transition-all"
+                                            title="Move Left"
+                                        >
+                                            <ChevronUp size={12} className="-rotate-90" />
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const idx = category.items.indexOf(item);
+                                                if (idx < category.items.length - 1) {
+                                                    const newItems = [...category.items];
+                                                    [newItems[idx + 1], newItems[idx]] = [newItems[idx], newItems[idx + 1]];
+                                                    const newCategories = categories.map(c => c.id === category.id ? { ...c, items: newItems.map((it, i) => ({ ...it, order: i })) } : c);
+                                                    updateSkillCategories(newCategories);
+                                                }
+                                            }}
+                                            disabled={category.items.indexOf(item) === category.items.length - 1}
+                                            className="p-1 text-gray-300 hover:text-blue-600 disabled:opacity-30 transition-all"
+                                            title="Move Right"
+                                        >
+                                            <ChevronDown size={12} className="-rotate-90" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteItem(category.id, item.id)}
+                                            className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-all"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                             <button

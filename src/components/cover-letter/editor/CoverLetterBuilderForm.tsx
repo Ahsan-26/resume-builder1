@@ -10,6 +10,8 @@ import { RecipientForm } from "./forms/RecipientForm";
 import { BodyForm } from "./forms/BodyForm";
 import { PersonalInfoForm } from "./forms/PersonalInfoForm"; // Specific copy or adapted
 
+import { TemplatesForm } from "./forms/TemplatesForm";
+
 interface CoverLetterBuilderFormProps {
     activeSection: CoverLetterSectionType;
 }
@@ -29,7 +31,7 @@ export const CoverLetterBuilderForm: React.FC<CoverLetterBuilderFormProps> = ({ 
             case "content":
                 return <BodyForm />;
             case "templates":
-                return <div className="p-4">Coming Soon: Template Selection</div>;
+                return <TemplatesForm />;
             default:
                 return null;
         }

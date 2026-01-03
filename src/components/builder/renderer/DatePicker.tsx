@@ -11,6 +11,7 @@ interface DatePickerProps {
     className?: string;
     onBlur?: () => void;
     disabled?: boolean;
+    align?: 'left' | 'right';
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -22,7 +23,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     isEditable = true,
     className = "",
     onBlur,
-    disabled = false
+    disabled = false,
+    align = 'left'
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -96,7 +98,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             </button>
 
             {isOpen && (
-                <div className="absolute top-full mt-2 left-0 z-50 bg-white border border-gray-200 rounded-xl shadow-2xl p-4 w-64 animate-in fade-in slide-in-from-top-2">
+                <div className={`absolute top-full mt-2 z-50 bg-white border border-gray-200 rounded-xl shadow-2xl p-4 w-64 animate-in fade-in slide-in-from-top-2 ${align === 'right' ? 'right-0' : 'left-0'}`}>
                     <div className="space-y-4">
                         {onCurrentChange && (
                             <div className="flex items-center justify-between pb-2 border-b border-gray-100">

@@ -23,11 +23,13 @@ interface ResumeState {
     lastSaved: Date | null;
     error: string | null;
     isPreviewMode: boolean;
+    activeSection: string;
 
     // Actions
     fetchResume: (id: string) => Promise<void>;
     setResume: (resume: Resume) => void;
     setIsPreviewMode: (isPreview: boolean) => void;
+    setActiveSection: (section: string) => void;
     updateResumeData: (data: Partial<Resume>) => void;
     updateTitle: (title: string) => void;
     updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
@@ -83,6 +85,7 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
     lastSaved: null,
     error: null,
     isPreviewMode: false,
+    activeSection: "personal",
 
     rollbackState: async (errorMsg: string) => {
         const { originalResume } = get();
@@ -106,6 +109,8 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
     setResume: (resume) => set({ resume }),
 
     setIsPreviewMode: (isPreview) => set({ isPreviewMode: isPreview }),
+
+    setActiveSection: (section) => set({ activeSection: section }),
 
     updateResumeData: (data) =>
         set((state) => {
@@ -608,7 +613,18 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
     },
 
     syncMetadata: async () => {
-        // ... logic ...
+        const { resume } = get();
+        if (!resume || !resume.id) return;
+        try {
+            await updateResume(resume.id, {
+                title: resume.title,
+                section_settings: resume.section_settings
+            });
+            set({ originalResume: JSON.parse(JSON.stringify(resume)) });
+        } catch (error) {
+            console.error('Failed to sync metadata:', error);
+            get().rollbackState("Failed to sync resume settings");
+        }
     },
 
     downloadResume: async () => {

@@ -5,18 +5,12 @@ import { useCoverLetterStore } from "@/store/useCoverLetterStore";
 
 export const RecipientForm = () => {
     const { currentCoverLetter, updateCoverLetter } = useCoverLetterStore();
-    const recipient = currentCoverLetter?.content?.recipient || { company_name: "" };
+
+    if (!currentCoverLetter) return null;
 
     const handleChange = (field: string, value: string) => {
-        if (!currentCoverLetter) return;
         updateCoverLetter(currentCoverLetter.id, {
-            content: {
-                ...currentCoverLetter.content,
-                recipient: {
-                    ...currentCoverLetter.content.recipient,
-                    [field]: value
-                }
-            }
+            [field]: value
         });
     };
 
@@ -26,29 +20,29 @@ export const RecipientForm = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
                 <input
                     type="text"
-                    value={recipient.company_name || ""}
+                    value={currentCoverLetter.company_name || ""}
                     onChange={e => handleChange('company_name', e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
                     placeholder="e.g. Google"
                 />
             </div>
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Hiring Manager (Optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Job Title / Target Role</label>
                 <input
                     type="text"
-                    value={recipient.manager_name || ""}
-                    onChange={e => handleChange('manager_name', e.target.value)}
+                    value={currentCoverLetter.job_title || ""}
+                    onChange={e => handleChange('job_title', e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
-                    placeholder="e.g. Jane Smith"
+                    placeholder="e.g. Senior Software Engineer"
                 />
             </div>
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Company Address / Details (Optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Job Description (For AI Context)</label>
                 <textarea
-                    value={recipient.address || ""}
-                    onChange={e => handleChange('address', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none min-h-[100px]"
-                    placeholder="123 Tech Lane..."
+                    value={currentCoverLetter.job_description || ""}
+                    onChange={e => handleChange('job_description', e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none min-h-[150px]"
+                    placeholder="Paste the job description here..."
                 />
             </div>
         </div>

@@ -11,49 +11,29 @@ export const calculatePages = (
     resume: Resume,
     templateDefinition: TemplateDefinition,
     sectionHeights: Record<string, number>,
-    isEditable: boolean
+    isEditable: boolean,
+    allKeys: string[]
 ): PageLayoutData[] => {
     // 1. Get all active sections sorted by order
     const sectionGap = templateDefinition.style.section_gap || 0;
 
-    // 1. Get all active sections sorted by order
-    const getSectionsForArea = (area: string) => {
-        const templateSections = Object.entries(templateDefinition.sections)
-            .filter(([key]) => key !== 'custom_sections'); // Skip monolithic
-
-        const mappedTemplateSections = templateSections.map(([key, config]) => {
-            const settings = resume.section_settings?.[key];
-            return {
-                key,
-                area: settings?.area ?? config.area,
-                order: settings?.order ?? config.order,
-                visible: settings?.visible ?? config.visible
-            };
-        });
-
-        // Map custom sections
-        const customSectionConfig = templateDefinition.sections['custom_sections'] || { area: 'full', visible: true, order: 99 };
-        const mappedCustomSections = (resume.custom_sections || []).map(section => {
-            const settings = resume.section_settings?.[section.id];
-            return {
-                key: `custom.${section.id}`,
-                area: settings?.area ?? ((customSectionConfig.area as string) || 'full'),
-                order: settings?.order ?? section.order ?? 99,
-                visible: settings?.visible ?? true
-            };
-        });
-
-        return [...mappedTemplateSections, ...mappedCustomSections]
-            .filter(s => s.area === area)
-            .filter(s => isEditable || s.visible)
-            .sort((a, b) => a.order - b.order)
-            .map(s => s.key);
+    const getAreaForKey = (key: string): string => {
+        const baseKey = key.split(':')[0];
+        if (baseKey.startsWith('custom.')) {
+            const sectionId = baseKey.split('.')[1];
+            const settings = resume.section_settings?.[sectionId];
+            const config = (templateDefinition.sections as any)['custom_sections'];
+            return settings?.area ?? config?.area ?? 'full';
+        }
+        const settings = resume.section_settings?.[baseKey];
+        const config = (templateDefinition.sections as any)[baseKey];
+        return settings?.area ?? config?.area ?? 'full';
     };
 
-    const headerSections = getSectionsForArea('header');
-    const leftSections = getSectionsForArea('left');
-    const rightSections = getSectionsForArea('right');
-    const fullSections = getSectionsForArea('full');
+    const headerKeys = allKeys.filter(k => getAreaForKey(k) === 'header');
+    const leftKeys = allKeys.filter(k => getAreaForKey(k) === 'left');
+    const rightKeys = allKeys.filter(k => getAreaForKey(k) === 'right');
+    const fullKeys = allKeys.filter(k => getAreaForKey(k) === 'full');
 
     // 2. Calculate Page Limits
     // Convert mm to px approx (96 DPI = 3.78 px/mm)
@@ -64,113 +44,106 @@ export const calculatePages = (
     const finalPageHeightMm = resume.page?.orientation === 'landscape' ? (resume.page?.size === 'LETTER' ? 216 : 210) : pageHeightMm;
 
     const margins = resume.page?.margins_mm || { top: 20, right: 20, bottom: 20, left: 20 };
-    const contentHeightPx = (finalPageHeightMm - margins.top - margins.bottom) * PX_PER_MM;
+    // Subtract 24px safety buffer to ensure content never hits the edge (approx 1 full line height)
+    const contentHeightPx = ((finalPageHeightMm - margins.top - margins.bottom) * PX_PER_MM) - 24;
 
     // 3. Distribution Logic
-    // We create Pages. Each Page has { header, left, right, full }
     const pages: PageLayoutData[] = [];
 
-    // Initial Page
-    let currentPage: PageLayoutData = { header: [], left: [], right: [], full: [] };
-    let currentLeftHeight = 0;
-    let currentRightHeight = 0;
-
-    // Add Header to Page 1
-    headerSections.forEach(key => {
-        currentPage.header.push(key);
-        currentLeftHeight += (sectionHeights[key] || 50); // Header pushes both columns down usually?
-        currentRightHeight += (sectionHeights[key] || 50);
-    });
-
-    // Helper to add sections to a specific column on the current page
-    // If it overflows, we move to next page
-    const fillColumn = (sections: string[], column: 'left' | 'right' | 'full') => {
-        sections.forEach(key => {
-            const h = sectionHeights[key] || 100; // Default estimate if missing
-
-            if (column === 'left') {
-                if (currentLeftHeight + h > contentHeightPx) {
-                    // Overflow!
-                    // Strict paging: Move strict entire section to next page?
-                    // User Req: "visually separate pages"
-                    // Ideally we'd split the section, but that requires deep recursive logic.
-                    // For now, we PUSH the section to the next page.
-
-                    // BUT, left and right are independent in 2-col?
-                    // If Left overflows, Left goes to Page 2. Right might still be on Page 1.
-                    // This creates a complex "Multi-Page Object" where Page 2 might have Left content but Empty Right content?
-                    // Yes. And Page 2 Right content starts after Page 1 Right content finishes.
-
-                    // Actually, simpler logic:
-                    // We just track "Global Left Column" vs "Global Right Column" matching to Pages.
-                }
-                // ... this accumulator logic is tricky because Left and Right must sync on Page Number?
-                // Visual Separation implies:
-                // Page 1 View: Left Col (Part 1) | Right Col (Part 1)
-                // Page 2 View: Left Col (Part 2) | Right Col (Part 2)
-            }
-        });
-    };
-
-    // ALTERNATIVE STRATEGY:
-    // Distribute Left sections into [Page1_Left, Page2_Left, ...]
-    // Distribute Right sections into [Page1_Right, Page2_Right, ...]
-    // Then merge them into Pages.
-
-    const distribute = (sections: string[], startHeight: number): string[][] => {
+    const distribute = (keys: string[], startHeight: number): string[][] => {
         const buckets: string[][] = [[]];
         let currentH = startHeight;
         let bucketIndex = 0;
+        let lastBaseKey = '';
 
-        sections.forEach(key => {
-            const h = sectionHeights[key] || 50;
-            if (currentH + h > contentHeightPx && currentH > startHeight) {
-                // Determine if we should break
-                // If single item is massive (> page), we must put it in; it will overflow.
+        // Group keys by section to implement keep-together logic
+        const sectionGroups: { baseKey: string; keys: string[]; totalH: number }[] = [];
+        keys.forEach(key => {
+            const baseKey = key.split(':')[0];
+            const h = sectionHeights[key] || 40;
+            // Add item gap (40px) if it's an item (not a header) and not the first item in the section
+            const isItem = key.includes(':items:');
+            const itemGap = (isItem && sectionGroups.length > 0 && sectionGroups[sectionGroups.length - 1].baseKey === baseKey && sectionGroups[sectionGroups.length - 1].keys.some(k => k.includes(':items:'))) ? 16 : 0;
+
+            if (sectionGroups.length > 0 && sectionGroups[sectionGroups.length - 1].baseKey === baseKey) {
+                sectionGroups[sectionGroups.length - 1].keys.push(key);
+                sectionGroups[sectionGroups.length - 1].totalH += (h + itemGap);
+            } else {
+                sectionGroups.push({ baseKey, keys: [key], totalH: h });
+            }
+        });
+
+        sectionGroups.forEach((group) => {
+            const isNewSection = group.baseKey !== lastBaseKey;
+            const gap = (isNewSection && lastBaseKey !== '') ? sectionGap : 0;
+
+            // If the whole section fits on the current page, add it
+            if (currentH + gap + group.totalH <= contentHeightPx) {
+                group.keys.forEach((key, kIdx) => {
+                    const h = sectionHeights[key] || 40;
+                    const isItem = key.includes(':items:');
+                    const itemGap = (isItem && kIdx > 0 && group.keys[kIdx - 1].includes(':items:')) ? 40 : 0;
+                    buckets[bucketIndex].push(key);
+                    currentH += (h + itemGap + (kIdx === 0 ? gap : 0));
+                });
+            }
+            // If it doesn't fit but it fits ON A NEW PAGE, move the whole thing
+            else if (group.totalH <= contentHeightPx && currentH > startHeight) {
                 bucketIndex++;
                 buckets[bucketIndex] = [];
-                currentH = 0; // New page starts at 0 (or margin?)
-                // If Page 2+, standard margin applies? Yes.
+                currentH = 0;
+                group.keys.forEach((key, kIdx) => {
+                    const h = sectionHeights[key] || 40;
+                    const isItem = key.includes(':items:');
+                    const itemGap = (isItem && kIdx > 0 && group.keys[kIdx - 1].includes(':items:')) ? 40 : 0;
+                    buckets[bucketIndex].push(key);
+                    currentH += (h + itemGap);
+                });
             }
-            buckets[bucketIndex].push(key);
-            currentH += h;
+            // If it doesn't fit even on a new page, WE MUST SPLIT IT
+            else {
+                group.keys.forEach((key, kIdx) => {
+                    const h = sectionHeights[key] || 40;
+                    const isItem = key.includes(':items:');
+                    const itemGap = (isItem && kIdx > 0 && group.keys[kIdx - 1].includes(':items:')) ? 40 : 0;
+                    const effectiveGap = (kIdx === 0) ? gap : itemGap;
+
+                    if (currentH + effectiveGap + h > contentHeightPx && currentH > (bucketIndex === 0 ? startHeight : 0)) {
+                        bucketIndex++;
+                        buckets[bucketIndex] = [];
+                        currentH = 0;
+                        buckets[bucketIndex].push(key);
+                        currentH += h;
+                    } else {
+                        buckets[bucketIndex].push(key);
+                        currentH += (effectiveGap + h);
+                    }
+                });
+            }
+            lastBaseKey = group.baseKey;
         });
         return buckets;
     };
 
     // Calculate start heights for columns (header pushes them)
-    // Assuming Header is FULL WIDTH at top of Page 1
     let headerHeight = 0;
-    headerSections.forEach(key => headerHeight += (sectionHeights[key] || 0));
+    headerKeys.forEach(key => headerHeight += (sectionHeights[key] || 40));
+    if (headerKeys.length > 0) headerHeight += sectionGap;
 
-    // Distribute Left
-    const leftBuckets = distribute(leftSections, headerHeight);
-    // Distribute Right
-    const rightBuckets = distribute(rightSections, headerHeight);
-    // Distribute Full (Single Col)
-    // Full sections usually come AFTER columns.
-    // So we need to know where columns ended.
-    const maxPageLeft = leftBuckets.length;
-    const maxPageRight = rightBuckets.length;
-    const columnsEndPage = Math.max(maxPageLeft, maxPageRight) - 1; // 0-indexed
+    // Distribute
+    const leftBuckets = distribute(leftKeys, headerHeight);
+    const rightBuckets = distribute(rightKeys, headerHeight);
 
-    // We need final height of the last page to render Full sections there or next
-    // This is getting complicated.
-
-    // SIMPLIFIED:
-    // Just map strict pages.
     const maxPages = Math.max(leftBuckets.length, rightBuckets.length);
 
     for (let i = 0; i < maxPages; i++) {
         pages.push({
-            header: i === 0 ? headerSections : [],
+            header: i === 0 ? headerKeys : [],
             left: leftBuckets[i] || [],
             right: rightBuckets[i] || [],
             full: []
         });
     }
-
-
 
     // Now handle Full Sections (Bottom)
     let lastPageIdx = pages.length - 1;
@@ -179,69 +152,141 @@ export const calculatePages = (
         lastPageIdx = 0;
     }
 
-    // Helper to get current height of a specific page index
     const getPageContentHeight = (pageIdx: number) => {
         if (!pages[pageIdx]) return 0;
         let h = 0;
-        // Page 0 has header
         if (pageIdx === 0) {
-            pages[pageIdx].header.forEach(k => h += (sectionHeights[k] || 0));
+            pages[pageIdx].header.forEach(k => h += (sectionHeights[k] || 40));
+            if (pages[pageIdx].header.length > 0) h += sectionGap;
         }
-        // Columns
+
         let leftH = 0;
-        pages[pageIdx].left.forEach(k => leftH += (sectionHeights[k] || 0));
+        let lastLeftBaseKey = '';
+        pages[pageIdx].left.forEach((k, idx) => {
+            const baseKey = k.split(':')[0];
+            const isItem = k.includes(':items:');
+            const itemGap = (isItem && idx > 0 && pages[pageIdx].left[idx - 1].startsWith(baseKey)) ? 40 : 0;
+
+            if (lastLeftBaseKey !== '' && baseKey !== lastLeftBaseKey) leftH += sectionGap;
+            leftH += (sectionHeights[k] || 40) + itemGap;
+            lastLeftBaseKey = baseKey;
+        });
+
         let rightH = 0;
-        pages[pageIdx].right.forEach(k => rightH += (sectionHeights[k] || 0));
+        let lastRightBaseKey = '';
+        pages[pageIdx].right.forEach((k, idx) => {
+            const baseKey = k.split(':')[0];
+            const isItem = k.includes(':items:');
+            const itemGap = (isItem && idx > 0 && pages[pageIdx].right[idx - 1].startsWith(baseKey)) ? 40 : 0;
+
+            if (lastRightBaseKey !== '' && baseKey !== lastRightBaseKey) rightH += sectionGap;
+            rightH += (sectionHeights[k] || 40) + itemGap;
+            lastRightBaseKey = baseKey;
+        });
 
         h += Math.max(leftH, rightH);
 
-        // Existing full sections on this page (if any, though we are adding them now)
-        pages[pageIdx].full.forEach(k => h += (sectionHeights[k] || 0));
+        let lastFullBaseKey = '';
+        pages[pageIdx].full.forEach((k, idx) => {
+            const baseKey = k.split(':')[0];
+            const isItem = k.includes(':items:');
+            const itemGap = (isItem && idx > 0 && pages[pageIdx].full[idx - 1].split(':')[0] === baseKey) ? 40 : 0;
 
-        // Add gap/margins estimates?
-        // Sections have 'mb-6' (24px) or gap style. ResumeRenderer uses style.section_gap.
-        // We should add gap for every section.
+            if (lastFullBaseKey !== '' && baseKey !== lastFullBaseKey) h += sectionGap;
+            // mt-6 buffer for the first full item after columns
+            if (idx === 0 && (pages[pageIdx].left.length > 0 || pages[pageIdx].right.length > 0)) h += sectionGap;
+            h += (sectionHeights[k] || 40) + itemGap;
+            lastFullBaseKey = baseKey;
+        });
+
         return h;
     };
 
     let currentUsedHeight = getPageContentHeight(lastPageIdx);
+    let lastFullBaseKey = '';
 
-    // We assume a small buffer or gap before full sections start (e.g., mt-6 = 24px)
-    currentUsedHeight += 24;
+    // Final distribution for Full Sections with keep-together logic
+    const fullSectionGroups: { baseKey: string; keys: string[]; totalH: number }[] = [];
+    fullKeys.forEach(key => {
+        const baseKey = key.split(':')[0];
+        const h = sectionHeights[key] || 40;
+        const isItem = key.includes(':items:');
+        const itemGap = (isItem && fullSectionGroups.length > 0 && fullSectionGroups[fullSectionGroups.length - 1].baseKey === baseKey && fullSectionGroups[fullSectionGroups.length - 1].keys.some(k => k.includes(':items:'))) ? 40 : 0;
 
-    fullSections.forEach(key => {
-        const h = sectionHeights[key] || 100;
+        if (fullSectionGroups.length > 0 && fullSectionGroups[fullSectionGroups.length - 1].baseKey === baseKey) {
+            fullSectionGroups[fullSectionGroups.length - 1].keys.push(key);
+            fullSectionGroups[fullSectionGroups.length - 1].totalH += (h + itemGap);
+        } else {
+            fullSectionGroups.push({ baseKey, keys: [key], totalH: h });
+        }
+    });
 
-        // Calculate gap required before this item
-        // If it's the very first item in 'full' list on this page, it needs 24px (mt-6).
-        // If it's subsequent, it needs sectionGap.
+    fullSectionGroups.forEach((group) => {
+        const isNewSection = group.baseKey !== lastFullBaseKey;
+
+        let gap = 0;
         const isFirstFullOnPage = pages[lastPageIdx].full.length === 0;
+        if (isFirstFullOnPage) {
+            if (pages[lastPageIdx].left.length > 0 || pages[lastPageIdx].right.length > 0) gap = sectionGap;
+        } else {
+            if (isNewSection) gap = sectionGap;
+        }
 
-        // However, if the page is FRESH (no header, no columns), does it need mt-6?
-        // ResumePage always renders Columns div even if empty? 
-        // If columns are empty height, mt-6 adds 24px space.
-        // Yes, likely.
+        // Keep-together logic for full sections
+        if (currentUsedHeight + gap + group.totalH <= contentHeightPx) {
+            group.keys.forEach((key, kIdx) => {
+                const h = sectionHeights[key] || 40;
+                const isItem = key.includes(':items:');
+                const itemGap = (isItem && kIdx > 0) ? 40 : 0;
+                const effectiveGap = (kIdx === 0) ? gap : itemGap;
 
-        const gap = isFirstFullOnPage ? 24 : sectionGap;
-
-        // Check fit
-        if (currentUsedHeight + gap + h > contentHeightPx && currentUsedHeight > 40) {
-            // New Page needed
+                pages[lastPageIdx].full.push(key);
+                currentUsedHeight += (h + effectiveGap);
+            });
+        }
+        else if (group.totalH <= contentHeightPx && currentUsedHeight > 40) {
             pages.push({ header: [], left: [], right: [], full: [] });
             lastPageIdx++;
-            currentUsedHeight = 0; // New page starts fresh
-
-            // For new page, this item becomes the first full item.
-            // It will have gap = 24 (mt-6).
-            // Check if it fits on new page (unlikely it wont unless massive).
-            // Update currentUsedHeight
-            pages[lastPageIdx].full.push(key);
-            currentUsedHeight += (24 + h);
-        } else {
-            // Add to current page
-            pages[lastPageIdx].full.push(key);
-            currentUsedHeight += (gap + h);
+            group.keys.forEach((key, kIdx) => {
+                const h = sectionHeights[key] || 40;
+                const isItem = key.includes(':items:');
+                const itemGap = (isItem && kIdx > 0) ? 40 : 0;
+                pages[lastPageIdx].full.push(key);
+                currentUsedHeight = (kIdx === 0) ? h : (currentUsedHeight + h + itemGap);
+            });
+            // Final adjustment for currentUsedHeight on new page
+            currentUsedHeight = getPageContentHeight(lastPageIdx);
         }
+        else {
+            // Split it
+            group.keys.forEach((key, kIdx) => {
+                const h = sectionHeights[key] || 40;
+                const isItem = key.includes(':items:');
+                const itemGap = (isItem && kIdx > 0) ? 40 : 0;
+
+                let effectiveGap = 0;
+                if (kIdx === 0) {
+                    if (pages[lastPageIdx].full.length === 0) {
+                        if (pages[lastPageIdx].left.length > 0 || pages[lastPageIdx].right.length > 0) effectiveGap = sectionGap;
+                    } else if (isNewSection) {
+                        effectiveGap = sectionGap;
+                    }
+                } else {
+                    effectiveGap = itemGap;
+                }
+
+                if (currentUsedHeight + effectiveGap + h > contentHeightPx && currentUsedHeight > 40) {
+                    pages.push({ header: [], left: [], right: [], full: [] });
+                    lastPageIdx++;
+                    pages[lastPageIdx].full.push(key);
+                    currentUsedHeight = h;
+                } else {
+                    pages[lastPageIdx].full.push(key);
+                    currentUsedHeight += (effectiveGap + h);
+                }
+            });
+        }
+        lastFullBaseKey = group.baseKey;
     });
 
     return pages;

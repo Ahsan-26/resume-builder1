@@ -17,7 +17,8 @@ export default function CoverLetterEditPage() {
 
     const [activeSection, setActiveSection] = useState<CoverLetterSectionType>("personal");
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const [showPreview, setShowPreview] = useState(true); // For mobile toggle
+    const [showPreview, setShowPreview] = useState(false); // Default to false for mobile-first
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -25,74 +26,139 @@ export default function CoverLetterEditPage() {
         }
     }, [id, fetchCoverLetter]);
 
+    // Set showPreview based on screen size on mount
+    useEffect(() => {
+        const checkScreen = () => {
+            if (window.innerWidth >= 768) {
+                setShowPreview(true);
+            } else {
+                setShowPreview(false);
+            }
+        };
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
+
     const handleSave = async () => {
-        // Auto-save is triggered by individual field updates in store for now (if implemented that way),
-        // but manual save can force a sync or be a placeholder if auto-save isn't fully robust.
-        // Current store implementation has `updateCoverLetter` which calls API.
-        // We can just show a toast or trigger a specific save action if we had draft state.
         toast.success("Saved successfully");
     };
 
     return (
-        <div className="flex flex-col h-screen bg-gray-100 overflow-hidden font-sans">
+        <div className="flex flex-col h-screen bg-white md:bg-gray-50 overflow-hidden font-sans">
             {/* Header */}
-            <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 z-20 shrink-0">
-                <div className="flex items-center gap-4">
-                    <Link href="/dashboard/cover-letters" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 z-30 shrink-0 shadow-sm">
+                <div className="flex items-center gap-2 md:gap-4">
+                    <button
+                        onClick={() => setIsMobileSidebarOpen(true)}
+                        className="md:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                        aria-label="Open editor menu"
+                    >
+                        <Layout size={20} />
+                    </button>
+                    <Link href="/dashboard/cover-letters" className="hidden sm:flex p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Back to cover letters">
                         <ArrowLeft size={18} className="text-gray-600" />
                     </Link>
-                    <div>
-                        <h1 className="text-sm font-bold text-gray-900">{currentCoverLetter?.title || "Untitled Cover Letter"}</h1>
-                        <p className="text-xs text-gray-400">Last saved: {currentCoverLetter ? new Date(currentCoverLetter.updated_at).toLocaleTimeString() : "Never"}</p>
+                    <div className="min-w-0 max-w-[150px] sm:max-w-[300px]">
+                        <input
+                            type="text"
+                            value={currentCoverLetter?.title || ""}
+                            onChange={(e) => updateCoverLetter(id, { title: e.target.value })}
+                            className="text-sm font-bold text-gray-900 bg-transparent border-none focus:ring-0 p-0 w-full truncate"
+                            placeholder="Untitled Cover Letter"
+                            aria-label="Cover letter title"
+                        />
+                        <p className="hidden xs:block text-[10px] text-gray-400 truncate">Saved: {currentCoverLetter ? new Date(currentCoverLetter.updated_at).toLocaleTimeString() : "Never"}</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                     <button
                         onClick={() => setShowPreview(!showPreview)}
-                        className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95 border border-gray-200 dark:border-gray-700"
+                        aria-label={showPreview ? "Show Editor" : "Show Full Preview"}
+                        title={showPreview ? "Show Editor" : "Show Full Preview"}
                     >
-                        {showPreview ? <Layout size={18} /> : <Eye size={18} />}
+                        {showPreview ? <><Layout size={14} /> <span className="hidden sm:inline">Edit</span></> : <><Eye size={14} /> <span className="hidden sm:inline">Preview</span></>}
                     </button>
                     <button
                         onClick={handleSave}
-                        className="flex items-center gap-2 px-4 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-full shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all active:scale-95"
+                        className="flex items-center gap-2 px-4 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-full shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition-all active:scale-95 shrink-0"
+                        aria-label="Save cover letter"
                     >
-                        {isSaving ? "Saving..." : <><Save size={14} /> Save</>}
+                        {isSaving ? "Saving..." : <><Save size={14} /> <span className="hidden sm:inline">Save</span></>}
                     </button>
                 </div>
             </header>
 
             {/* Main Layout */}
-            <div className="flex flex-1 relative overflow-hidden bg-[#F8FAFC]">
-                {/* Sidebar */}
-                <div className={`
-                    relative shrink-0 border-r border-gray-200 bg-white flex flex-col transition-all duration-300
-                    ${isSidebarCollapsed ? "w-16" : "w-60"}
-                    hidden md:flex
-                 `}>
+            <div className="flex flex-1 relative overflow-hidden bg-white">
+                {/* Desktop Sidebar */}
+                <aside
+                    className={`
+                        relative shrink-0 border-r border-gray-200 bg-white flex flex-col transition-all duration-300 z-20
+                        ${isSidebarCollapsed ? "w-16" : "w-64"}
+                        hidden md:flex
+                    `}
+                    aria-label="Editor navigation"
+                >
                     <CoverLetterBuilderSidebar
                         activeSection={activeSection}
-                        onSectionChange={setActiveSection}
+                        onSectionChange={(s) => {
+                            setActiveSection(s);
+                            if (window.innerWidth < 768) setShowPreview(false);
+                        }}
                         isCollapsed={isSidebarCollapsed}
                         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                     />
-                </div>
+                </aside>
 
-                {/* Editor (Form) */}
-                <div className={`
-                    flex-1 flex flex-col overflow-hidden transition-all duration-300
-                    ${showPreview ? "hidden md:flex md:w-[400px] shrink-0" : "flex w-full"}
-                 `}>
-                    <CoverLetterBuilderForm activeSection={activeSection} />
-                </div>
+                {/* Mobile Sidebar Overlay */}
+                {isMobileSidebarOpen && (
+                    <div className="fixed inset-0 z-50 md:hidden">
+                        <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setIsMobileSidebarOpen(false)} />
+                        <div className="absolute inset-y-0 left-0 w-72 bg-white shadow-2xl animate-in slide-in-from-left duration-300">
+                            <CoverLetterBuilderSidebar
+                                activeSection={activeSection}
+                                onSectionChange={(s) => {
+                                    setActiveSection(s);
+                                    setIsMobileSidebarOpen(false);
+                                    setShowPreview(false);
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
 
-                {/* Preview */}
-                <div className={`
-                    flex-1 bg-[#F1F5F9] h-full overflow-hidden flex flex-col transition-all duration-300
-                    ${!showPreview ? "hidden md:flex" : "flex"}
-                 `}>
-                    <CoverLetterPreview isEditable={true} />
+                {/* Editor Container */}
+                <div className="flex flex-1 flex-col md:flex-row overflow-hidden relative">
+                    {/* Form Section */}
+                    <main
+                        className={`
+                            flex-1 flex flex-col overflow-y-auto bg-white transition-all duration-500 ease-in-out
+                            ${showPreview ? "hidden md:flex md:w-[45%] lg:w-[40%] xl:w-[35%] shrink-0" : "w-full"}
+                        `}
+                        aria-label="Form editor"
+                    >
+                        <div className="max-w-3xl mx-auto w-full p-6 md:p-8 lg:p-12">
+                            <CoverLetterBuilderForm activeSection={activeSection} />
+                        </div>
+                    </main>
+
+                    {/* Preview Section */}
+                    <section
+                        className={`
+                            flex-1 bg-gray-50 border-l border-gray-200 h-full overflow-hidden flex flex-col transition-all duration-500 ease-in-out py-4 md:py-8
+                            ${!showPreview ? "hidden md:flex" : "flex"}
+                        `}
+                        aria-label="Document preview"
+                    >
+                        <div className="flex-1 overflow-auto px-4 md:px-8">
+                            <div className="max-w-[210mm] mx-auto min-h-full flex items-center justify-center">
+                                <CoverLetterPreview isEditable={true} />
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>

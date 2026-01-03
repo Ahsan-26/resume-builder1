@@ -1,44 +1,45 @@
 export interface CoverLetter {
     id: string;
-    user_id: string;
+    user: number; // User ID from backend
     title: string;
-    template_id: string;
-    content: CoverLetterContent;
+    template: string; // Template ID
+    template_id?: string; // For writing
+    template_detail?: CoverLetterTemplate;
+    linked_resume?: string; // UUID of linked resume
+    company_name: string;
+    job_title: string;
+    job_description: string;
+    body: string;
+    status: 'draft' | 'published';
     created_at: string;
     updated_at: string;
-}
-
-export interface CoverLetterContent {
-    personal_info: {
-        full_name: string;
-        email: string;
-        phone?: string;
-        address?: string;
-        job_title?: string; // Target Role
-    };
-    recipient: {
-        company_name: string;
-        manager_name?: string;
-        address?: string;
-    };
-    body: string; // HTML or Markdown content
-    date: string;
 }
 
 export interface CoverLetterTemplate {
     id: string;
     name: string;
-    thumbnail?: string;
-    data: string; // JSON string or object defining layout/styles
+    slug: string;
+    description: string;
+    category: string;
+    is_premium: boolean;
+    preview_image_url: string;
+    is_active: boolean;
+    definition: any; // Design tokens, layout hints, etc.
 }
 
 export interface CreateCoverLetterData {
     title: string;
-    template_id?: string;
+    template_id: string;
+    linked_resume?: string;
 }
 
 export interface UpdateCoverLetterData {
     title?: string;
     template_id?: string;
-    content?: Partial<CoverLetterContent>;
+    company_name?: string;
+    job_title?: string;
+    job_description?: string;
+    body?: string;
+    status?: 'draft' | 'published';
+    linked_resume?: string;
 }

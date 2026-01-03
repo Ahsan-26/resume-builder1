@@ -3,14 +3,14 @@
 import React from "react";
 import { useResumeStore } from "../../../store/useResumeStore";
 import { Strength } from "../../../types/resume";
-import { Plus, Trash2, X, Zap } from "lucide-react";
+import { Plus, Trash2, X, Zap, ChevronUp, ChevronDown } from "lucide-react";
 
 interface StrengthsFormProps {
     items: Strength[];
 }
 
 export const StrengthsForm: React.FC<StrengthsFormProps> = ({ items = [] }) => {
-    const { updateStrengths, resume } = useResumeStore();
+    const { updateStrengths, reorderItems, resume } = useResumeStore();
     const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
 
     const handleAdd = () => {
@@ -64,12 +64,44 @@ export const StrengthsForm: React.FC<StrengthsFormProps> = ({ items = [] }) => {
                                 className="bg-transparent text-sm font-bold text-gray-700 w-36 focus:outline-none placeholder-gray-300"
                                 placeholder="e.g. Leadership"
                             />
-                            <button
-                                onClick={() => handleDelete(item.id)}
-                                className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            >
-                                <X size={14} />
-                            </button>
+                            <div className="flex items-center gap-0.5 border-l border-gray-100 ml-1 pl-1">
+                                <button
+                                    onClick={() => {
+                                        const newIds = items.map(i => i.id);
+                                        const idx = items.indexOf(item);
+                                        if (idx > 0) {
+                                            [newIds[idx - 1], newIds[idx]] = [newIds[idx], newIds[idx - 1]];
+                                            reorderItems('strengths', newIds);
+                                        }
+                                    }}
+                                    disabled={items.indexOf(item) === 0}
+                                    className="p-1 text-gray-300 hover:text-blue-600 disabled:opacity-30 transition-all"
+                                    title="Move Left"
+                                >
+                                    <ChevronUp size={14} className="-rotate-90" />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const newIds = items.map(i => i.id);
+                                        const idx = items.indexOf(item);
+                                        if (idx < items.length - 1) {
+                                            [newIds[idx + 1], newIds[idx]] = [newIds[idx], newIds[idx + 1]];
+                                            reorderItems('strengths', newIds);
+                                        }
+                                    }}
+                                    disabled={items.indexOf(item) === items.length - 1}
+                                    className="p-1 text-gray-300 hover:text-blue-600 disabled:opacity-30 transition-all"
+                                    title="Move Right"
+                                >
+                                    <ChevronDown size={14} className="-rotate-90" />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(item.id)}
+                                    className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-all"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
                         </div>
                     ))}
                     <button

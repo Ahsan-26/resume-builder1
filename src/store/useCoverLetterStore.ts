@@ -24,6 +24,9 @@ interface CoverLetterState {
     setCurrentCoverLetter: (coverLetter: CoverLetter | null) => void;
 }
 
+// Module-level variable to track autosave timeout
+let coverLetterAutosaveTimeout: NodeJS.Timeout | null = null;
+
 export const useCoverLetterStore = create<CoverLetterState>((set, get) => ({
     coverLetters: [],
     currentCoverLetter: null,
@@ -67,30 +70,36 @@ export const useCoverLetterStore = create<CoverLetterState>((set, get) => ({
     },
 
     updateCoverLetter: async (id, data) => {
-        // Optimistic update for current letter
+        // 1. Optimistic update (Immediate UI feedback)
         const { currentCoverLetter } = get();
         if (currentCoverLetter && currentCoverLetter.id === id) {
             set({
                 currentCoverLetter: {
                     ...currentCoverLetter,
-                    ...data as any, // Shallow merge 
-                    content: { ...currentCoverLetter.content, ...(data.content || {}) }
+                    ...data as any,
                 }
             });
         }
 
-        set({ isSaving: true }); // Don't wipe error here to allow retry logic if needed
-        try {
-            const updated = await updateCoverLetter(id, data);
-            set(state => ({
-                coverLetters: state.coverLetters.map(cl => cl.id === id ? updated : cl),
-                currentCoverLetter: updated,
-                isSaving: false
-            }));
-        } catch (err) {
-            // Rollback if needed (omitted for brevity, can implement if strict consistency required)
-            set({ error: (err as Error).message, isSaving: false });
+        // 2. Debounced API call
+        if (coverLetterAutosaveTimeout) {
+            clearTimeout(coverLetterAutosaveTimeout);
         }
+
+        set({ isSaving: true });
+
+        coverLetterAutosaveTimeout = setTimeout(async () => {
+            try {
+                const updated = await updateCoverLetter(id, data);
+                set(state => ({
+                    coverLetters: state.coverLetters.map(cl => cl.id === id ? updated : cl),
+                    currentCoverLetter: updated,
+                    isSaving: false
+                }));
+            } catch (err) {
+                set({ error: (err as Error).message, isSaving: false });
+            }
+        }, 1000); // 1 second debounce
     },
 
     deleteCoverLetter: async (id) => {

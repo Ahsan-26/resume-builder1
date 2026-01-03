@@ -12,7 +12,7 @@ interface EducationFormProps {
 }
 
 export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
-    const { addEducation, updateEducation, removeEducation, resume } = useResumeStore();
+    const { addEducation, updateEducation, removeEducation, reorderItems, resume } = useResumeStore();
     const [expandedId, setExpandedId] = React.useState<string | null>(items[0]?.id || null);
     const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
 
@@ -87,7 +87,41 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1">
+                                    <div className="flex items-center border-r border-gray-200 pr-2 mr-1">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const newIds = items.map(i => i.id);
+                                                if (items.indexOf(item) > 0) {
+                                                    const idx = items.indexOf(item);
+                                                    [newIds[idx - 1], newIds[idx]] = [newIds[idx], newIds[idx - 1]];
+                                                    reorderItems('educations', newIds);
+                                                }
+                                            }}
+                                            disabled={items.indexOf(item) === 0}
+                                            className="p-2 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-lg transition-all"
+                                            title="Move Up"
+                                        >
+                                            <ChevronUp size={16} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const newIds = items.map(i => i.id);
+                                                if (items.indexOf(item) < items.length - 1) {
+                                                    const idx = items.indexOf(item);
+                                                    [newIds[idx + 1], newIds[idx]] = [newIds[idx], newIds[idx + 1]];
+                                                    reorderItems('educations', newIds);
+                                                }
+                                            }}
+                                            disabled={items.indexOf(item) === items.length - 1}
+                                            className="p-2 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-lg transition-all"
+                                            title="Move Down"
+                                        >
+                                            <ChevronDown size={16} />
+                                        </button>
+                                    </div>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -151,6 +185,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({ items = [] }) => {
                                                 onChange={(val) => handleChange(item.id, "end_date", val)}
                                                 placeholder="MM/YYYY"
                                                 disabled={item.is_current}
+                                                align="right"
                                             />
                                         </div>
                                         <div className="md:col-span-2 flex items-center gap-3 px-1">

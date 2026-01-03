@@ -1,6 +1,6 @@
 import React from 'react';
 import { Resume, TemplateStyle, WorkExperience, Education, SkillCategory, SkillItem, CustomSection, CustomSectionItem } from '@/types/resume';
-import { Mail, Phone, MapPin, Globe, Linkedin, Eye, EyeOff, Plus, ChevronUp, ChevronDown } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Linkedin, Eye, EyeOff, Plus, ChevronUp, ChevronDown, Trash2, GripVertical, Settings2 } from 'lucide-react';
 import { EditableField } from './EditableField';
 import { useResumeStore } from '@/store/useResumeStore';
 import { DatePicker } from './DatePicker';
@@ -9,7 +9,90 @@ export interface SectionProps {
     resume: Resume;
     style: TemplateStyle;
     isEditable?: boolean;
+    renderOnly?: 'header' | 'items';
+    limitToId?: string;
 }
+
+// ----------------------------------------------------------------------
+// Unified Action Toolbar
+// ----------------------------------------------------------------------
+export const SectionActionToolbar = ({
+    onAdd,
+    onToggleVisibility,
+    isVisible,
+    onDelete,
+    onMoveUp,
+    onMoveDown,
+    isFirst,
+    isLast,
+    className = ""
+}: {
+    onAdd?: () => void;
+    onToggleVisibility?: () => void;
+    isVisible?: boolean;
+    onDelete?: () => void;
+    onMoveUp?: () => void;
+    onMoveDown?: () => void;
+    isFirst?: boolean;
+    isLast?: boolean;
+    className?: string;
+}) => {
+    return (
+        <div className={`flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-100 shadow-xl shadow-gray-200/50 rounded-full px-2 py-1 absolute z-30 transition-all duration-200 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 ${className}`}>
+            {onMoveUp && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
+                    disabled={isFirst}
+                    className="p-1.5 hover:bg-gray-50 rounded-full text-gray-400 hover:text-gray-900 disabled:opacity-20 transition-colors"
+                    title="Move Up"
+                >
+                    <ChevronUp size={14} />
+                </button>
+            )}
+            {onMoveDown && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
+                    disabled={isLast}
+                    className="p-1.5 hover:bg-gray-50 rounded-full text-gray-400 hover:text-gray-900 disabled:opacity-20 transition-colors"
+                    title="Move Down"
+                >
+                    <ChevronDown size={14} />
+                </button>
+            )}
+            {(onMoveUp || onMoveDown) && <div className="w-px h-4 bg-gray-100 mx-0.5" />}
+
+            {onAdd && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onAdd(); }}
+                    className="p-1.5 hover:bg-blue-50 rounded-full text-blue-500 hover:text-blue-600 transition-colors"
+                    title="Add Item"
+                >
+                    <Plus size={16} />
+                </button>
+            )}
+
+            {onToggleVisibility && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onToggleVisibility(); }}
+                    className="p-1.5 hover:bg-gray-50 rounded-full text-gray-400 hover:text-gray-900 transition-colors"
+                    title={isVisible ? "Hide" : "Show"}
+                >
+                    {isVisible ? <Eye size={14} /> : <EyeOff size={14} />}
+                </button>
+            )}
+
+            {onDelete && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                    className="p-1.5 hover:bg-red-50 rounded-full text-red-400 hover:text-red-500 transition-colors"
+                    title="Delete"
+                >
+                    <Trash2 size={14} />
+                </button>
+            )}
+        </div>
+    );
+};
 
 export const PersonalInfoSection: React.FC<SectionProps> = ({ resume, style, isEditable = false }) => {
     const { personal_info } = resume;
@@ -51,7 +134,7 @@ export const PersonalInfoSection: React.FC<SectionProps> = ({ resume, style, isE
     };
 
     return (
-        <div className={`mb-8 ${isCentered ? 'text-center' : ''}`}>
+        <div className={`${isCentered ? 'text-center' : ''}`}>
             <h1 style={{
                 color: style.primary_color,
                 fontSize: `${2.5 * style.heading_scale}rem`,
@@ -109,7 +192,7 @@ export const PersonalInfoSection: React.FC<SectionProps> = ({ resume, style, isE
     );
 };
 
-export const ExperienceSection: React.FC<SectionProps> = ({ resume, style, isEditable = false }) => {
+export const ExperienceSection: React.FC<SectionProps> = ({ resume, style, isEditable = false, renderOnly, limitToId }) => {
     const { work_experiences } = resume;
     const { updateExperience, removeExperience, addExperience, updateSectionOrder, reorderItems, updateSectionSettings } = useResumeStore();
 
@@ -148,188 +231,184 @@ export const ExperienceSection: React.FC<SectionProps> = ({ resume, style, isEdi
     const sectionTitle = sectionSettings.title || "Experience";
 
     return (
-        <div className={`mb-6 ${!isVisible ? 'opacity-50 grayscale' : ''}`}>
-            <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
-                <h2 style={{
-                    color: style.primary_color,
-                    fontSize: `${1.25 * style.heading_scale}rem`,
-                }} className="font-bold uppercase tracking-wider flex items-center gap-2">
-                    <EditableField
-                        value={sectionTitle}
-                        onChange={(val) => updateSectionSettings('work_experiences', { title: val })}
-                        placeholder="Experience"
-                        isEditable={isEditable}
-                    />
-                    {!isVisible && <span className="text-xs font-normal normal-case text-gray-400">(Hidden)</span>}
-                </h2>
-                {isEditable && (
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={toggleVisibility}
-                            className="p-1 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
-                            title={isVisible ? "Hide Section" : "Show Section"}
-                        >
-                            {isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
-                        </button>
-                        <button
-                            onClick={handleAdd}
-                            className="p-1 hover:bg-gray-100 rounded-full text-blue-600 transition-colors"
-                            title="Add Experience"
-                        >
-                            <Plus size={20} />
-                        </button>
-                    </div>
-                )}
-            </div>
-            <div className="flex flex-col gap-6">
-                {work_experiences.sort((a, b) => (a.order || 0) - (b.order || 0)).map((exp, index) => (
-                    <div key={exp.id} className="group relative">
-                        {isEditable && (
-                            <div className="absolute -left-8 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                    onClick={() => {
-                                        const newIds = work_experiences.map(e => e.id);
-                                        if (index > 0) {
-                                            [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
-                                            reorderItems('work_experiences', newIds);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === 0}
-                                >
-                                    <ChevronUp size={14} />
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const newIds = work_experiences.map(e => e.id);
-                                        if (index < work_experiences.length - 1) {
-                                            [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
-                                            reorderItems('work_experiences', newIds);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === work_experiences.length - 1}
-                                >
-                                    <ChevronDown size={14} />
-                                </button>
-                            </div>
-                        )}
-                        {isEditable && (
-                            <button
-                                onClick={() => removeExperience(exp.id)}
-                                className="absolute -right-2 -top-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity shadow-lg hover:bg-red-600 z-10"
-                                title="Delete"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
-                        )}
-                        <div className="flex justify-between items-baseline mb-1">
-                            <h3 className="text-lg font-bold text-gray-800">
-                                <EditableField
-                                    value={exp.position_title}
-                                    onChange={(val) => updateExperience(exp.id, { position_title: val })}
-                                    placeholder="Position Title"
-                                    isEditable={isEditable}
-                                />
-                            </h3>
-                            {(!sectionSettings.items?.[exp.id]?.hide_date || isEditable) && (
-                                <div className="flex items-center gap-1">
-                                    <span className={`text-sm text-gray-500 flex items-center gap-1 ${sectionSettings.items?.[exp.id]?.hide_date ? 'opacity-40' : ''}`}>
-                                        <DatePicker
-                                            value={exp.start_date}
-                                            onChange={(val) => updateExperience(exp.id, { start_date: val })}
+        <div className={`group relative transition-all duration-300 ${(!isVisible && !renderOnly) ? 'opacity-40 grayscale' : ''} ${!renderOnly ? 'mb-6' : ''}`}>
+            {isEditable && !renderOnly && (
+                <SectionActionToolbar
+                    onToggleVisibility={toggleVisibility}
+                    isVisible={isVisible}
+                    className="-top-10 left-1/2 -translate-x-1/2"
+                />
+            )}
+
+            {(!renderOnly || renderOnly === 'header') && (
+                <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
+                    <h2 style={{
+                        color: style.primary_color,
+                        fontSize: `${1.25 * style.heading_scale}rem`,
+                    }} className="font-bold uppercase tracking-wider flex items-center gap-2">
+                        <EditableField
+                            value={sectionTitle}
+                            onChange={(val) => updateSectionSettings('work_experiences', { title: val })}
+                            placeholder="Experience"
+                            isEditable={isEditable}
+                        />
+                        {!isVisible && <span className="text-xs font-normal normal-case text-gray-400 italic">(Temporarily Hidden)</span>}
+                    </h2>
+                </div>
+            )}
+
+            {(!renderOnly || renderOnly === 'items') && (
+                <div className="flex flex-col gap-4">
+                    {work_experiences.sort((a, b) => (a.order || 0) - (b.order || 0))
+                        .filter(exp => !limitToId || exp.id === limitToId)
+                        .map((exp, index) => (
+                            <div key={exp.id} className={`group/item relative`}>
+                                {isEditable && !limitToId && (
+                                    <SectionActionToolbar
+                                        onMoveUp={() => {
+                                            const newIds = work_experiences.map(e => e.id);
+                                            if (index > 0) {
+                                                [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
+                                                reorderItems('work_experiences', newIds);
+                                            }
+                                        }}
+                                        onMoveDown={() => {
+                                            const newIds = work_experiences.map(e => e.id);
+                                            if (index < work_experiences.length - 1) {
+                                                [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
+                                                reorderItems('work_experiences', newIds);
+                                            }
+                                        }}
+                                        isFirst={index === 0}
+                                        isLast={index === work_experiences.length - 1}
+                                        className="-top-10 left-1/2 -translate-x-1/2"
+                                    />
+                                )}
+                                <div className="mb-2">
+                                    <h3 className="text-lg font-bold text-gray-800 leading-tight">
+                                        <EditableField
+                                            value={exp.position_title}
+                                            onChange={(val) => updateExperience(exp.id, { position_title: val })}
+                                            placeholder="Position Title"
                                             isEditable={isEditable}
                                         />
-                                        <span className="mx-0.5">—</span>
-                                        <DatePicker
-                                            value={exp.end_date}
-                                            onChange={(val) => updateExperience(exp.id, { end_date: val })}
-                                            isCurrent={exp.is_current}
-                                            onCurrentChange={(val) => updateExperience(exp.id, { is_current: val })}
-                                            isEditable={isEditable}
-                                            placeholder="Present"
-                                        />
-                                    </span>
-                                    {isEditable && (
-                                        <button
-                                            onClick={() => updateSectionSettings('work_experiences', {
-                                                items: {
-                                                    ...sectionSettings.items,
-                                                    [exp.id]: { ...sectionSettings.items?.[exp.id], hide_date: !sectionSettings.items?.[exp.id]?.hide_date }
-                                                }
-                                            })}
-                                            className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
-                                        >
-                                            {sectionSettings.items?.[exp.id]?.hide_date ? <EyeOff size={10} /> : <Eye size={10} />}
-                                        </button>
+                                    </h3>
+
+                                    {(!sectionSettings.items?.[exp.id]?.hide_date || isEditable) && (
+                                        <div className="flex items-center gap-1 mt-1">
+                                            <span className={`text-sm text-gray-500 flex items-center gap-1 flex-wrap ${sectionSettings.items?.[exp.id]?.hide_date ? 'opacity-40' : ''}`}>
+                                                <DatePicker
+                                                    value={exp.start_date}
+                                                    onChange={(val) => updateExperience(exp.id, { start_date: val })}
+                                                    isEditable={isEditable}
+                                                />
+                                                <span className="mx-0.5">—</span>
+                                                <DatePicker
+                                                    value={exp.end_date}
+                                                    onChange={(val) => updateExperience(exp.id, { end_date: val })}
+                                                    isCurrent={exp.is_current}
+                                                    onCurrentChange={(val) => updateExperience(exp.id, { is_current: val })}
+                                                    isEditable={isEditable}
+                                                    placeholder="Present"
+                                                    align="left"
+                                                />
+                                            </span>
+                                            {isEditable && (
+                                                <button
+                                                    onClick={() => updateSectionSettings('work_experiences', {
+                                                        items: {
+                                                            ...sectionSettings.items,
+                                                            [exp.id]: { ...sectionSettings.items?.[exp.id], hide_date: !sectionSettings.items?.[exp.id]?.hide_date }
+                                                        }
+                                                    })}
+                                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
+                                                >
+                                                    {sectionSettings.items?.[exp.id]?.hide_date ? <EyeOff size={10} /> : <Eye size={10} />}
+                                                </button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                            )}
-                        </div>
-                        <div style={{ color: style.accent_color }} className="font-medium mb-2 flex gap-1 items-center">
-                            <EditableField
-                                value={exp.company_name}
-                                onChange={(val) => updateExperience(exp.id, { company_name: val })}
-                                placeholder="Company Name"
-                                isEditable={isEditable}
-                            />
-                            {(!sectionSettings.fields?.location || isEditable) && (
-                                <div className="flex items-center gap-1">
-                                    <span className="mx-1">|</span>
+                                <div style={{ color: style.accent_color }} className="font-medium mb-2 flex gap-1 items-center">
                                     <EditableField
-                                        value={exp.city}
-                                        onChange={(val) => updateExperience(exp.id, { city: val })}
-                                        placeholder="City"
+                                        value={exp.company_name}
+                                        onChange={(val) => updateExperience(exp.id, { company_name: val })}
+                                        placeholder="Company Name"
                                         isEditable={isEditable}
-                                        className={!sectionSettings.fields?.location ? 'opacity-40' : ''}
                                     />
-                                    {isEditable && (
-                                        <button
-                                            onClick={() => updateSectionSettings('work_experiences', {
-                                                fields: { ...sectionSettings.fields, location: !sectionSettings.fields?.location }
-                                            })}
-                                            className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
-                                        >
-                                            {sectionSettings.fields?.location !== false ? <Eye size={10} /> : <EyeOff size={10} />}
-                                        </button>
+                                    {(sectionSettings.items?.[exp.id]?.fields?.location !== false || isEditable) && (
+                                        <div className="flex items-center gap-1">
+                                            <span className="mx-1">|</span>
+                                            <EditableField
+                                                value={exp.city}
+                                                onChange={(val) => updateExperience(exp.id, { city: val })}
+                                                placeholder="City"
+                                                isEditable={isEditable}
+                                                className={sectionSettings.items?.[exp.id]?.fields?.location === false ? 'opacity-40' : ''}
+                                            />
+                                            {isEditable && (
+                                                <button
+                                                    onClick={() => updateSectionSettings('work_experiences', {
+                                                        items: {
+                                                            ...sectionSettings.items,
+                                                            [exp.id]: {
+                                                                ...sectionSettings.items?.[exp.id],
+                                                                fields: {
+                                                                    ...sectionSettings.items?.[exp.id]?.fields,
+                                                                    location: sectionSettings.items?.[exp.id]?.fields?.location === false
+                                                                }
+                                                            }
+                                                        }
+                                                    })}
+                                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
+                                                >
+                                                    {sectionSettings.items?.[exp.id]?.fields?.location !== false ? <Eye size={10} /> : <EyeOff size={10} />}
+                                                </button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                            )}
-                        </div>
-                        {(!sectionSettings.fields?.description || isEditable) && (
-                            <div className="relative group/desc">
-                                <p style={{ lineHeight: style.line_height }} className={`text-gray-600 whitespace-pre-line ${!sectionSettings.fields?.description ? 'opacity-40' : ''}`}>
-                                    <EditableField
-                                        value={exp.description}
-                                        onChange={(val) => updateExperience(exp.id, { description: val })}
-                                        placeholder="Job Description..."
-                                        multiline
-                                        isEditable={isEditable}
-                                    />
-                                </p>
-                                {isEditable && (
-                                    <button
-                                        onClick={() => updateSectionSettings('work_experiences', {
-                                            fields: { ...sectionSettings.fields, description: !sectionSettings.fields?.description }
-                                        })}
-                                        className="absolute -right-6 top-0 p-0.5 hover:bg-gray-100 rounded text-gray-400 opacity-0 group-hover/desc:opacity-100 transition-opacity"
-                                    >
-                                        {sectionSettings.fields?.description !== false ? <Eye size={10} /> : <EyeOff size={10} />}
-                                    </button>
+                                {(sectionSettings.items?.[exp.id]?.fields?.description !== false || isEditable) && (
+                                    <div className="relative group/desc">
+                                        <p style={{ lineHeight: style.line_height }} className={`text-gray-600 whitespace-pre-line ${sectionSettings.items?.[exp.id]?.fields?.description === false ? 'opacity-40' : ''}`}>
+                                            <EditableField
+                                                value={exp.description}
+                                                onChange={(val) => updateExperience(exp.id, { description: val })}
+                                                placeholder="Job Description..."
+                                                multiline
+                                                isEditable={isEditable}
+                                            />
+                                        </p>
+                                        {isEditable && (
+                                            <button
+                                                onClick={() => updateSectionSettings('work_experiences', {
+                                                    items: {
+                                                        ...sectionSettings.items,
+                                                        [exp.id]: {
+                                                            ...sectionSettings.items?.[exp.id],
+                                                            fields: {
+                                                                ...sectionSettings.items?.[exp.id]?.fields,
+                                                                description: sectionSettings.items?.[exp.id]?.fields?.description === false
+                                                            }
+                                                        }
+                                                    }
+                                                })}
+                                                className="absolute -right-6 top-0 p-0.5 hover:bg-gray-100 rounded text-gray-400 opacity-0 group-hover/desc:opacity-100 transition-opacity"
+                                            >
+                                                {sectionSettings.items?.[exp.id]?.fields?.description !== false ? <Eye size={10} /> : <EyeOff size={10} />}
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
                             </div>
-                        )}
-                    </div>
-                ))}
-            </div>
+                        ))}
+                </div>
+            )}
         </div>
     );
 };
 
-export const EducationSection: React.FC<SectionProps> = ({ resume, style, isEditable = false }) => {
+export const EducationSection: React.FC<SectionProps> = ({ resume, style, isEditable = false, renderOnly, limitToId }) => {
     const { educations } = resume;
     const { updateEducation, removeEducation, addEducation, updateSectionOrder, reorderItems, updateSectionSettings } = useResumeStore();
 
@@ -368,132 +447,119 @@ export const EducationSection: React.FC<SectionProps> = ({ resume, style, isEdit
     const sectionTitle = sectionSettings.title || "Education";
 
     return (
-        <div className={`mb-6 ${!isVisible ? 'opacity-50 grayscale' : ''}`}>
-            <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
-                <h2 style={{
-                    color: style.primary_color,
-                    fontSize: `${1.25 * style.heading_scale}rem`,
-                }} className="font-bold uppercase tracking-wider flex items-center gap-2">
-                    <EditableField
-                        value={sectionTitle}
-                        onChange={(val) => updateSectionSettings('educations', { title: val })}
-                        placeholder="Education"
-                        isEditable={isEditable}
-                    />
-                    {!isVisible && <span className="text-xs font-normal normal-case text-gray-400">(Hidden)</span>}
-                </h2>
-                {isEditable && (
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={toggleVisibility}
-                            className="p-1 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
-                            title={isVisible ? "Hide Section" : "Show Section"}
-                        >
-                            {isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
-                        </button>
-                        <button
-                            onClick={handleAdd}
-                            className="p-1 hover:bg-gray-100 rounded-full text-blue-600 transition-colors"
-                            title="Add Education"
-                        >
-                            <Plus size={20} />
-                        </button>
-                    </div>
-                )}
-            </div>
-            <div className="flex flex-col gap-4">
-                {educations?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((edu, index) => (
-                    <div key={edu.id} className="group relative">
-                        {isEditable && (
-                            <div className="absolute -left-8 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                    onClick={() => {
-                                        const newIds = educations.map(e => e.id);
-                                        if (index > 0) {
-                                            [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
-                                            reorderItems('educations', newIds);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === 0}
-                                >
-                                    <ChevronUp size={14} />
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const newIds = educations.map(e => e.id);
-                                        if (index < educations.length - 1) {
-                                            [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
-                                            reorderItems('educations', newIds);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === educations.length - 1}
-                                >
-                                    <ChevronDown size={14} />
-                                </button>
+        <div className={`group relative transition-all duration-300 ${(!isVisible && !renderOnly) ? 'opacity-40 grayscale' : ''} ${!renderOnly ? 'mb-6' : ''}`}>
+            {isEditable && !renderOnly && (
+                <SectionActionToolbar
+                    onToggleVisibility={toggleVisibility}
+                    isVisible={isVisible}
+                    className="-top-10 left-1/2 -translate-x-1/2"
+                />
+            )}
+
+            {(!renderOnly || renderOnly === 'header') && (
+                <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
+                    <h2 style={{
+                        color: style.primary_color,
+                        fontSize: `${1.25 * style.heading_scale}rem`,
+                    }} className="font-bold uppercase tracking-wider flex items-center gap-2">
+                        <EditableField
+                            value={sectionTitle}
+                            onChange={(val) => updateSectionSettings('educations', { title: val })}
+                            placeholder="Education"
+                            isEditable={isEditable}
+                        />
+                        {!isVisible && <span className="text-xs font-normal normal-case text-gray-400 italic">(Temporarily Hidden)</span>}
+                    </h2>
+                </div>
+            )}
+            {(!renderOnly || renderOnly === 'items') && (
+                <div className="flex flex-col gap-4">
+                    {educations.sort((a, b) => (a.order || 0) - (b.order || 0))
+                        .filter(edu => !limitToId || edu.id === limitToId)
+                        .map((edu, index) => (
+                            <div key={edu.id} className={`group/item relative`}>
+                                {isEditable && !limitToId && (
+                                    <SectionActionToolbar
+                                        onMoveUp={() => {
+                                            const newIds = educations.map(e => e.id);
+                                            if (index > 0) {
+                                                [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
+                                                reorderItems('educations', newIds);
+                                            }
+                                        }}
+                                        onMoveDown={() => {
+                                            const newIds = educations.map(e => e.id);
+                                            if (index < educations.length - 1) {
+                                                [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
+                                                reorderItems('educations', newIds);
+                                            }
+                                        }}
+                                        isFirst={index === 0}
+                                        isLast={index === educations.length - 1}
+                                        className="-top-10 left-1/2 -translate-x-1/2"
+                                    />
+                                )}
+                                <div className="font-bold text-gray-800">
+                                    <EditableField
+                                        value={edu.school_name}
+                                        onChange={(val) => updateEducation(edu.id, { school_name: val })}
+                                        placeholder="School Name"
+                                        isEditable={isEditable}
+                                    />
+                                </div>
+                                <div style={{ color: style.accent_color }} className="font-medium">
+                                    <EditableField
+                                        value={edu.degree}
+                                        onChange={(val) => updateEducation(edu.id, { degree: val })}
+                                        placeholder="Degree"
+                                        isEditable={isEditable}
+                                    />
+                                </div>
+                                <div className="text-gray-500 italic">
+                                    <EditableField
+                                        value={edu.field_of_study}
+                                        onChange={(val) => updateEducation(edu.id, { field_of_study: val })}
+                                        placeholder="Field of Study"
+                                        isEditable={isEditable}
+                                    />
+                                </div>
+                                <span className="text-sm text-gray-500 flex items-center gap-1">
+                                    <DatePicker
+                                        value={edu.start_date}
+                                        onChange={(val) => updateEducation(edu.id, { start_date: val })}
+                                        isEditable={isEditable}
+                                    />
+                                    <span className="mx-0.5">—</span>
+                                    <DatePicker
+                                        value={edu.end_date}
+                                        onChange={(val) => updateEducation(edu.id, { end_date: val })}
+                                        isCurrent={edu.is_current}
+                                        onCurrentChange={(val) => updateEducation(edu.id, { is_current: val })}
+                                        isEditable={isEditable}
+                                        placeholder="Present"
+                                        align="right"
+                                    />
+                                </span>
+                                {(isEditable || edu.description) && (sectionSettings.items?.[edu.id]?.fields?.description !== false) && (
+                                    <div className="mt-2 text-sm text-gray-600 whitespace-pre-line">
+                                        <EditableField
+                                            value={edu.description || ""}
+                                            onChange={(val) => updateEducation(edu.id, { description: val })}
+                                            placeholder="Description/Notable Achievements..."
+                                            multiline
+                                            isEditable={isEditable}
+                                        />
+                                    </div>
+                                )}
                             </div>
-                        )}
-                        {isEditable && (
-                            <button
-                                onClick={() => removeEducation(edu.id)}
-                                className="absolute -right-2 -top-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600 z-10"
-                                title="Delete"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
-                        )}
-                        <div className="font-bold text-gray-800">
-                            <EditableField
-                                value={edu.school_name}
-                                onChange={(val) => updateEducation(edu.id, { school_name: val })}
-                                placeholder="School Name"
-                                isEditable={isEditable}
-                            />
-                        </div>
-                        <div style={{ color: style.accent_color }} className="font-medium">
-                            <EditableField
-                                value={edu.degree}
-                                onChange={(val) => updateEducation(edu.id, { degree: val })}
-                                placeholder="Degree"
-                                isEditable={isEditable}
-                            />
-                        </div>
-                        <div className="text-gray-500 italic">
-                            <EditableField
-                                value={edu.field_of_study}
-                                onChange={(val) => updateEducation(edu.id, { field_of_study: val })}
-                                placeholder="Field of Study"
-                                isEditable={isEditable}
-                            />
-                        </div>
-                        <span className="text-sm text-gray-500 flex items-center gap-1">
-                            <DatePicker
-                                value={edu.start_date}
-                                onChange={(val) => updateEducation(edu.id, { start_date: val })}
-                                isEditable={isEditable}
-                            />
-                            <span className="mx-0.5">—</span>
-                            <DatePicker
-                                value={edu.end_date}
-                                onChange={(val) => updateEducation(edu.id, { end_date: val })}
-                                isCurrent={edu.is_current}
-                                onCurrentChange={(val) => updateEducation(edu.id, { is_current: val })}
-                                isEditable={isEditable}
-                                placeholder="Present"
-                            />
-                        </span>
-                    </div>
-                ))}
-            </div>
+                        ))}
+                </div>
+            )}
         </div>
     );
 };
 
-export const SkillsSection: React.FC<SectionProps> = ({ resume, style, isEditable = false }) => {
+export const SkillsSection: React.FC<SectionProps> = ({ resume, style, isEditable = false, renderOnly, limitToId }) => {
     const { skill_categories } = resume;
     const { updateSkillCategories, updateSectionOrder, reorderItems, updateSectionSettings } = useResumeStore();
 
@@ -557,213 +623,161 @@ export const SkillsSection: React.FC<SectionProps> = ({ resume, style, isEditabl
     const sectionTitle = sectionSettings.title || "Skills";
 
     return (
-        <div className={`mb-6 ${!isVisible ? 'opacity-50 grayscale' : ''}`}>
-            <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
-                <h2 style={{
-                    color: style.primary_color,
-                    fontSize: `${1.25 * style.heading_scale}rem`,
-                }} className="font-bold uppercase tracking-wider flex items-center gap-2">
-                    <EditableField
-                        value={sectionTitle}
-                        onChange={(val) => updateSectionSettings('skill_categories', { title: val })}
-                        placeholder="Skills"
-                        isEditable={isEditable}
-                    />
-                    {!isVisible && <span className="text-xs font-normal normal-case text-gray-400">(Hidden)</span>}
-                </h2>
-                {isEditable && (
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={toggleVisibility}
-                            className="p-1 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
-                            title={isVisible ? "Hide Section" : "Show Section"}
-                        >
-                            {isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
-                        </button>
-                        <button
-                            onClick={() => {
-                                const newCat: SkillCategory = {
-                                    id: crypto.randomUUID(),
-                                    name: "New Category",
-                                    items: [{ id: crypto.randomUUID(), name: "Skill", level: "intermediate", order: 0 }],
-                                    order: skill_categories.length
-                                };
-                                updateSkillCategories([...skill_categories, newCat]);
-                            }}
-                            className="p-1 hover:bg-gray-100 rounded-full text-blue-600 transition-colors"
-                            title="Add Skill Category"
-                        >
-                            <Plus size={20} />
-                        </button>
-                    </div>
-                )}
-            </div>
-            <div className="flex flex-col gap-6">
-                {skill_categories?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((cat, index) => (
-                    <div key={cat.id} className="group relative">
-                        {isEditable && (
-                            <div className="absolute -left-8 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                    onClick={() => {
-                                        const newIds = skill_categories.map(e => e.id);
-                                        if (index > 0) {
-                                            [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
-                                            reorderItems('skill_categories', newIds);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === 0}
-                                >
-                                    <ChevronUp size={14} />
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const newIds = skill_categories.map(e => e.id);
-                                        if (index < skill_categories.length - 1) {
-                                            [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
-                                            reorderItems('skill_categories', newIds);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === skill_categories.length - 1}
-                                >
-                                    <ChevronDown size={14} />
-                                </button>
-                            </div>
-                        )}
-                        {isEditable && (
-                            <button
-                                onClick={() => handleDeleteCategory(cat.id)}
-                                className="absolute -right-2 -top-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600 z-10"
-                                title="Delete Category"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
-                        )}
-                        <div className="flex justify-between items-center mb-3">
-                            <div className="font-semibold text-gray-700 text-xs uppercase tracking-wider">
-                                <EditableField
-                                    value={cat.name}
-                                    onChange={(val) => handleUpdateCategoryName(cat.id, val)}
-                                    placeholder="Category Name"
-                                    isEditable={isEditable}
-                                />
-                            </div>
-                            {isEditable && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        const updated = skill_categories.map(c => {
-                                            if (c.id === cat.id) {
-                                                const newItem: SkillItem = { id: crypto.randomUUID(), name: "New Skill", level: "intermediate", order: c.items.length };
-                                                return { ...c, items: [...c.items, newItem] };
-                                            }
-                                            return c;
-                                        });
-                                        updateSkillCategories(updated);
-                                    }}
-                                    className="p-1.5 hover:bg-blue-50 rounded-full text-blue-600 transition-colors border border-transparent hover:border-blue-200"
-                                    title="Add Skill"
-                                >
-                                    <Plus size={16} />
-                                </button>
-                            )}
-                        </div>
+        <div className={`group relative transition-all duration-300 ${(!isVisible && !renderOnly) ? 'opacity-40 grayscale' : ''} ${!renderOnly ? 'mb-6' : ''}`}>
+            {isEditable && !renderOnly && (
+                <SectionActionToolbar
+                    onToggleVisibility={toggleVisibility}
+                    isVisible={isVisible}
+                    className="-top-10 left-1/2 -translate-x-1/2"
+                />
+            )}
 
-                        {displayMode === 'bars' ? (
-                            <div className="grid grid-cols-1 gap-x-8 gap-y-4">
-                                {cat.items.map((item) => (
-                                    <div key={item.id} className="group/skill relative">
-                                        <div className="flex justify-between mb-1 text-xs font-medium text-gray-700">
-                                            <EditableField
-                                                value={item.name}
-                                                onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
-                                                placeholder="Skill"
-                                                isEditable={isEditable}
-                                            />
-                                            <span className="text-gray-400 capitalize">{item.level}</span>
-                                        </div>
-                                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                                            <div
-                                                className="h-1.5 rounded-full transition-all duration-500"
-                                                style={{
-                                                    backgroundColor: style.accent_color,
-                                                    width: item.level === 'expert' ? '100%' :
-                                                        item.level === 'professional' ? '75%' :
-                                                            item.level === 'intermediate' ? '50%' : '25%'
-                                                }}
-                                            />
-                                        </div>
-                                        {isEditable && (
-                                            <button
-                                                onClick={() => handleDeleteSkill(cat.id, item.id)}
-                                                className="absolute -right-6 top-0 p-1 text-red-400 opacity-0 group-hover/skill:opacity-100 transition-opacity"
-                                            >
-                                                <Plus size={14} className="rotate-45" />
-                                            </button>
-                                        )}
+            {(!renderOnly || renderOnly === 'header') && (
+                <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
+                    <h2 style={{
+                        color: style.primary_color,
+                        fontSize: `${1.25 * style.heading_scale}rem`,
+                    }} className="font-bold uppercase tracking-wider flex items-center gap-2">
+                        <EditableField
+                            value={sectionTitle}
+                            onChange={(val) => updateSectionSettings('skill_categories', { title: val })}
+                            placeholder="Skills"
+                            isEditable={isEditable}
+                        />
+                        {!isVisible && <span className="text-xs font-normal normal-case text-gray-400 italic">(Temporarily Hidden)</span>}
+                    </h2>
+                </div>
+            )}
+            {(!renderOnly || renderOnly === 'items') && (
+                <div className="flex flex-col gap-6">
+                    {skill_categories?.sort((a, b) => (a.order || 0) - (b.order || 0))
+                        .filter(cat => !limitToId || cat.id === limitToId)
+                        .map((cat, catIdx) => (
+                            <div key={cat.id} className="group/item relative">
+                                {isEditable && !limitToId && (
+                                    <SectionActionToolbar
+                                        onMoveUp={() => {
+                                            const newIds = (skill_categories || []).map(e => e.id);
+                                            if (catIdx > 0) {
+                                                [newIds[catIdx - 1], newIds[catIdx]] = [newIds[catIdx], newIds[catIdx - 1]];
+                                                reorderItems('skill_categories', newIds);
+                                            }
+                                        }}
+                                        onMoveDown={() => {
+                                            const newIds = (skill_categories || []).map(e => e.id);
+                                            if (catIdx < (skill_categories || []).length - 1) {
+                                                [newIds[catIdx + 1], newIds[catIdx]] = [newIds[catIdx], newIds[catIdx + 1]];
+                                                reorderItems('skill_categories', newIds);
+                                            }
+                                        }}
+                                        isFirst={catIdx === 0}
+                                        isLast={catIdx === (skill_categories || []).length - 1}
+                                        className="-top-10 left-1/2 -translate-x-1/2"
+                                    />
+                                )}
+                                <div className="flex justify-between items-center mb-3">
+                                    <div className="font-semibold text-gray-700 text-xs uppercase tracking-wider">
+                                        <EditableField
+                                            value={cat.name}
+                                            onChange={(val) => handleUpdateCategoryName(cat.id, val)}
+                                            placeholder="Category Name"
+                                            isEditable={isEditable}
+                                        />
                                     </div>
-                                ))}
-                            </div>
-                        ) : displayMode === 'list' ? (
-                            <ul className="list-disc list-inside space-y-1">
-                                {cat.items.map((item) => (
-                                    <li key={item.id} className="group/skill relative text-sm text-gray-700">
-                                        <EditableField
-                                            value={item.name}
-                                            onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
-                                            placeholder="Skill"
-                                            isEditable={isEditable}
-                                        />
-                                        {isEditable && (
-                                            <button
-                                                onClick={() => handleDeleteSkill(cat.id, item.id)}
-                                                className="ml-2 text-red-400 opacity-0 group-hover/skill:opacity-100 transition-opacity"
+                                </div>
+
+                                {displayMode === 'bars' ? (
+                                    <div className="grid grid-cols-1 gap-x-8 gap-y-4">
+                                        {cat.items.map((item) => (
+                                            <div key={item.id} className="group/skill relative">
+                                                <div className="flex justify-between mb-1 text-xs font-medium text-gray-700">
+                                                    <EditableField
+                                                        value={item.name}
+                                                        onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
+                                                        placeholder="Skill"
+                                                        isEditable={isEditable}
+                                                    />
+                                                    <span className="text-gray-400 capitalize">{item.level}</span>
+                                                </div>
+                                                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                                    <div
+                                                        className="h-1.5 rounded-full transition-all duration-500"
+                                                        style={{
+                                                            backgroundColor: style.accent_color,
+                                                            width: item.level === 'expert' ? '100%' :
+                                                                item.level === 'professional' ? '75%' :
+                                                                    item.level === 'intermediate' ? '50%' : '25%'
+                                                        }}
+                                                    />
+                                                </div>
+                                                {isEditable && (
+                                                    <button
+                                                        onClick={() => handleDeleteSkill(cat.id, item.id)}
+                                                        className="absolute -right-6 top-0 p-1 text-red-400 opacity-0 group-hover/skill:opacity-100 transition-opacity"
+                                                    >
+                                                        <Plus size={14} className="rotate-45" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : displayMode === 'list' ? (
+                                    <ul className="list-disc list-inside space-y-1">
+                                        {cat.items.map((item) => (
+                                            <li key={item.id} className="group/skill relative text-sm text-gray-700">
+                                                <EditableField
+                                                    value={item.name}
+                                                    onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
+                                                    placeholder="Skill"
+                                                    isEditable={isEditable}
+                                                />
+                                                {isEditable && (
+                                                    <button
+                                                        onClick={() => handleDeleteSkill(cat.id, item.id)}
+                                                        className="ml-2 text-red-400 opacity-0 group-hover/skill:opacity-100 transition-opacity"
+                                                    >
+                                                        <Plus size={12} className="rotate-45" />
+                                                    </button>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="flex flex-wrap gap-3">
+                                        {cat.items.map((item) => (
+                                            <span
+                                                key={item.id}
+                                                className="group/skill relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
                                             >
-                                                <Plus size={12} className="rotate-45" />
-                                            </button>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <div className="flex flex-wrap gap-3">
-                                {cat.items.map((item) => (
-                                    <span
-                                        key={item.id}
-                                        className="group/skill relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
-                                    >
-                                        <EditableField
-                                            value={item.name}
-                                            onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
-                                            placeholder="Skill"
-                                            isEditable={isEditable}
-                                        />
-                                        {isEditable && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteSkill(cat.id, item.id);
-                                                }}
-                                                className="absolute -right-2 -top-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover/skill:opacity-100 transition-all shadow-sm hover:bg-red-600 z-10"
-                                                title="Delete Skill"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                </svg>
-                                            </button>
-                                        )}
-                                    </span>
-                                ))}
+                                                <EditableField
+                                                    value={item.name}
+                                                    onChange={(val) => handleUpdateSkillName(cat.id, item.id, val)}
+                                                    placeholder="Skill"
+                                                    isEditable={isEditable}
+                                                />
+                                                {isEditable && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteSkill(cat.id, item.id);
+                                                        }}
+                                                        className="absolute -right-2 -top-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover/skill:opacity-100 transition-all shadow-sm hover:bg-red-600 z-10"
+                                                        title="Delete Skill"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                        </svg>
+                                                    </button>
+                                                )}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                ))}
-            </div>
+                        ))}
+                </div>
+            )}
         </div>
     );
 };
@@ -802,7 +816,15 @@ export const StrengthsSection: React.FC<SectionProps> = ({ resume, style, isEdit
     const sectionTitle = sectionSettings.title || "Strengths";
 
     return (
-        <div className={`mb-6 ${!isVisible ? 'opacity-50 grayscale' : ''}`}>
+        <div className={`group relative mb-6 transition-all duration-300 ${!isVisible ? 'opacity-40 grayscale' : ''}`}>
+            {isEditable && (
+                <SectionActionToolbar
+                    onToggleVisibility={toggleVisibility}
+                    isVisible={isVisible}
+                    className="-top-10 left-1/2 -translate-x-1/2"
+                />
+            )}
+
             <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
                 <h2 style={{
                     color: style.primary_color,
@@ -814,65 +836,35 @@ export const StrengthsSection: React.FC<SectionProps> = ({ resume, style, isEdit
                         placeholder="Strengths"
                         isEditable={isEditable}
                     />
-                    {!isVisible && <span className="text-xs font-normal normal-case text-gray-400">(Hidden)</span>}
+                    {!isVisible && <span className="text-xs font-normal normal-case text-gray-400 italic">(Temporarily Hidden)</span>}
                 </h2>
-                {isEditable && (
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={toggleVisibility}
-                            className="p-1 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
-                            title={isVisible ? "Hide Section" : "Show Section"}
-                        >
-                            {isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
-                        </button>
-                        <button
-                            onClick={() => {
-                                const newItem = { id: crypto.randomUUID(), label: "New Strength", order: strengths.length };
-                                updateStrengths([...strengths, newItem]);
-                            }}
-                            className="p-1 hover:bg-gray-100 rounded-full text-blue-600 transition-colors"
-                            title="Add Strength"
-                        >
-                            <Plus size={20} />
-                        </button>
-                    </div>
-                )}
             </div>
             <div className="flex flex-wrap gap-3">
                 {strengths?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((item, index) => (
                     <span
                         key={item.id}
-                        className="group relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
+                        className="group/item relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
                     >
                         {isEditable && (
-                            <div className="absolute -left-4 -top-6 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-sm border rounded p-0.5 z-20">
-                                <button
-                                    onClick={() => {
-                                        const newIds = strengths.map(e => e.id);
-                                        if (index > 0) {
-                                            [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
-                                            reorderItems('strengths', newIds);
-                                        }
-                                    }}
-                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === 0}
-                                >
-                                    <ChevronUp size={10} />
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const newIds = strengths.map(e => e.id);
-                                        if (index < strengths.length - 1) {
-                                            [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
-                                            reorderItems('strengths', newIds);
-                                        }
-                                    }}
-                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === strengths.length - 1}
-                                >
-                                    <ChevronDown size={10} />
-                                </button>
-                            </div>
+                            <SectionActionToolbar
+                                onMoveUp={() => {
+                                    const newIds = strengths.map(e => e.id);
+                                    if (index > 0) {
+                                        [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
+                                        reorderItems('strengths', newIds);
+                                    }
+                                }}
+                                onMoveDown={() => {
+                                    const newIds = strengths.map(e => e.id);
+                                    if (index < strengths.length - 1) {
+                                        [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
+                                        reorderItems('strengths', newIds);
+                                    }
+                                }}
+                                isFirst={index === 0}
+                                isLast={index === strengths.length - 1}
+                                className="-top-10 left-1/2 -translate-x-1/2"
+                            />
                         )}
                         <EditableField
                             value={item.label}
@@ -880,21 +872,6 @@ export const StrengthsSection: React.FC<SectionProps> = ({ resume, style, isEdit
                             placeholder="Strength"
                             isEditable={isEditable}
                         />
-                        {isEditable && (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(item.id);
-                                }}
-                                className="absolute -right-2 -top-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-sm hover:bg-red-600 z-10"
-                                title="Delete"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        )}
                     </span>
                 ))}
             </div>
@@ -936,7 +913,15 @@ export const HobbiesSection: React.FC<SectionProps> = ({ resume, style, isEditab
     const sectionTitle = sectionSettings.title || "Hobbies";
 
     return (
-        <div className={`mb-6 ${!isVisible ? 'opacity-50 grayscale' : ''}`}>
+        <div className={`group relative mb-6 transition-all duration-300 ${!isVisible ? 'opacity-40 grayscale' : ''}`}>
+            {isEditable && (
+                <SectionActionToolbar
+                    onToggleVisibility={toggleVisibility}
+                    isVisible={isVisible}
+                    className="-top-10 left-1/2 -translate-x-1/2"
+                />
+            )}
+
             <div className="flex justify-between items-center border-b-2 pb-2 mb-4" style={{ borderColor: style.accent_color }}>
                 <h2 style={{
                     color: style.primary_color,
@@ -948,65 +933,35 @@ export const HobbiesSection: React.FC<SectionProps> = ({ resume, style, isEditab
                         placeholder="Hobbies"
                         isEditable={isEditable}
                     />
-                    {!isVisible && <span className="text-xs font-normal normal-case text-gray-400">(Hidden)</span>}
+                    {!isVisible && <span className="text-xs font-normal normal-case text-gray-400 italic">(Temporarily Hidden)</span>}
                 </h2>
-                {isEditable && (
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={toggleVisibility}
-                            className="p-1 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
-                            title={isVisible ? "Hide Section" : "Show Section"}
-                        >
-                            {isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
-                        </button>
-                        <button
-                            onClick={() => {
-                                const newItem = { id: crypto.randomUUID(), label: "New Hobby", order: hobbies.length };
-                                updateHobbies([...hobbies, newItem]);
-                            }}
-                            className="p-1 hover:bg-gray-100 rounded-full text-blue-600 transition-colors"
-                            title="Add Hobby"
-                        >
-                            <Plus size={20} />
-                        </button>
-                    </div>
-                )}
             </div>
             <div className="flex flex-wrap gap-3">
                 {hobbies?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((item, index) => (
                     <span
                         key={item.id}
-                        className="group relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
+                        className="group/item relative px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700 font-medium hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all"
                     >
                         {isEditable && (
-                            <div className="absolute -left-4 -top-6 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-sm border rounded p-0.5 z-20">
-                                <button
-                                    onClick={() => {
-                                        const newIds = hobbies.map(e => e.id);
-                                        if (index > 0) {
-                                            [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
-                                            reorderItems('hobbies', newIds);
-                                        }
-                                    }}
-                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === 0}
-                                >
-                                    <ChevronUp size={10} />
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const newIds = hobbies.map(e => e.id);
-                                        if (index < hobbies.length - 1) {
-                                            [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
-                                            reorderItems('hobbies', newIds);
-                                        }
-                                    }}
-                                    className="p-0.5 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={index === hobbies.length - 1}
-                                >
-                                    <ChevronDown size={10} />
-                                </button>
-                            </div>
+                            <SectionActionToolbar
+                                onMoveUp={() => {
+                                    const newIds = hobbies.map(e => e.id);
+                                    if (index > 0) {
+                                        [newIds[index - 1], newIds[index]] = [newIds[index], newIds[index - 1]];
+                                        reorderItems('hobbies', newIds);
+                                    }
+                                }}
+                                onMoveDown={() => {
+                                    const newIds = hobbies.map(e => e.id);
+                                    if (index < hobbies.length - 1) {
+                                        [newIds[index + 1], newIds[index]] = [newIds[index], newIds[index + 1]];
+                                        reorderItems('hobbies', newIds);
+                                    }
+                                }}
+                                isFirst={index === 0}
+                                isLast={index === hobbies.length - 1}
+                                className="-top-10 left-1/2 -translate-x-1/2"
+                            />
                         )}
                         <EditableField
                             value={item.label}
@@ -1014,21 +969,6 @@ export const HobbiesSection: React.FC<SectionProps> = ({ resume, style, isEditab
                             placeholder="Hobby"
                             isEditable={isEditable}
                         />
-                        {isEditable && (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(item.id);
-                                }}
-                                className="absolute -right-2 -top-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-sm hover:bg-red-600 z-10"
-                                title="Delete"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        )}
                     </span>
                 ))}
             </div>
@@ -1076,80 +1016,50 @@ export const CustomSectionRenderer: React.FC<SectionProps> = ({ resume, style, i
     };
 
     return (
-        <div className={`flex flex-col gap-8 ${!isVisible ? 'opacity-50 grayscale' : ''}`}>
+        <div className={`group relative flex flex-col gap-8 transition-all duration-300 ${!isVisible ? 'opacity-40 grayscale' : ''}`}>
             {isEditable && (
-                <div className="flex justify-end mb-2">
-                    <button
-                        onClick={toggleVisibility}
-                        className="p-1 hover:bg-gray-100 rounded-full text-gray-500 transition-colors flex items-center gap-1 text-xs"
-                        title={isVisible ? "Hide Custom Sections" : "Show Custom Sections"}
-                    >
-                        {isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-                        {isVisible ? "Visible" : "Hidden"}
-                    </button>
-                </div>
+                <SectionActionToolbar
+                    onToggleVisibility={toggleVisibility}
+                    isVisible={isVisible}
+                    className="-top-10 left-1/2 -translate-x-1/2"
+                />
             )}
             {custom_sections?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((section, sIdx) => {
                 const sectionSettings = resume.section_settings?.[section.id] || { order: 0, visible: true };
                 const sectionTitle = sectionSettings.title || section.title;
 
                 return (
-                    <div key={section.id} className="mb-2 group relative">
+                    <div key={section.id} className="group/item relative">
                         {isEditable && (
-                            <div className="absolute -left-8 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                    onClick={() => {
-                                        const newIds = custom_sections.map(e => e.id);
-                                        if (sIdx > 0) {
-                                            [newIds[sIdx - 1], newIds[sIdx]] = [newIds[sIdx], newIds[sIdx - 1]];
-                                            // Custom sections need special reordering logic if they are in an array
-                                            const updated = [...custom_sections].sort((a, b) => {
-                                                const idxA = newIds.indexOf(a.id);
-                                                const idxB = newIds.indexOf(b.id);
-                                                return idxA - idxB;
-                                            }).map((s, i) => ({ ...s, order: i }));
-                                            updateCustomSections(updated);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={sIdx === 0}
-                                >
-                                    <ChevronUp size={14} />
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const newIds = custom_sections.map(e => e.id);
-                                        if (sIdx < custom_sections.length - 1) {
-                                            [newIds[sIdx + 1], newIds[sIdx]] = [newIds[sIdx], newIds[sIdx + 1]];
-                                            const updated = [...custom_sections].sort((a, b) => {
-                                                const idxA = newIds.indexOf(a.id);
-                                                const idxB = newIds.indexOf(b.id);
-                                                return idxA - idxB;
-                                            }).map((s, i) => ({ ...s, order: i }));
-                                            updateCustomSections(updated);
-                                        }
-                                    }}
-                                    className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                    disabled={sIdx === custom_sections.length - 1}
-                                >
-                                    <ChevronDown size={14} />
-                                </button>
-                            </div>
-                        )}
-                        {isEditable && (
-                            <button
-                                onClick={() => {
-                                    const updated = custom_sections.filter(s => s.id !== section.id);
-                                    updateCustomSections(updated);
+                            <SectionActionToolbar
+                                onMoveUp={() => {
+                                    const newIds = custom_sections.map(e => e.id);
+                                    if (sIdx > 0) {
+                                        [newIds[sIdx - 1], newIds[sIdx]] = [newIds[sIdx], newIds[sIdx - 1]];
+                                        const updated = [...custom_sections].sort((a, b) => {
+                                            const idxA = newIds.indexOf(a.id);
+                                            const idxB = newIds.indexOf(b.id);
+                                            return idxA - idxB;
+                                        }).map((s, i) => ({ ...s, order: i }));
+                                        updateCustomSections(updated);
+                                    }
                                 }}
-                                className="absolute -right-2 -top-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600 z-10"
-                                title="Delete Section"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
+                                onMoveDown={() => {
+                                    const newIds = custom_sections.map(e => e.id);
+                                    if (sIdx < custom_sections.length - 1) {
+                                        [newIds[sIdx + 1], newIds[sIdx]] = [newIds[sIdx], newIds[sIdx + 1]];
+                                        const updated = [...custom_sections].sort((a, b) => {
+                                            const idxA = newIds.indexOf(a.id);
+                                            const idxB = newIds.indexOf(b.id);
+                                            return idxA - idxB;
+                                        }).map((s, i) => ({ ...s, order: i }));
+                                        updateCustomSections(updated);
+                                    }
+                                }}
+                                isFirst={sIdx === 0}
+                                isLast={sIdx === custom_sections.length - 1}
+                                className="-right-12 top-0 flex-col"
+                            />
                         )}
                         <h2 style={{
                             color: style.primary_color,
@@ -1167,43 +1077,34 @@ export const CustomSectionRenderer: React.FC<SectionProps> = ({ resume, style, i
                             {section.items.sort((a, b) => (a.order || 0) - (b.order || 0)).map((item, iIdx) => (
                                 <div key={item.id} className="group/item relative">
                                     {isEditable && (
-                                        <div className="absolute -left-8 top-0 flex flex-col gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                            <button
-                                                onClick={() => {
-                                                    const newItems = [...section.items];
-                                                    if (iIdx > 0) {
-                                                        [newItems[iIdx - 1], newItems[iIdx]] = [newItems[iIdx], newItems[iIdx - 1]];
-                                                        const updatedItems = newItems.map((it, idx) => ({ ...it, order: idx }));
-                                                        const newSections = [...custom_sections];
-                                                        newSections[sIdx] = { ...section, items: updatedItems };
-                                                        updateCustomSections(newSections);
-                                                    }
-                                                }}
-                                                className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                                disabled={iIdx === 0}
-                                            >
-                                                <ChevronUp size={12} />
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    const newItems = [...section.items];
-                                                    if (iIdx < section.items.length - 1) {
-                                                        [newItems[iIdx + 1], newItems[iIdx]] = [newItems[iIdx], newItems[iIdx + 1]];
-                                                        const updatedItems = newItems.map((it, idx) => ({ ...it, order: idx }));
-                                                        const newSections = [...custom_sections];
-                                                        newSections[sIdx] = { ...section, items: updatedItems };
-                                                        updateCustomSections(newSections);
-                                                    }
-                                                }}
-                                                className="p-1 hover:bg-gray-100 rounded text-gray-400"
-                                                disabled={iIdx === section.items.length - 1}
-                                            >
-                                                <ChevronDown size={12} />
-                                            </button>
-                                        </div>
+                                        <SectionActionToolbar
+                                            onMoveUp={() => {
+                                                const newItems = [...section.items];
+                                                if (iIdx > 0) {
+                                                    [newItems[iIdx - 1], newItems[iIdx]] = [newItems[iIdx], newItems[iIdx - 1]];
+                                                    const updatedItems = newItems.map((it, idx) => ({ ...it, order: idx }));
+                                                    const newSections = [...custom_sections];
+                                                    newSections[sIdx] = { ...section, items: updatedItems };
+                                                    updateCustomSections(newSections);
+                                                }
+                                            }}
+                                            onMoveDown={() => {
+                                                const newItems = [...section.items];
+                                                if (iIdx < section.items.length - 1) {
+                                                    [newItems[iIdx + 1], newItems[iIdx]] = [newItems[iIdx], newItems[iIdx + 1]];
+                                                    const updatedItems = newItems.map((it, idx) => ({ ...it, order: idx }));
+                                                    const newSections = [...custom_sections];
+                                                    newSections[sIdx] = { ...section, items: updatedItems };
+                                                    updateCustomSections(newSections);
+                                                }
+                                            }}
+                                            isFirst={iIdx === 0}
+                                            isLast={iIdx === section.items.length - 1}
+                                            className="-left-12 top-0 flex-col"
+                                        />
                                     )}
-                                    <div className="flex justify-between items-baseline mb-1">
-                                        <h3 className="text-lg font-bold text-gray-800">
+                                    <div className="mb-2">
+                                        <h3 className="text-lg font-bold text-gray-800 leading-tight">
                                             <EditableField
                                                 value={item.title}
                                                 onChange={(val) => {
@@ -1217,7 +1118,7 @@ export const CustomSectionRenderer: React.FC<SectionProps> = ({ resume, style, i
                                                 isEditable={isEditable}
                                             />
                                         </h3>
-                                        <span className="text-sm text-gray-500">
+                                        <div className="text-sm text-gray-500 mt-1">
                                             <EditableField
                                                 value={item.meta}
                                                 onChange={(val) => {
@@ -1230,7 +1131,7 @@ export const CustomSectionRenderer: React.FC<SectionProps> = ({ resume, style, i
                                                 placeholder="Date/Location"
                                                 isEditable={isEditable}
                                             />
-                                        </span>
+                                        </div>
                                     </div>
                                     <div style={{ color: style.accent_color }} className="font-medium mb-2">
                                         <EditableField
@@ -1263,43 +1164,10 @@ export const CustomSectionRenderer: React.FC<SectionProps> = ({ resume, style, i
                                     </p>
                                 </div>
                             ))}
-                            {isEditable && (
-                                <button
-                                    onClick={() => {
-                                        const newSections = [...custom_sections];
-                                        const newItem: CustomSectionItem = {
-                                            id: crypto.randomUUID(),
-                                            title: "New Item",
-                                            subtitle: "Subtitle",
-                                            meta: "2024",
-                                            description: "Click to edit description",
-                                            start_date: "",
-                                            end_date: "",
-                                            is_current: false,
-                                            order: section.items.length,
-                                        };
-                                        newSections[sIdx] = { ...section, items: [...section.items, newItem] };
-                                        updateCustomSections(newSections);
-                                    }}
-                                    className="mt-4 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2"
-                                >
-                                    <Plus size={16} />
-                                    Add Item
-                                </button>
-                            )}
                         </div>
                     </div>
                 );
             })}
-            {isEditable && (
-                <button
-                    onClick={handleAddSection}
-                    className="mt-4 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
-                >
-                    <Plus size={16} />
-                    Add New Section
-                </button>
-            )}
         </div>
     );
 };

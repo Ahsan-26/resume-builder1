@@ -181,7 +181,10 @@ export interface Resume {
         area?: 'header' | 'left' | 'right' | 'full'; // Client-side only, not persisted
         title?: string; // Client-side only
         fields?: Record<string, boolean>; // Client-side only
-        items?: Record<string, { hide_date?: boolean }>; // Client-side only
+        items?: Record<string, {
+            hide_date?: boolean;
+            fields?: Record<string, boolean>; // Item-specific field visibility
+        }>; // Client-side only
     }>;
     personal_info: PersonalInfo;
     work_experiences: WorkExperience[];

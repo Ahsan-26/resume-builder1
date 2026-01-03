@@ -12,7 +12,7 @@ interface CustomSectionFormProps {
 }
 
 export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections = [] }) => {
-    const { updateCustomSections, resume } = useResumeStore();
+    const { updateCustomSections, reorderItems, resume } = useResumeStore();
     const [expandedSectionId, setExpandedSectionId] = React.useState<string | null>(sections[0]?.id || null);
     const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null);
     const accentColor = resume?.template?.definition?.style?.accent_color || "#2563EB";
@@ -133,7 +133,39 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                     <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-blue-600 rounded-full" />
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const newSections = [...sections];
+                                        const idx = sections.indexOf(section);
+                                        if (idx > 0) {
+                                            [newSections[idx - 1], newSections[idx]] = [newSections[idx], newSections[idx - 1]];
+                                            updateCustomSections(newSections.map((s, i) => ({ ...s, order: i })));
+                                        }
+                                    }}
+                                    disabled={sections.indexOf(section) === 0}
+                                    className="p-2 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-lg transition-all"
+                                    title="Move Up"
+                                >
+                                    <ChevronUp size={18} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const newSections = [...sections];
+                                        const idx = sections.indexOf(section);
+                                        if (idx < sections.length - 1) {
+                                            [newSections[idx + 1], newSections[idx]] = [newSections[idx], newSections[idx + 1]];
+                                            updateCustomSections(newSections.map((s, i) => ({ ...s, order: i })));
+                                        }
+                                    }}
+                                    disabled={sections.indexOf(section) === sections.length - 1}
+                                    className="p-2 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-lg transition-all"
+                                    title="Move Down"
+                                >
+                                    <ChevronDown size={18} />
+                                </button>
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -169,7 +201,41 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                                         <div className={`w-2 h-2 rounded-full ${expandedItemId === item.id ? 'bg-blue-600' : 'bg-gray-300'}`} />
                                                         <span className="text-xs font-bold text-gray-700">{item.title || "New Item"}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const idx = section.items.indexOf(item);
+                                                                if (idx > 0) {
+                                                                    const newItems = [...section.items];
+                                                                    [newItems[idx - 1], newItems[idx]] = [newItems[idx], newItems[idx - 1]];
+                                                                    const updatedSections = sections.map(s => s.id === section.id ? { ...s, items: newItems.map((it, i) => ({ ...it, order: i })) } : s);
+                                                                    updateCustomSections(updatedSections);
+                                                                }
+                                                            }}
+                                                            disabled={section.items.indexOf(item) === 0}
+                                                            className="p-1.5 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-md transition-all"
+                                                            title="Move Up"
+                                                        >
+                                                            <ChevronUp size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const idx = section.items.indexOf(item);
+                                                                if (idx < section.items.length - 1) {
+                                                                    const newItems = [...section.items];
+                                                                    [newItems[idx + 1], newItems[idx]] = [newItems[idx], newItems[idx + 1]];
+                                                                    const updatedSections = sections.map(s => s.id === section.id ? { ...s, items: newItems.map((it, i) => ({ ...it, order: i })) } : s);
+                                                                    updateCustomSections(updatedSections);
+                                                                }
+                                                            }}
+                                                            disabled={section.items.indexOf(item) === section.items.length - 1}
+                                                            className="p-1.5 text-gray-300 hover:text-blue-600 disabled:opacity-30 rounded-md transition-all"
+                                                            title="Move Down"
+                                                        >
+                                                            <ChevronDown size={14} />
+                                                        </button>
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -222,6 +288,7 @@ export const CustomSectionForm: React.FC<CustomSectionFormProps> = ({ sections =
                                                                 onChange={(val) => handleUpdateItem(section.id, item.id, "end_date", val)}
                                                                 placeholder="MM/YYYY"
                                                                 disabled={item.is_current}
+                                                                align="right"
                                                             />
                                                         </div>
                                                         <div className="md:col-span-2 flex items-center gap-3 px-1">

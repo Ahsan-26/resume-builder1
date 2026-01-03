@@ -9,8 +9,9 @@ export async function fetchTemplates(type?: string): Promise<Template[]> {
     return res.json();
 }
 
-export async function fetchTemplate(id: string): Promise<Template> {
-    const res = await apiFetch(`/templates/${id}/`);
+export async function fetchTemplate(id: string, type?: string): Promise<Template> {
+    const url = type === 'cover_letter' ? `/cover-letters/templates/${id}/` : `/templates/${id}/`;
+    const res = await apiFetch(url);
     if (!res.ok) throw new Error("Failed to fetch template");
     return res.json();
 }

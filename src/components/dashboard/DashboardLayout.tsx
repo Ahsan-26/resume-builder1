@@ -9,16 +9,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const pathname = usePathname();
 
-    // Hide sidebar on resume editor page
-    const isResumeEditor = pathname?.includes('/resumes/') && pathname?.includes('/edit');
+    // Hide sidebar on editor pages
+    const isEditor = (pathname?.includes('/resumes/') || pathname?.includes('/cover-letters/')) && pathname?.includes('/edit');
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            {!isResumeEditor && <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />}
+            {!isEditor && <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />}
 
-            <div className={`${!isResumeEditor ? 'lg:pl-64' : ''} flex flex-col min-h-screen transition-all duration-300`}>
+            <div className={`${!isEditor ? 'lg:pl-64' : ''} flex flex-col min-h-screen transition-all duration-300`}>
                 {/* Mobile Header - Only show when not in editor */}
-                {!isResumeEditor && (
+                {!isEditor && (
                     <header className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
                         <button
                             onClick={() => setIsSidebarOpen(true)}
@@ -31,8 +31,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </header>
                 )}
 
-                <main className={`flex-1 ${!isResumeEditor ? 'p-4 lg:p-8' : ''}`}>
-                    {!isResumeEditor ? (
+                <main className={`flex-1 ${!isEditor ? 'p-4 lg:p-8' : ''}`}>
+                    {!isEditor ? (
                         <div className="max-w-7xl mx-auto">
                             {children}
                         </div>

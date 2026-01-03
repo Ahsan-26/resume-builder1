@@ -14,8 +14,21 @@ import Link from "next/link";
 export default function ResumeEditPage() {
     const params = useParams();
     const id = params.id as string;
-    const { fetchResume, isSaving, isAutosaving, lastSaved, resume, saveResume, autosaveResume, updateTitle, isPreviewMode, setIsPreviewMode, downloadResume } = useResumeStore();
-    const [activeSection, setActiveSection] = useState<SectionType>("personal");
+    const {
+        fetchResume,
+        isSaving,
+        isAutosaving,
+        lastSaved,
+        resume,
+        saveResume,
+        autosaveResume,
+        updateTitle,
+        isPreviewMode,
+        setIsPreviewMode,
+        downloadResume,
+        activeSection,
+        setActiveSection
+    } = useResumeStore();
     const [isRearrangeOpen, setIsRearrangeOpen] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -117,7 +130,7 @@ export default function ResumeEditPage() {
                     shrink-0 border-r border-gray-200 bg-white flex flex-col transition-all duration-300
                 `}>
                     <BuilderSidebar
-                        activeSection={activeSection}
+                        activeSection={activeSection as SectionType}
                         onSectionChange={(s) => {
                             setActiveSection(s);
                             if (isSmall) setIsSidebarCollapsed(true);
@@ -144,7 +157,7 @@ export default function ResumeEditPage() {
                     ${isDesktop ? "w-[360px] md:w-[400px] shrink-0" : ""}
                 `}>
                     <div className="flex-1 overflow-y-auto border-r border-gray-200 bg-white">
-                        <BuilderForm activeSection={activeSection} />
+                        <BuilderForm activeSection={activeSection as SectionType} />
                     </div>
                 </div>
 

@@ -43,17 +43,30 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({ isEditab
     }, []);
 
     // Template Fetching Logic
-    const [templateDefinition, setTemplateDefinition] = useState<any>(null); // Replace any with TemplateDefinition
+    const [templateDefinition, setTemplateDefinition] = useState<any>(null);
+    const [linkedResume, setLinkedResume] = useState<any>(null);
 
     useEffect(() => {
         if (currentCoverLetter?.template_id) {
             import('@/lib/api/templates').then(({ fetchTemplate }) => {
-                fetchTemplate(currentCoverLetter.template_id)
+                fetchTemplate(currentCoverLetter.template_id!, 'cover_letter')
                     .then(template => setTemplateDefinition(template.definition))
                     .catch(err => console.error("Failed to load template", err));
             });
         }
     }, [currentCoverLetter?.template_id]);
+
+    useEffect(() => {
+        if (currentCoverLetter?.linked_resume) {
+            import('@/lib/api/resumes').then(({ fetchResume }) => {
+                fetchResume(currentCoverLetter.linked_resume!)
+                    .then(resume => setLinkedResume(resume))
+                    .catch(err => console.error("Failed to load linked resume", err));
+            });
+        } else {
+            setLinkedResume(null);
+        }
+    }, [currentCoverLetter?.linked_resume]);
 
     const effectiveScale = userScale !== null ? userScale : scale;
 
@@ -79,6 +92,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({ isEditab
                 <CoverLetterRenderer
                     coverLetter={currentCoverLetter}
                     templateDefinition={templateDefinition}
+                    linkedResume={linkedResume}
                     isEditable={isEditable}
                 />
             </div>
