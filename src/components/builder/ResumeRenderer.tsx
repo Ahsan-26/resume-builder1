@@ -188,46 +188,61 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
     // Helpers to get all keys
     const getAllSectionKeys = () => {
         const allKeys: string[] = [];
-        const SPLIT_SECTIONS = ['work_experiences', 'educations', 'skill_categories'];
 
-        // 1. Prepare combined list of sections for sorting
-        const standardSections = Object.entries(templateDefinition.sections)
-            .filter(([key]) => key !== 'custom_sections');
+        // 1. Prepare list of sections to process
+        const sectionsToProcess: { key: string; config: any; order: number; isVisible: boolean }[] = [];
 
-        const customSectionsAsEntries = (resume.custom_sections || []).map(section => {
-            const config = (templateDefinition.sections as any)['custom_sections'] || { order: 99, area: 'full', visible: true };
-            return [`custom.${section.id}`, config] as [string, any];
+        Object.entries(templateDefinition.sections).forEach(([tempKey, config]) => {
+            if (tempKey === 'custom_sections') {
+                // Expand the 'custom_sections' template block into individual custom sections
+                (resume.custom_sections || []).forEach((section) => {
+                    const settings = resume.section_settings?.[section.id];
+                    sectionsToProcess.push({
+                        key: `custom.${section.id}`,
+                        config: config,
+                        // Use set order, fallback to section's own order, then template's custom_sections order
+                        order: settings?.order ?? section.order ?? config.order ?? 99,
+                        isVisible: isEditable || (settings?.visible ?? true)
+                    });
+                });
+            } else {
+                const settings = resume.section_settings?.[tempKey];
+                sectionsToProcess.push({
+                    key: tempKey,
+                    config,
+                    order: settings?.order ?? config.order ?? 0,
+                    isVisible: isEditable || (settings?.visible ?? config.visible ?? true)
+                });
+            }
         });
 
-        const combinedSections = [...standardSections, ...customSectionsAsEntries]
-            .sort(([keyA, configA], [keyB, configB]) => {
-                const idA = keyA.startsWith('custom.') ? keyA.split('.')[1] : keyA;
-                const idB = keyB.startsWith('custom.') ? keyB.split('.')[1] : keyB;
-                const orderA = resume.section_settings?.[idA]?.order ?? configA.order ?? 99;
-                const orderB = resume.section_settings?.[idB]?.order ?? configB.order ?? 99;
-                return orderA - orderB;
-            });
+        // 2. Sort all sections (interleaved standard and custom)
+        sectionsToProcess.sort((a, b) => a.order - b.order);
 
-        // 2. Generate granular keys in sorted order
-        combinedSections.forEach(([key, config]) => {
-            const id = key.startsWith('custom.') ? key.split('.')[1] : key;
-            const settings = resume.section_settings?.[id];
-            const isVisible = isEditable || (settings?.visible ?? config.visible ?? true);
+        // 3. Generate granular keys for sorted sections
+        sectionsToProcess.forEach(({ key, isVisible }) => {
+            if (!isVisible) return;
 
-            if (isVisible) {
-                if (key.startsWith('custom.')) {
-                    const section = resume.custom_sections?.find(s => s.id === id);
-                    if (section) {
-                        allKeys.push(`${key}:header`);
-                        (section.items || []).forEach(item => {
-                            allKeys.push(`${key}:items:${item.id}`);
-                        });
-                    }
-                } else if (SPLIT_SECTIONS.includes(key)) {
+            if (key.startsWith('custom.')) {
+                const sectionId = key.split('.')[1];
+                const section = (resume.custom_sections || []).find(s => s.id === sectionId);
+                if (section) {
                     allKeys.push(`${key}:header`);
-                    const items = (resume as any)[key] || [];
-                    items.forEach((item: any) => {
+                    (section.items || []).forEach(item => {
                         allKeys.push(`${key}:items:${item.id}`);
+                    });
+                }
+            } else {
+                // Determine if this section should be split into items
+                // This is dynamic: if the resume property is an array, we split it.
+                // We exclude 'strengths' and 'hobbies' if we want them rendered as tags (though they are arrays)
+                const TAG_SECTIONS = ['strengths', 'hobbies'];
+                const items = (resume as any)[key];
+
+                if (Array.isArray(items) && !TAG_SECTIONS.includes(key)) {
+                    allKeys.push(`${key}:header`);
+                    items.forEach((item: any) => {
+                        if (item.id) allKeys.push(`${key}:items:${item.id}`);
                     });
                 } else {
                     allKeys.push(key);
@@ -251,8 +266,8 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
             const heights: Record<string, number> = {};
             allKeys.forEach(key => {
                 const el = measureRef.current?.querySelector(`[data-measure-key="${key}"]`);
-                if (el) {
-                    heights[key] = el.getBoundingClientRect().height;
+                if (el instanceof HTMLElement) {
+                    heights[key] = el.offsetHeight;
                 }
             });
 
@@ -309,7 +324,8 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({ resume, template
                         settings = resume.section_settings?.[sectionId];
                     }
 
-                    const area = settings?.area ?? config?.area ?? 'full';
+                    const section = baseKey.startsWith('custom.') ? resume.custom_sections?.find(s => s.id === baseKey.split('.')[1]) : null;
+                    const area = settings?.area ?? section?.area ?? config?.area ?? 'full';
 
                     let width = '100%';
                     if (templateDefinition.layout.type === 'two_column') {

@@ -55,7 +55,7 @@ function cleanSectionSettings(settings: Record<string, any> | undefined) {
     if (!settings) return settings;
 
     const cleaned: Record<string, any> = {};
-    const validKeys = ['order', 'visible', 'area', 'items'];
+    const validKeys = ['order', 'visible', 'area'];
 
     Object.keys(settings).forEach(key => {
         const section = settings[key];

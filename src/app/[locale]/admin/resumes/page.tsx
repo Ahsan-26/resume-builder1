@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, ExternalLink, MoreVertical, CheckCircle2, XCircle } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/apiClient";
 import toast from "react-hot-toast";
+import AdminCard from "@/components/admin/shared/AdminCard";
+import AdminButton from "@/components/admin/shared/AdminButton";
+import AdminLoadingSpinner from "@/components/admin/shared/AdminLoadingSpinner";
 
 export default function ResumeTemplatesPage() {
     const [templates, setTemplates] = useState<any[]>([]);
@@ -46,6 +49,20 @@ export default function ResumeTemplatesPage() {
         }
     };
 
+    const handleToggleActive = async (id: string) => {
+        try {
+            const res = await apiFetch(`/admin/templates/${id}/toggle_active/`, { method: "POST" });
+            if (res.ok) {
+                toast.success("Template status updated");
+                fetchTemplates();
+            } else {
+                toast.error("Failed to update template status");
+            }
+        } catch (err) {
+            toast.error("Error updating template");
+        }
+    };
+
     const filteredTemplates = templates.filter(t =>
         t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -58,16 +75,14 @@ export default function ResumeTemplatesPage() {
                     <h1 className="text-3xl font-bold text-[#00004d]">Resume Templates</h1>
                     <p className="text-gray-500 mt-2">Manage and create resume templates for your users.</p>
                 </div>
-                <Link
-                    href="/admin/resumes/new"
-                    className="bg-[#00004d] text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-[#002366] transition-all shadow-lg shadow-blue-900/20 active:scale-95"
-                >
-                    <Plus className="w-5 h-5" />
-                    <span>Add New Template</span>
+                <Link href="/admin/resumes/new">
+                    <AdminButton variant="primary" icon={<Plus className="w-5 h-5" />}>
+                        Add New Template
+                    </AdminButton>
                 </Link>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <AdminCard>
                 <div className="flex flex-col md:flex-row gap-4 mb-8">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -79,10 +94,6 @@ export default function ResumeTemplatesPage() {
                             className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] transition-all"
                         />
                     </div>
-                    <button className="flex items-center gap-2 px-6 py-3 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
-                        <Filter className="w-5 h-5" />
-                        <span>Filter</span>
-                    </button>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -99,7 +110,9 @@ export default function ResumeTemplatesPage() {
                         <tbody className="divide-y divide-gray-50">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="py-8 text-center text-gray-500">Loading templates...</td>
+                                    <td colSpan={5}>
+                                        <AdminLoadingSpinner />
+                                    </td>
                                 </tr>
                             ) : filteredTemplates.length === 0 ? (
                                 <tr>
@@ -130,17 +143,23 @@ export default function ResumeTemplatesPage() {
                                         </span>
                                     </td>
                                     <td className="py-4">
-                                        {template.is_active ? (
-                                            <div className="flex items-center gap-1.5 text-green-600">
-                                                <CheckCircle2 className="w-4 h-4" />
-                                                <span className="text-sm font-medium">Active</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-1.5 text-gray-400">
-                                                <XCircle className="w-4 h-4" />
-                                                <span className="text-sm font-medium">Inactive</span>
-                                            </div>
-                                        )}
+                                        <button
+                                            onClick={() => handleToggleActive(template.id)}
+                                            className="flex items-center gap-1.5 hover:opacity-75 transition-opacity"
+                                            aria-label={`Toggle template ${template.is_active ? 'inactive' : 'active'}`}
+                                        >
+                                            {template.is_active ? (
+                                                <>
+                                                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                                    <span className="text-sm font-medium text-green-600">Active</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <XCircle className="w-4 h-4 text-gray-400" />
+                                                    <span className="text-sm font-medium text-gray-400">Inactive</span>
+                                                </>
+                                            )}
+                                        </button>
                                     </td>
                                     <td className="py-4">
                                         {template.is_premium ? (
@@ -158,17 +177,16 @@ export default function ResumeTemplatesPage() {
                                             <Link
                                                 href={`/admin/resumes/${template.id}/edit`}
                                                 className="p-2 text-gray-400 hover:text-[#00004d] hover:bg-blue-50 rounded-lg transition-all"
+                                                aria-label={`Edit ${template.name}`}
                                             >
                                                 <Edit2 className="w-4 h-4" />
                                             </Link>
                                             <button
                                                 onClick={() => handleDelete(template.id)}
                                                 className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                aria-label={`Delete ${template.name}`}
                                             >
                                                 <Trash2 className="w-4 h-4" />
-                                            </button>
-                                            <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all">
-                                                <MoreVertical className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>
@@ -177,7 +195,7 @@ export default function ResumeTemplatesPage() {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </AdminCard>
         </div>
     );
 }

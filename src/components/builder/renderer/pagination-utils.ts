@@ -22,8 +22,9 @@ export const calculatePages = (
         if (baseKey.startsWith('custom.')) {
             const sectionId = baseKey.split('.')[1];
             const settings = resume.section_settings?.[sectionId];
+            const section = resume.custom_sections?.find(s => s.id === sectionId);
             const config = (templateDefinition.sections as any)['custom_sections'];
-            return settings?.area ?? config?.area ?? 'full';
+            return settings?.area ?? section?.area ?? config?.area ?? 'full';
         }
         const settings = resume.section_settings?.[baseKey];
         const config = (templateDefinition.sections as any)[baseKey];

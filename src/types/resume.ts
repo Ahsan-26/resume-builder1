@@ -156,6 +156,7 @@ export interface CustomSection {
     type: string; // e.g., "achievements", "volunteering"
     title: string;
     order: number;
+    area?: 'header' | 'left' | 'right' | 'full';
     items: CustomSectionItem[];
 }
 

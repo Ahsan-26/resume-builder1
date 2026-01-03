@@ -52,36 +52,45 @@ export const RearrangeModal: React.FC<RearrangeModalProps> = ({ isOpen, onClose 
         }
     }, [resume, isOpen]);
 
+    const syncToStore = (currentSections: typeof sections) => {
+        const newSettings: Record<string, { order: number; visible: boolean; area: string }> = {};
+        currentSections.forEach(s => {
+            newSettings[s.id] = { order: s.order, visible: s.visible, area: s.area };
+        });
+        updateSectionOrder(newSettings);
+    };
+
     const handleReorder = (newOrder: typeof sections, area: string) => {
         const otherSections = sections.filter(s => s.area !== area);
         const updatedAreaSections = newOrder.map((s, index) => ({ ...s, order: index, area }));
-        setSections([...otherSections, ...updatedAreaSections].sort((a, b) => a.order - b.order));
+        const newState = [...otherSections, ...updatedAreaSections].sort((a, b) => a.order - b.order);
+        setSections(newState);
+        syncToStore(newState);
     };
 
     const toggleVisibility = (id: string) => {
-        setSections(prev => prev.map(s => s.id === id ? { ...s, visible: !s.visible } : s));
+        setSections(prev => {
+            const newState = prev.map(s => s.id === id ? { ...s, visible: !s.visible } : s);
+            syncToStore(newState);
+            return newState;
+        });
     };
 
     const moveArea = (id: string, newArea: string) => {
         setSections(prev => {
             const updated = prev.map(s => s.id === id ? { ...s, area: newArea, order: 999 } : s);
-            // Re-index orders within areas
             const areas = ['header', 'left', 'right', 'full'];
             let final: typeof sections = [];
             areas.forEach(a => {
                 const areaSections = updated.filter(s => s.area === a).sort((x, y) => x.order - y.order);
                 final = [...final, ...areaSections.map((s, i) => ({ ...s, order: i }))];
             });
+            syncToStore(final);
             return final;
         });
     };
 
     const handleSave = () => {
-        const newSettings: Record<string, { order: number; visible: boolean; area: string }> = {};
-        sections.forEach(s => {
-            newSettings[s.id] = { order: s.order, visible: s.visible, area: s.area };
-        });
-        updateSectionOrder(newSettings);
         onClose();
     };
 

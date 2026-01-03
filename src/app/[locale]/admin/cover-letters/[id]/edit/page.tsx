@@ -1,12 +1,49 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import CoverLetterForm from "@/components/admin/cover-letters/CoverLetterForm";
+import { apiFetch } from "@/lib/apiClient";
+import toast from "react-hot-toast";
+import AdminLoadingSpinner from "@/components/admin/shared/AdminLoadingSpinner";
 
-async function fetchTemplate(id: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/admin/cover-letter-templates/${id}/`);
-    if (!res.ok) throw new Error("Failed to fetch template");
-    return res.json();
-}
+export default function Page() {
+    const { id } = useParams();
+    const [template, setTemplate] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-export default async function Page({ params }: { params: { id: string } }) {
-    const initialData = await fetchTemplate(params.id);
-    return <CoverLetterForm initialData={initialData} />;
+    useEffect(() => {
+        const fetchTemplate = async () => {
+            try {
+                const res = await apiFetch(`/admin/cover-letter-templates/${id}/`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setTemplate(data);
+                } else {
+                    toast.error("Failed to load template");
+                }
+            } catch (err) {
+                toast.error("Error loading template");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (id) fetchTemplate();
+    }, [id]);
+
+    if (loading) {
+        return <AdminLoadingSpinner />;
+    }
+
+    if (!template) {
+        return (
+            <div className="text-center py-12">
+                <h2 className="text-2xl font-bold text-gray-900">Template not found</h2>
+                <p className="text-gray-500 mt-2">The template you are looking for does not exist or has been deleted.</p>
+            </div>
+        );
+    }
+
+    return <CoverLetterForm initialData={template} />;
 }

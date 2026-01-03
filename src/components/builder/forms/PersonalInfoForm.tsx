@@ -18,26 +18,6 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
     const [errors, setErrors] = React.useState<Record<string, string>>({});
     const [isGeneratingSummary, setIsGeneratingSummary] = React.useState(false);
 
-    const validateUrl = (name: string, value: string) => {
-        if (!value) {
-            setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
-            });
-            return;
-        }
-        try {
-            new URL(value);
-            setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
-            });
-        } catch (e) {
-            setErrors(prev => ({ ...prev, [name]: "Please enter a valid URL (e.g. https://example.com)" }));
-        }
-    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -217,8 +197,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
                                     name="website"
                                     value={data.website || ""}
                                     onChange={handleChange}
-                                    onBlur={(e) => validateUrl(e.target.name, e.target.value)}
-                                    className={`${inputClasses} pl-12 ${errors.website ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : ''}`}
+                                    className={`${inputClasses} pl-12`}
                                     placeholder="https://ahsan.dev"
                                 />
                             </div>
@@ -233,8 +212,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
                                     name="linkedin_url"
                                     value={data.linkedin_url || ""}
                                     onChange={handleChange}
-                                    onBlur={(e) => validateUrl(e.target.name, e.target.value)}
-                                    className={`${inputClasses} pl-12 ${errors.linkedin_url ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : ''}`}
+                                    className={`${inputClasses} pl-12`}
                                     placeholder="https://linkedin.com/in/ahsan"
                                 />
                             </div>
@@ -249,8 +227,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data = {} as
                                     name="github_url"
                                     value={data.github_url || ""}
                                     onChange={handleChange}
-                                    onBlur={(e) => validateUrl(e.target.name, e.target.value)}
-                                    className={`${inputClasses} pl-12 ${errors.github_url ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : ''}`}
+                                    className={`${inputClasses} pl-12`}
                                     placeholder="https://github.com/ahsan"
                                 />
                             </div>

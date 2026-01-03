@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 import { Save } from "lucide-react";
 
 import { apiFetch } from "@/lib/apiClient";
+import AdminCard from "@/components/admin/shared/AdminCard";
+import AdminButton from "@/components/admin/shared/AdminButton";
+import AdminFormField from "@/components/admin/shared/AdminFormField";
 import CoverLetterLayout from "./CoverLetterLayout";
 import CoverLetterStyle from "./CoverLetterStyle";
 import CoverLetterSections from "./CoverLetterSections";
@@ -20,7 +23,7 @@ export default function CoverLetterForm({ initialData }: Props) {
     const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
-        id: initialData?.id || undefined,
+        id: initialData?.id || "",
         name: initialData?.name || "",
         slug: initialData?.slug || "",
         description: initialData?.description || "",
@@ -42,16 +45,17 @@ export default function CoverLetterForm({ initialData }: Props) {
 
         try {
             const payload = { ...formData };
-            if (!initialData) delete payload.id;
 
             const url = initialData
                 ? `/admin/cover-letter-templates/${initialData.id}/`
                 : "/admin/cover-letter-templates/";
-            const method = initialData ? "PATCH" : "POST";
+            const method = initialData ? "PUT" : "POST";
 
             const res = await apiFetch(url, { method, body: JSON.stringify(payload) });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || data.detail || "Failed to save template");
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || data.detail || JSON.stringify(data) || "Failed to save template");
+            }
 
             toast.success(`Cover letter template ${initialData ? "updated" : "created"} successfully`);
             router.push("/admin/cover-letters");
@@ -63,36 +67,141 @@ export default function CoverLetterForm({ initialData }: Props) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-[#00004d]">
+                        {initialData ? "Edit Cover Letter Template" : "Create Cover Letter Template"}
+                    </h1>
+                    <p className="text-gray-500 mt-2">Configure template settings and styling options.</p>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     {/* Basic Info */}
-                    <div className="space-y-3">
-                        <input type="text" placeholder="Template Name" value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full border rounded px-3 py-2" required />
-                        <input type="text" placeholder="Slug" value={formData.slug}
-                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                            className="w-full border rounded px-3 py-2" />
-                        <textarea placeholder="Description" value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full border rounded px-3 py-2" />
-                    </div>
+                    <AdminCard>
+                        <h2 className="text-xl font-bold text-gray-900 mb-6">Basic Information</h2>
+                        <div className="space-y-4">
+                            <AdminFormField
+                                label="Template ID"
+                                required
+                                helpText={initialData ? "ID cannot be changed after creation" : "Unique identifier (e.g., standard-1)"}
+                                htmlFor="template-id"
+                            >
+                                <input
+                                    id="template-id"
+                                    type="text"
+                                    placeholder="standard-1"
+                                    value={formData.id}
+                                    onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] transition-all disabled:bg-gray-50 disabled:text-gray-500"
+                                    required
+                                    disabled={!!initialData}
+                                />
+                            </AdminFormField>
 
-                    {/* Dynamic Sections */}
+                            <AdminFormField label="Template Name" required htmlFor="template-name">
+                                <input
+                                    id="template-name"
+                                    type="text"
+                                    placeholder="Professional Cover Letter"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] transition-all"
+                                    required
+                                />
+                            </AdminFormField>
+
+                            <AdminFormField label="Slug" helpText="Auto-generated from name if left empty" htmlFor="template-slug">
+                                <input
+                                    id="template-slug"
+                                    type="text"
+                                    placeholder="professional-cover-letter"
+                                    value={formData.slug}
+                                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] transition-all"
+                                />
+                            </AdminFormField>
+
+                            <AdminFormField label="Description" htmlFor="template-description">
+                                <textarea
+                                    id="template-description"
+                                    placeholder="A professional cover letter template suitable for corporate positions..."
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] transition-all resize-none"
+                                    rows={3}
+                                />
+                            </AdminFormField>
+
+                            <AdminFormField label="Category" required htmlFor="template-category">
+                                <select
+                                    id="template-category"
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00004d]/20 focus:border-[#00004d] transition-all"
+                                >
+                                    <option value="professional">Professional</option>
+                                    <option value="creative">Creative</option>
+                                    <option value="modern">Modern</option>
+                                </select>
+                            </AdminFormField>
+
+                            <div className="flex items-center gap-6">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.is_premium}
+                                        onChange={(e) => setFormData({ ...formData, is_premium: e.target.checked })}
+                                        className="w-4 h-4 rounded border-gray-300 text-[#00004d] focus:ring-[#00004d]/20"
+                                    />
+                                    <span className="text-sm font-medium text-gray-700">Premium Template</span>
+                                </label>
+
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.is_active}
+                                        onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                                        className="w-4 h-4 rounded border-gray-300 text-[#00004d] focus:ring-[#00004d]/20"
+                                    />
+                                    <span className="text-sm font-medium text-gray-700">Active</span>
+                                </label>
+                            </div>
+                        </div>
+                    </AdminCard>
+
+                    {/* Layout, Style, Sections */}
                     <CoverLetterLayout formData={formData} setFormData={setFormData} />
                     <CoverLetterStyle formData={formData} setFormData={setFormData} />
                     <CoverLetterSections formData={formData} setFormData={setFormData} />
                 </div>
 
                 {/* Preview */}
-                <CoverLetterPreview formData={formData} />
+                <div className="lg:col-span-1">
+                    <div className="sticky top-6">
+                        <CoverLetterPreview formData={formData} />
+                    </div>
+                </div>
             </div>
 
             <div className="flex justify-end gap-3">
-                <button type="submit" disabled={loading} className="bg-[#2f6a46] text-white px-6 py-2 rounded hover:bg-[#245436] transition">
-                    <Save className="inline w-5 h-5 mr-2" /> {loading ? "Saving..." : "Save Template"}
-                </button>
+                <AdminButton
+                    type="button"
+                    variant="secondary"
+                    onClick={() => router.push("/admin/cover-letters")}
+                >
+                    Cancel
+                </AdminButton>
+                <AdminButton
+                    type="submit"
+                    variant="primary"
+                    loading={loading}
+                    icon={<Save className="w-5 h-5" />}
+                >
+                    {initialData ? "Update" : "Create"} Template
+                </AdminButton>
             </div>
         </form>
     );

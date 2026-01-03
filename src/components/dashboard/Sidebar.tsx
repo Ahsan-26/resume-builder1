@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { FileText, File, User, LogOut, X } from "lucide-react";
+import { FileText, File, User, LogOut, X, Home } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 
@@ -19,6 +19,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const router = useRouter();
 
     const menuItems = [
+        { name: t("home") || "Home", icon: Home, href: "/dashboard" },
         { name: t("resumes"), icon: FileText, href: "/dashboard/resumes" },
         { name: t("coverLetters"), icon: File, href: "/dashboard/cover-letters" },
         { name: "Resume Templates", icon: FileText, href: "/dashboard/templates?type=resume" },
@@ -42,7 +43,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             <nav className="flex-1 px-4 space-y-2 py-6">
                 {menuItems.map((item) => {
-                    const isActive = pathname === item.href;
+                    // Exact match for /dashboard, otherwise check if path starts with href
+                    const isActive = item.href === "/dashboard"
+                        ? pathname === "/dashboard" || pathname === "/dashboard/"
+                        : pathname?.startsWith(item.href);
+
                     return (
                         <Link
                             key={item.href}

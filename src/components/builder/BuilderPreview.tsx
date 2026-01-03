@@ -103,19 +103,22 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
             if (!containerRef.current || !contentRef.current) return;
 
             const containerWidth = containerRef.current.clientWidth;
-            const padding = 32; // Add some padding calculation if needed
+            const containerHeight = containerRef.current.clientHeight;
+
+            // Standard padding for comfortable viewing
+            const padding = 48;
 
             // Calculate auto-scale to fit container width
-            // We subtract a bit of padding to ensure it floats nicely
-            let newScale = (containerWidth - 32) / widthPx;
+            let newScale = (containerWidth - padding) / widthPx;
 
-            // On very large screens, don't scale up beyond 1.5 automatically
+            // Also ensure it fits roughly in height if zoom is not user-set
+            // but primarily we fit width for editing
             newScale = Math.min(newScale, 1.5);
-
-            // On very small screens, ensure we don't scale to 0
-            newScale = Math.max(newScale, 0.2);
+            newScale = Math.max(newScale, 0.1);
 
             setScale(newScale);
+
+            // Measure the unscaled height of the content to handle the transform offset
             setContentHeight(contentRef.current.offsetHeight);
         };
 
@@ -126,7 +129,7 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
         updateScale();
 
         return () => observer.disconnect();
-    }, [widthPx]); // Re-run if page dims change
+    }, [widthPx, resume?.custom_sections, resume?.work_experiences, resume?.educations]); // Re-measure on content changes too
 
     if (!resume) {
         return (
@@ -165,9 +168,9 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
     };
 
     return (
-        <div ref={containerRef} className="relative w-full h-full flex justify-center overflow-auto py-4 sm:py-8 print:p-0 print:block bg-gray-100/50">
+        <div ref={containerRef} className="relative w-full h-full flex flex-col items-center overflow-auto py-4 sm:py-8 print:p-0 print:block bg-gray-100/50 scrollbar-hide">
             {/* Zoom Controls */}
-            <div className="absolute bottom-4 right-4 flex gap-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-lg shadow-lg border border-gray-200 z-10 print:hidden transition-opacity hover:opacity-100 opacity-0 sm:opacity-100">
+            <div className="sticky top-4 mb-4 flex gap-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-lg shadow-lg border border-gray-200 z-10 print:hidden transition-opacity hover:opacity-100 opacity-60 sm:opacity-100">
                 <button
                     onClick={handleZoomOut}
                     className="p-1.5 hover:bg-gray-100 rounded-md text-gray-600 hover:text-gray-900 transition-colors"
@@ -178,10 +181,10 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
                 <div className="w-px bg-gray-200 mx-0.5"></div>
                 <button
                     onClick={handleFitToScreen}
-                    className={`p-1.5 rounded-md text-xs font-medium tabular-nums min-w-[3rem] text-center transition-colors ${userScale === null ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
-                    title="Fit to Screen"
+                    className={`p-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider min-w-[4rem] text-center transition-colors ${userScale === null ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 text-gray-600'}`}
+                    title="Fit to Width"
                 >
-                    {Math.round(effectiveScale * 100)}%
+                    {userScale === null ? 'Auto Fit' : `${Math.round(effectiveScale * 100)}%`}
                 </button>
                 <div className="w-px bg-gray-200 mx-0.5"></div>
                 <button
@@ -197,11 +200,10 @@ export const BuilderPreview: React.FC<BuilderPreviewProps> = ({ isEditable = fal
                 ref={contentRef}
                 className="origin-top transition-transform duration-200 ease-out print:shadow-none print:transform-none print:m-0"
                 style={{
-                    // width: `${widthMm}mm`, // ResumeRenderer now handles width per page
-                    // minHeight: `${heightMm}mm`,
+                    width: `${widthPx}px`,
                     transform: `scale(${effectiveScale})`,
-                    marginBottom: contentHeight ? `calc(${contentHeight}px * (${effectiveScale} - 1) + 40px)` : 0,
-                    marginLeft: userScale !== null && widthPx * effectiveScale > (containerRef.current?.clientWidth || 0) ? `${(widthPx * effectiveScale - (containerRef.current?.clientWidth || 0)) / 2}px` : 0
+                    marginBottom: `calc(${contentHeight}px * (${effectiveScale} - 1) + 40px)`,
+                    flexShrink: 0
                 }}
             >
                 <ResumeRenderer resume={previewResume} templateDefinition={localTemplateDefinition} isEditable={isEditable} />

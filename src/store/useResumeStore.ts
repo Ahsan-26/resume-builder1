@@ -128,24 +128,47 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
             if (!state.resume) return {};
             const currentSettings = state.resume.section_settings || {};
             const newSettings = { ...currentSettings };
+            const newCustomSections = [...(state.resume.custom_sections || [])];
+            let customChanged = false;
 
             Object.entries(sectionSettings).forEach(([key, value]) => {
+                // 1. Update global section settings (frontend state)
                 newSettings[key] = {
                     ...currentSettings[key],
                     order: value.order,
                     visible: value.visible,
                     area: (value.area as any) || currentSettings[key]?.area
                 };
+
+                // 2. If it's a custom section, also update its internal order AND area
+                const customIdx = newCustomSections.findIndex(s => s.id === key);
+                if (customIdx !== -1) {
+                    newCustomSections[customIdx] = {
+                        ...newCustomSections[customIdx],
+                        order: value.order,
+                        area: (value.area as any) || newCustomSections[customIdx].area
+                    };
+                    customChanged = true;
+                }
             });
 
             return {
                 resume: {
                     ...state.resume,
                     section_settings: newSettings,
+                    custom_sections: newCustomSections
                 },
             };
         });
+
+        const { resume, originalResume } = get();
         debounceSync('metadata', get().syncMetadata);
+
+        // Check if custom sections actually changed compared to original
+        const customChanged = JSON.stringify(resume?.custom_sections) !== JSON.stringify(originalResume?.custom_sections);
+        if (customChanged) {
+            debounceSync('custom_sections', get().syncCustomSections);
+        }
     },
 
     updateSectionSettings: (sectionId, settings) => {
