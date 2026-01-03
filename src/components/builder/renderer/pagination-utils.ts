@@ -60,7 +60,7 @@ export const calculatePages = (
         const sectionGroups: { baseKey: string; keys: string[]; totalH: number }[] = [];
         keys.forEach(key => {
             const baseKey = key.split(':')[0];
-            const h = sectionHeights[key] || 40;
+            const h = sectionHeights[key] || 16;
             // Add item gap (40px) if it's an item (not a header) and not the first item in the section
             const isItem = key.includes(':items:');
             const itemGap = (isItem && sectionGroups.length > 0 && sectionGroups[sectionGroups.length - 1].baseKey === baseKey && sectionGroups[sectionGroups.length - 1].keys.some(k => k.includes(':items:'))) ? 16 : 0;
@@ -80,7 +80,7 @@ export const calculatePages = (
             // If the whole section fits on the current page, add it
             if (currentH + gap + group.totalH <= contentHeightPx) {
                 group.keys.forEach((key, kIdx) => {
-                    const h = sectionHeights[key] || 40;
+                    const h = sectionHeights[key] || 16;
                     const isItem = key.includes(':items:');
                     const itemGap = (isItem && kIdx > 0 && group.keys[kIdx - 1].includes(':items:')) ? 40 : 0;
                     buckets[bucketIndex].push(key);
@@ -93,7 +93,7 @@ export const calculatePages = (
                 buckets[bucketIndex] = [];
                 currentH = 0;
                 group.keys.forEach((key, kIdx) => {
-                    const h = sectionHeights[key] || 40;
+                    const h = sectionHeights[key] || 16;
                     const isItem = key.includes(':items:');
                     const itemGap = (isItem && kIdx > 0 && group.keys[kIdx - 1].includes(':items:')) ? 40 : 0;
                     buckets[bucketIndex].push(key);
@@ -103,7 +103,7 @@ export const calculatePages = (
             // If it doesn't fit even on a new page, WE MUST SPLIT IT
             else {
                 group.keys.forEach((key, kIdx) => {
-                    const h = sectionHeights[key] || 40;
+                    const h = sectionHeights[key] || 16;
                     const isItem = key.includes(':items:');
                     const itemGap = (isItem && kIdx > 0 && group.keys[kIdx - 1].includes(':items:')) ? 40 : 0;
                     const effectiveGap = (kIdx === 0) ? gap : itemGap;
@@ -127,7 +127,7 @@ export const calculatePages = (
 
     // Calculate start heights for columns (header pushes them)
     let headerHeight = 0;
-    headerKeys.forEach(key => headerHeight += (sectionHeights[key] || 40));
+    headerKeys.forEach(key => headerHeight += (sectionHeights[key] || 16));
     if (headerKeys.length > 0) headerHeight += sectionGap;
 
     // Distribute
@@ -156,7 +156,7 @@ export const calculatePages = (
         if (!pages[pageIdx]) return 0;
         let h = 0;
         if (pageIdx === 0) {
-            pages[pageIdx].header.forEach(k => h += (sectionHeights[k] || 40));
+            pages[pageIdx].header.forEach(k => h += (sectionHeights[k] || 16));
             if (pages[pageIdx].header.length > 0) h += sectionGap;
         }
 
@@ -168,7 +168,7 @@ export const calculatePages = (
             const itemGap = (isItem && idx > 0 && pages[pageIdx].left[idx - 1].startsWith(baseKey)) ? 40 : 0;
 
             if (lastLeftBaseKey !== '' && baseKey !== lastLeftBaseKey) leftH += sectionGap;
-            leftH += (sectionHeights[k] || 40) + itemGap;
+            leftH += (sectionHeights[k] || 16) + itemGap;
             lastLeftBaseKey = baseKey;
         });
 
@@ -180,7 +180,7 @@ export const calculatePages = (
             const itemGap = (isItem && idx > 0 && pages[pageIdx].right[idx - 1].startsWith(baseKey)) ? 40 : 0;
 
             if (lastRightBaseKey !== '' && baseKey !== lastRightBaseKey) rightH += sectionGap;
-            rightH += (sectionHeights[k] || 40) + itemGap;
+            rightH += (sectionHeights[k] || 16) + itemGap;
             lastRightBaseKey = baseKey;
         });
 
@@ -195,7 +195,7 @@ export const calculatePages = (
             if (lastFullBaseKey !== '' && baseKey !== lastFullBaseKey) h += sectionGap;
             // mt-6 buffer for the first full item after columns
             if (idx === 0 && (pages[pageIdx].left.length > 0 || pages[pageIdx].right.length > 0)) h += sectionGap;
-            h += (sectionHeights[k] || 40) + itemGap;
+            h += (sectionHeights[k] || 16) + itemGap;
             lastFullBaseKey = baseKey;
         });
 
@@ -209,7 +209,7 @@ export const calculatePages = (
     const fullSectionGroups: { baseKey: string; keys: string[]; totalH: number }[] = [];
     fullKeys.forEach(key => {
         const baseKey = key.split(':')[0];
-        const h = sectionHeights[key] || 40;
+        const h = sectionHeights[key] || 16;
         const isItem = key.includes(':items:');
         const itemGap = (isItem && fullSectionGroups.length > 0 && fullSectionGroups[fullSectionGroups.length - 1].baseKey === baseKey && fullSectionGroups[fullSectionGroups.length - 1].keys.some(k => k.includes(':items:'))) ? 40 : 0;
 
@@ -235,7 +235,7 @@ export const calculatePages = (
         // Keep-together logic for full sections
         if (currentUsedHeight + gap + group.totalH <= contentHeightPx) {
             group.keys.forEach((key, kIdx) => {
-                const h = sectionHeights[key] || 40;
+                const h = sectionHeights[key] || 16;
                 const isItem = key.includes(':items:');
                 const itemGap = (isItem && kIdx > 0) ? 40 : 0;
                 const effectiveGap = (kIdx === 0) ? gap : itemGap;
@@ -248,7 +248,7 @@ export const calculatePages = (
             pages.push({ header: [], left: [], right: [], full: [] });
             lastPageIdx++;
             group.keys.forEach((key, kIdx) => {
-                const h = sectionHeights[key] || 40;
+                const h = sectionHeights[key] || 16;
                 const isItem = key.includes(':items:');
                 const itemGap = (isItem && kIdx > 0) ? 40 : 0;
                 pages[lastPageIdx].full.push(key);
@@ -260,7 +260,7 @@ export const calculatePages = (
         else {
             // Split it
             group.keys.forEach((key, kIdx) => {
-                const h = sectionHeights[key] || 40;
+                const h = sectionHeights[key] || 16;
                 const isItem = key.includes(':items:');
                 const itemGap = (isItem && kIdx > 0) ? 40 : 0;
 

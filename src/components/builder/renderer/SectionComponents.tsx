@@ -816,7 +816,7 @@ export const StrengthsSection: React.FC<SectionProps> = ({ resume, style, isEdit
     const sectionTitle = sectionSettings.title || "Strengths";
 
     return (
-        <div className={`group relative mb-6 transition-all duration-300 ${!isVisible ? 'opacity-40 grayscale' : ''}`}>
+        <div className={`group relative transition-all duration-300 ${!isVisible ? 'opacity-40 grayscale' : ''}`}>
             {isEditable && (
                 <SectionActionToolbar
                     onToggleVisibility={toggleVisibility}
@@ -913,7 +913,7 @@ export const HobbiesSection: React.FC<SectionProps> = ({ resume, style, isEditab
     const sectionTitle = sectionSettings.title || "Hobbies";
 
     return (
-        <div className={`group relative mb-6 transition-all duration-300 ${!isVisible ? 'opacity-40 grayscale' : ''}`}>
+        <div className={`group relative transition-all duration-300 ${!isVisible ? 'opacity-40 grayscale' : ''}`}>
             {isEditable && (
                 <SectionActionToolbar
                     onToggleVisibility={toggleVisibility}
